@@ -13,12 +13,14 @@ from plyplus import Grammar, STransformer
 
 class MaraTransformer(STransformer):
     """Transforms JSON AST into Python native objects."""
-    number  = lambda self, node: float(node.tail[0])
+    body    = lambda self, node: node.tail
+    number  = lambda self, node: int(node.tail[0])
     string  = lambda self, node: node.tail[0][1:-1]
     boolean = lambda self, node: True if node.tail[0] in ['true'] else False
     null    = lambda self, node: None
     array   = lambda self, node: node.tail
     pair    = lambda self, node: { node.tail[0] : node.tail[1] }
+    value   = lambda self, node: node.tail[0]
     def object(self, node):
         result = {}
         for i in node.tail:
@@ -42,7 +44,6 @@ def transform(grammar, src_str):
 ###########################################################
 
 cli.option('-g --grammar_file=<f> Grammar File.')
-
 
 @cli.cmd('load [options]')
 def load_cmd(grammar_file):

@@ -2,9 +2,9 @@
 # Grammar CLI
 ###########################################################
 
+from util import cli
+
 cli.option('-g --grammar_file=<f> Grammar File.')
-
-
 @cli.cmd('load [options]')
 def load_grammar(grammar_file):
     print grammar(grammar_file)
