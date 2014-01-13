@@ -14,6 +14,7 @@ tokens = (
     'VID', 'TID', 'SID',
 )
 
+# Wrappers
 t_LPAR = r'\('
 t_RPAR = r'\)'
 t_LBKT = r'\['
@@ -22,7 +23,6 @@ t_LBRC = r'\{'
 t_RBRC = r'\}'
 
 # Distinct symbols
-
 t_PIPE   = r'\|'
 t_AMP    = r'\&'
 t_DOLLAR = r'\$'
@@ -33,6 +33,7 @@ t_COMMA  = r'\,'
 t_DOT    = r'\.'
 t_NL     = r'\n'
 
+# Identifiers
 t_VID = r'_*[a-z][A-Za-z_0-9]*'
 t_TID = r'_*[A-Z][A-Za-z_0-9]*'
 t_SID = r'_*([~!%?<>*/+-]|\^)+|\&\&|\|\|'
