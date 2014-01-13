@@ -11,10 +11,9 @@ Mara is a new programming language designed to be fast, fun, and functional.
     - Type Inference
     - For Expressions
     - Hybrid Memory Management
-    - Tasks
-    - Coroutines
+    - Dependency Injection
 
-Okay, it's offer all of those features today, but it will as development progressses.  Some of the driving principles behind Mara are:
+Okay, it doesn't offer all of those features today, but it will as development progressses.  Some of the driving principles behind Mara are:
 
     - Pragmatism over ideaology.
     - Obey the programmer.
