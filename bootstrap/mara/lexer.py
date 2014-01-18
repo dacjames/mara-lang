@@ -12,6 +12,8 @@ tokens = (
     'PIPE', 'AMP', 'DOLLAR', 'AT', 'SLASH',
     'POUND', 'COMMA', 'DOT', 'NL',
     'VID', 'TID', 'SID',
+
+    'INTD','INTX','INTP','REAL','SCI',
 )
 
 # Wrappers
@@ -30,18 +32,46 @@ t_AT     = r'@'
 t_SLASH  = r'\\'
 t_POUND  = r'\#'
 t_COMMA  = r'\,'
-t_DOT    = r'\.'
+t_DOT    = r'[.]'
 t_NL     = r'\n'
 
+# Literals
+def t_SCI(tok):
+    r'[-+]?[0-9]+(\.|\.[0-9]+)e[-+]?[0-9]+(\.|\.[0-9]+)?'
+    return tok
+def t_REAL(tok):
+    r'[-+]?[0-9]+([.][0-9]+|[.])'
+    return tok
+def t_INTP(tok):
+    r'[-+]?[0-9]+(_[0-9]+)+'
+    return tok
+def t_INTX(tok):
+    r'[-+]?0x([0-9]|[A-F]|[a-f])+'
+    return tok
+def t_INTD(tok):
+    r'[-+]?[0-9]+'
+    return tok
+
 # Identifiers
-t_VID = r'_*[a-z][A-Za-z_0-9]*'
-t_TID = r'_*[A-Z][A-Za-z_0-9]*'
-t_SID = r'_*([~!%?<>*/+-]|\^)+|\&\&|\|\|'
+def t_VID(tok):
+    r'_*[a-z][A-Za-z_0-9]*'
+    return tok
+def t_TID(tok):
+    r'_*[A-Z][A-Za-z_0-9]*'
+    return tok
+def t_SID(tok):
+    r'_*([~!%?<>*/]|\^)+|\&\&|\|\|'
+    return tok
 
 t_ignore = ' \t\r'
+def t_error(tok):
+    return tok
 
 import ply.lex as lex
 lexer = lex.lex()
+
+# import ipdb; ipdb.set_trace()
+
 
 def lex_tokens(input):
     '''

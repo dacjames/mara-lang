@@ -46,3 +46,26 @@ def test_lex_value_identifiers():
         ('VID', 'num0'), ('NL', '\n'),
         ('VID', '____pZ0x9'),
     ]
+
+def test_lex_literal_nums():
+    given = ('1_000_000 1. 0.9 1231.0 -1 -19.0 +0 -10' +
+            ' +3.14e-10 1.2e10 7.8e+10 0xAEF -0x12Aef')
+    output = list(lex_simple(given))
+    assert output == [
+        # ('INTD', '0'),
+        ('INTP', '1_000_000'),
+        ('REAL', '1.'),
+        ('REAL', '0.9'),
+        ('REAL', '1231.0'),
+        ('INTD', '-1'),
+        ('REAL', '-19.0'),
+        ('INTD', '+0'),
+        ('INTD', '-10'),
+        ('SCI', '+3.14e-10'),
+        ('SCI', '1.2e10'),
+        ('SCI', '7.8e+10'),
+        ('INTX', '0xAEF'),
+        ('INTX', '-0x12Aef'),
+    ]
+
+
