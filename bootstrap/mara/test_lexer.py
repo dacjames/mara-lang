@@ -37,7 +37,7 @@ def test_lex_distinct_symbols():
 def test_lex_value_identifiers():
     given = '''hello _goodbye
                pizza_sauce num0
-               ____pZ0x9'''
+               ____pZ0x9 _0'''
     output = list(lex_simple(given))
     assert output == [
         ('VID', 'hello'),
@@ -45,6 +45,7 @@ def test_lex_value_identifiers():
         ('VID', 'pizza_sauce'),
         ('VID', 'num0'), ('NL', '\n'),
         ('VID', '____pZ0x9'),
+        ('VID', '_0'),
     ]
 
 def test_lex_literal_nums():

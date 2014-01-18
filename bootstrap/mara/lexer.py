@@ -54,7 +54,7 @@ def t_INTD(tok):
 
 # Identifiers
 def t_VID(tok):
-    r'_*[a-z][A-Za-z_0-9]*'
+    r'(_+[0-9]|_*[a-z])[A-Za-z_0-9]*'
     return tok
 def t_TID(tok):
     r'_*[A-Z][A-Za-z_0-9]*'
@@ -69,8 +69,6 @@ def t_error(tok):
 
 import ply.lex as lex
 lexer = lex.lex()
-
-# import ipdb; ipdb.set_trace()
 
 
 def lex_tokens(input):
