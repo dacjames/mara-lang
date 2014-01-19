@@ -56,7 +56,7 @@ def test_lex_value_identifiers():
 
 def test_lex_literal_nums():
     given = ('module 1_000_000 1. 0.9 1231.0 -1 -19.0 +0 -10' +
-            ' +3.14e-10 1.2e10 7.8e+10 0xAEF -0x12Aef end')
+            ' +3.14e-10 1.2e10 7.8e+10 1e10 0xAEF -0x12Aef end')
     output = list(lex_simple(given))
     assert output == [
         ('MODULE', 'module'),
@@ -71,6 +71,7 @@ def test_lex_literal_nums():
         ('SCI', '+3.14e-10'),
         ('SCI', '1.2e10'),
         ('SCI', '7.8e+10'),
+        ('SCI', '1e10'),
         ('INTX', '0xAEF'),
         ('INTX', '-0x12Aef'),
         ('END', 'end'),
