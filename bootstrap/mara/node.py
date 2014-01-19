@@ -78,17 +78,23 @@ class ValueId(_Value):
 class SymbolId(_Value):
     pass
 
+
 class TypeId(_Value):
     pass
 
 
-class If(Node):
-    def __init__(self, pred, body):
-        self.pred = pred
-        self.body = body
+class Block(Node):
+    def __init__(self, exprs):
+        self.exprs = exprs
 
 
 class BinOp(Node):
     def __init__(self, func, args):
         self.func = func
         self.args = args
+
+
+class If(Node):
+    def __init__(self, pred, body):
+        self.pred = pred
+        self.body = body
