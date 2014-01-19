@@ -7,8 +7,10 @@ from lexer import tokens
 import node
 import util
 
+
 class ParseError(Exception):
     pass
+
 
 def p_module(prod):
     '''module : MODULE expr END
@@ -61,7 +63,3 @@ def p_sci(p):
 parser = yacc.yacc()
 
 parser.parse('module test 10 end')
-
-
-
-

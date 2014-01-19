@@ -45,9 +45,11 @@ def transform(grammar, src_str):
 
 cli.option('-g --grammar_file=<f> Grammar File.')
 
+
 @cli.cmd('load [options]')
 def load_cmd(grammar_file):
     print grammar(grammar_file)
+
 
 @cli.cmd('parse [options] <src_file>')
 def parse_cmd(src_file, grammar_file):
@@ -65,5 +67,3 @@ def parse_cmd(src_file, grammar_file):
 
 if __name__ == '__main__':
     cli.main()
-
-

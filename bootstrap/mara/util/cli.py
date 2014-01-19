@@ -1,6 +1,7 @@
 from docopt import docopt
 import sys
 
+
 class CLI:
     commands = set()
     options = set()
@@ -29,9 +30,7 @@ class CLI:
         try:
             docopt(CLI.usage(), argv=[])
         except Exception as e:
-            pass #print("{0}".format(e))
-            # print CLI.usage()
-            # raise e
+            pass
 
 
 def option(option_line):
@@ -51,6 +50,7 @@ def cmd(cmd_line):
         wrapped
     return cmd_decorator
 
+
 def main():
     # print CLI.usage()
     args = docopt(CLI.usage())
@@ -60,13 +60,16 @@ def main():
     for action, function in CLI.actions.items():
         if args[action]:
             positional = [
-                value for arg,value in args.items()
+                value for arg, value in args.items()
                 if arg.startswith('<') and value is not None
             ]
-            options = {arg[2:]:value for arg,value in args.items() if arg.startswith('--')}
+            options = {
+                arg[2:]: value
+                for arg, value in args.items()
+                if arg.startswith('--')
+            }
 
             # print positional
             # print options
 
             function(*positional, **options)
-

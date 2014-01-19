@@ -16,7 +16,7 @@ tokens = (
     'EQ', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'MOD', 'POWER',
     'VID', 'TID', 'SID',
 
-    'INTD','INTX','INTP','REAL','SCI',
+    'INTD', 'INTX', 'INTP', 'REAL', 'SCI',
 )
 
 states = (
@@ -29,6 +29,7 @@ def t_MODULE(tok):
     tok.lexer.begin('code')
     return tok
 
+
 def t_code_END(tok):
     'end'
     tok.lexer.begin('INITIAL')
@@ -36,8 +37,10 @@ def t_code_END(tok):
 
 t_code_ignore = ' \t'
 
+
 def t_error(tok):
     return tok
+
 
 def t_code_error(tok):
     return tok
@@ -51,7 +54,7 @@ t_code_LBRC = r'\{'
 t_code_RBRC = r'\}'
 
 # Distinct symbols
-t_code_EQ       = r'='
+t_code_EQ     = r'='
 t_code_PIPE   = r'\|'
 t_code_AMP    = r'\&'
 t_code_DOLLAR = r'\$'
@@ -75,23 +78,35 @@ t_code_POWER  = r'\^'
 def t_code_SCI(tok):
     r'[-+]?[0-9]+(\.?|\.[0-9]+)e[-+]?[0-9]+(\.|\.[0-9]+)?'
     return tok
+
+
 def t_code_REAL(tok):
     r'[-+]?[0-9]+([.][0-9]+|[.])'
     return tok
+
+
 def t_code_INTP(tok):
     r'[-+]?[0-9]+(_[0-9]+)+'
     return tok
+
+
 def t_code_INTX(tok):
     r'[-+]?0x([0-9]|[A-F]|[a-f])+'
     return tok
+
+
 def t_code_INTD(tok):
     r'[-+]?[0-9]+'
     return tok
 
-# Identifiers
+##--- Identifiers ---##
+
+
 def t_code_VID(tok):
     r'(_+[0-9]|_*[a-z])[A-Za-z_0-9]*'
     return tok
+
+
 def t_code_TID(tok):
     r'_*[A-Z][A-Za-z_0-9]*'
     return tok
@@ -101,6 +116,7 @@ SYMB = r'[&|%=+\-^*/]'
 
 
 print r'{A}+|{B}({A}|{B})+'.format(A=SYMA, B=SYMB)
+
 
 @TOKEN(r'{A}+|{B}({A}|{B})+'.format(A=SYMA, B=SYMB))
 def t_code_SID(tok):
@@ -123,10 +139,9 @@ def lex_tokens(input):
 
 SimpleToken = namedtuple('SimpleToken', ['type', 'value'])
 
+
 def lex_simple(input):
     '''Lex an input stream, yielding the a simplified namedtuple
     '''
     for tok in lex_tokens(input):
         yield SimpleToken(tok.type, tok.value)
-
-

@@ -3,7 +3,6 @@ import util
 from abc import ABCMeta, abstractmethod
 
 
-
 class Node(object):
     __metaclass__ = ABCMeta
 
@@ -23,13 +22,15 @@ class Node(object):
                 return False
         return True
 
-
     def __repr__(self):
         '''Universal representation of the node based on inspecting the name
         and "public fields".
         '''
+        fields = [
+            (attr, repr(getattr(self, attr)))
+            for attr in util.instance_fields(self)
+        ]
 
-        fields = [(attr, repr(getattr(self, attr))) for attr in util.instance_fields(self)]
         field_str = ', '.join([
             '{name}={value}'.format(name=name, value=value) for
             (name, value) in fields
@@ -50,11 +51,19 @@ class Tuple(Node):
     def __init__(self, values=[]):
         self.values = values
 
+
 class Literal(Node):
     def __init__(self, value):
         self.value = value
 
 
-class Int(Literal): pass
-class Real(Literal): pass
-class Sci(Literal): pass
+class Int(Literal):
+    pass
+
+
+class Real(Literal):
+    pass
+
+
+class Sci(Literal):
+    pass

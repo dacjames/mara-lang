@@ -4,10 +4,14 @@
 
 from util import cli
 
+
 cli.option('-g --grammar_file=<f> Grammar File.')
+
+
 @cli.cmd('load [options]')
 def load_grammar(grammar_file):
     print grammar(grammar_file)
+
 
 @cli.cmd('parse [options] <src_file>')
 def parse(src_file, grammar_file):

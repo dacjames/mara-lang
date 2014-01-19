@@ -3,13 +3,16 @@
 
 import types
 
+
 def _public_attrs(obj, pred=lambda attr: True):
-    '''Public attributes of an object, fields and methods, filtered by a predicate.
+    '''Public attributes of an object, fields and methods,
+    filtered by a predicate.
     '''
     return sorted([
         attr for attr in dir(obj)
         if not attr.startswith('_') and pred(attr)
     ])
+
 
 def _is_instance_method(obj, attr):
     attribute = getattr(obj, attr)
@@ -17,6 +20,7 @@ def _is_instance_method(obj, attr):
         isinstance(attribute, types.MethodType) and
         attribute.im_class is obj.__class__
     )
+
 
 def _is_instance_field(obj, attr):
     attribute = getattr(obj, attr, None)

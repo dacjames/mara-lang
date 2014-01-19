@@ -1,6 +1,7 @@
 from parser import parser
 import node
 
+
 def test_parse_bottoms():
     assert (
         parser.parse('module test 10 end') ==
