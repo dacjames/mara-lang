@@ -15,10 +15,12 @@ class Node(object):
         '''
         canary = object()
         for attr in util.instance_fields(self):
+
             attribute = getattr(self, attr)
             other_attribute = getattr(other, attr, canary)
+            equal = (other_attribute is not canary and attribute == other_attribute)
 
-            if other_attribute is canary or attribute != other_attribute:
+            if not equal:
                 return False
         return True
 
@@ -52,18 +54,41 @@ class Tuple(Node):
         self.values = values
 
 
-class Literal(Node):
+class _Value(Node):
     def __init__(self, value):
         self.value = value
 
 
-class Int(Literal):
+class Int(_Value):
     pass
 
 
-class Real(Literal):
+class Real(_Value):
     pass
 
 
-class Sci(Literal):
+class Sci(_Value):
     pass
+
+
+class ValueId(_Value):
+    pass
+
+
+class SymbolId(_Value):
+    pass
+
+class TypeId(_Value):
+    pass
+
+
+class If(Node):
+    def __init__(self, pred, body):
+        self.pred = pred
+        self.body = body
+
+
+class BinOp(Node):
+    def __init__(self, func, args):
+        self.func = func
+        self.args = args
