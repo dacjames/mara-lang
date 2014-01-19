@@ -3,6 +3,7 @@ Mara Language Lexer
 '''
 
 from collections import namedtuple
+from ply.lex import TOKEN
 
 tokens = (
     'MODULE', 'END',
@@ -12,6 +13,7 @@ tokens = (
 
     'PIPE', 'AMP', 'DOLLAR', 'AT', 'SLASH',
     'POUND', 'COMMA', 'DOT', 'NL',
+    'EQ', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'MOD', 'POWER',
     'VID', 'TID', 'SID',
 
     'INTD','INTX','INTP','REAL','SCI',
@@ -32,7 +34,7 @@ def t_code_END(tok):
     tok.lexer.begin('INITIAL')
     return tok
 
-t_code_ignore = ' \t\r'
+t_code_ignore = ' \t'
 
 def t_error(tok):
     return tok
@@ -49,6 +51,7 @@ t_code_LBRC = r'\{'
 t_code_RBRC = r'\}'
 
 # Distinct symbols
+t_code_EQ       = r'='
 t_code_PIPE   = r'\|'
 t_code_AMP    = r'\&'
 t_code_DOLLAR = r'\$'
@@ -58,6 +61,15 @@ t_code_POUND  = r'\#'
 t_code_COMMA  = r'\,'
 t_code_DOT    = r'[.]'
 t_code_NL     = r'\n'
+
+# Operators
+t_code_PLUS   = r'[+]'
+t_code_MINUS  = r'[-]'
+t_code_TIMES  = r'[*]'
+t_code_DIVIDE = r'[/]'
+t_code_MOD    = r'[%]'
+t_code_POWER  = r'\^'
+
 
 # Literals
 def t_code_SCI(tok):
@@ -83,20 +95,25 @@ def t_code_VID(tok):
 def t_code_TID(tok):
     r'_*[A-Z][A-Za-z_0-9]*'
     return tok
+
+SYMA = r'[~!?<>]'
+SYMB = r'[&|%=+\-^*/]'
+
+
+print r'{A}+|{B}({A}|{B})+'.format(A=SYMA, B=SYMB)
+
+@TOKEN(r'{A}+|{B}({A}|{B})+'.format(A=SYMA, B=SYMB))
 def t_code_SID(tok):
-    r'_*([~!%?<>*/]|\^)+|\&\&|\|\|'
     return tok
-
-
 
 import ply.lex as lex
 lexer = lex.lex()
 
 
 def lex_tokens(input):
+    '''Lex an input stream, yielding one token at a time.
     '''
-    Lex an input stream, yielding one token at a time.
-    '''
+    lexer.begin('INITIAL')
     lexer.input(input)
     while True:
         tok = lexer.next()
@@ -107,12 +124,9 @@ def lex_tokens(input):
 SimpleToken = namedtuple('SimpleToken', ['type', 'value'])
 
 def lex_simple(input):
-    '''
-    Lex an input stream, yielding the a simplified namedtuple
+    '''Lex an input stream, yielding the a simplified namedtuple
     '''
     for tok in lex_tokens(input):
         yield SimpleToken(tok.type, tok.value)
-
-
 
 

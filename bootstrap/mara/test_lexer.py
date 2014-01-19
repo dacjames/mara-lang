@@ -22,7 +22,7 @@ def test_lex_wrappers():
 
 
 def test_lex_distinct_symbols():
-    given = 'module@|&$\#,.end'
+    given = 'module @ | & $ \ # , . = + - ^ / * end'
     output = list(lex_simple(given))
     assert output == [
         ('MODULE', 'module'),
@@ -34,25 +34,48 @@ def test_lex_distinct_symbols():
         ('POUND', '#'),
         ('COMMA', ','),
         ('DOT', '.'),
+        ('EQ', '='),
+        ('PLUS', '+'),
+        ('MINUS', '-'),
+        ('POWER', '^'),
+        ('DIVIDE', '/'),
+        ('TIMES', '*'),
         ('END', 'end'),
     ]
 
 
-def test_lex_value_identifiers():
-    given = '''module hello _goodbye
-               pizza_sauce num0
-               ____pZ0x9 _0 end'''
+def test_lex_identifiers():
+    given = '''module
+        hello _goodbye
+        pizza_sauce num0
+        ____pZ0x9 _0
+        < > == =>
+        ~! ~~ ~>>
+        ??? !
+    end'''.replace('\n', ' ')
+
     output = list(lex_simple(given))
     assert output == [
         ('MODULE', 'module'),
         ('VID', 'hello'),
-        ('VID', '_goodbye'), ('NL', '\n'),
+        ('VID', '_goodbye'),
         ('VID', 'pizza_sauce'),
-        ('VID', 'num0'), ('NL', '\n'),
+        ('VID', 'num0'),
         ('VID', '____pZ0x9'),
         ('VID', '_0'),
+        ('SID', '<'),
+        ('SID', '>'),
+        ('SID', '=='),
+        ('SID', '=>'),
+        ('SID', '~!'),
+        ('SID', '~~'),
+        ('SID', '~>>'),
+        ('SID', '???'),
+        ('SID', '!'),
         ('END', 'end'),
     ]
+
+
 
 def test_lex_literal_nums():
     given = ('module 1_000_000 1. 0.9 1231.0 -1 -19.0 +0 -10' +
