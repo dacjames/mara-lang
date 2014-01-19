@@ -2,12 +2,14 @@
 import util
 from abc import ABCMeta, abstractmethod
 
+
+
 class Node(object):
     __metaclass__ = ABCMeta
 
     def __init__(self):
         if self.__class__ is Node:
-            raise TypeError('Node is abstract and should not be instantiated')
+            raise TypeError('Node is abstract and should not be instantiated.')
 
     def __eq__(self, other):
         '''Universal equality method based on inspecting the "public fields".
@@ -48,3 +50,11 @@ class Tuple(Node):
     def __init__(self, values=[]):
         self.values = values
 
+class Literal(Node):
+    def __init__(self, value):
+        self.value = value
+
+
+class Int(Literal): pass
+class Real(Literal): pass
+class Sci(Literal): pass
