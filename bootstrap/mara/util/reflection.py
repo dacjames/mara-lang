@@ -84,7 +84,3 @@ def instance_methods(obj):
     '''Public methods on an object.
     '''
     return _public_attrs(obj, lambda attr: _is_instance_method(obj, attr))
-
-
-
-
