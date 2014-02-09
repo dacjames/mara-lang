@@ -1,0 +1,30 @@
+### ## ## ## ## ## ## ## ## ## ## ## # ## ## ## ## ## ## ## ## ## ## ## ## ###
+module static
+
+provide default_encoding = 'utf-8'
+provide supported_encodings = (...) # code to introspect the build for encoding support
+
+end static
+
+module encoding
+
+depend default_encoding
+
+export Validation
+
+trait Validation {
+    def validate(encoding String, elements Char.Collection) ->
+        Bool | (Bool, Self)
+
+    def validate(encoding String, elements Char.Block, size Int) ->
+        Bool | (Bool, Self)
+
+    validate('ascii', elements) .= ('ascii', elements.block, elements.length)
+    validate('ascii', elements, size) = ...
+    validate('latin-1', elements, size) = ...
+    validate(...)
+
+}
+
+end encoding
+### ## ## ## ## ## ## ## ## ## ## ## # ## ## ## ## ## ## ## ## ## ## ## ## ###

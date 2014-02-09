@@ -1,0 +1,79 @@
+end string
+
+###
+# strings module
+
+The strings module provides several objects for working with characters and strings.
+
+- String
+  implimented for three datums:
+    - Symbol (interned, immutable array of bytes)
+    - Text (immutable tree of utf-8 code points)
+    - Char.Array
+
+- Char
+  implimented for two datums:
+    - Rune utf-code point, TODO: rune encoding
+    - Byte type of UInt8, unknown encoding
+
+
+###
+
+module strings
+
+import strings_impl(Text, Symbol, Char.Array)
+import chars_impl(Rune, Byte)
+
+export {
+    String
+    Text
+    Symbol
+    Char.Array
+    Rune
+    Byte
+}
+
+
+trait String =
+    & Collection
+    & StringFunctions
+    & StringShortcuts
+
+alias Stringy = (String | Regex)
+
+trait String::StringFunctions {
+
+    def replace Stringy -> String
+    def find Stringy -> String?
+    def contains Stringy -> Bool
+
+    contains(string) = match (self.find string)
+        as item! true
+        as ?     false
+
+    def upper -> String
+    def lower -> String
+
+    def like String | Regex -> Bool
+
+    def startswith String | Regex -> Bool
+    def endswith String | Regex -> Bool
+}
+
+trait StringLiteral::StringShortcuts {
+    def c = self.to Char.Array
+    def t = self.to Text
+    def s = self.to Symbol
+    def f = self.format
+}
+
+
+
+
+def Symbol::to Text = self.c.decode 'utf8'
+def Symbol::to Char.Array = self.elements
+def Symbol
+
+
+
+end
