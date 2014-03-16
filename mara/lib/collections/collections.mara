@@ -1,0 +1,57 @@
+module impl
+using Collection
+
+datum(T) LinkedList =
+    | ListNode
+    | Nil
+
+datum(T) Node {
+    head T
+    tail This
+}
+
+def LinkedList = nil
+
+def Node::get index =
+    match   index
+    as 0    this.head
+    else    self(index - 1)
+
+def Nil::get index = fail IndexError
+
+end impl
+
+
+
+module example
+
+depend random/seed
+
+a = random.matrix
+
+
+end example
+
+
+module
+
+trait Collection(Index, Elem) {
+    def get (Index) -> Elem
+    def put (Elem, Index) -> Elem
+    def del (Index) -> Elem
+
+    def head -> Elem
+    def tail -> This
+    def last -> Elem
+
+    def push (Elem) -> This | (Elem, This)
+    def pop  (Elem) -> This | (Elem, This)
+
+    def add (Elem) -> This | (Elem, This)
+    def pull (Elem) -> This | (Elem, This)
+
+    def peak (Elem) -> Elem?
+    def look (Elem) -> Elem?
+}
+
+end

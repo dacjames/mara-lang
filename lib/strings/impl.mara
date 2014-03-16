@@ -1,0 +1,39 @@
+### ## ## ## ## ## ## ## ## ## ## ## # ## ## ## ## ## ## ## ## ## ## ## ## ###
+
+module chars_impl
+import encodings
+
+datum Rune { codepoint UInt32 }
+Rune = ...
+
+datum Char = UInt8
+
+
+end chars_impl
+
+### ## ## ## ## ## ## ## ## ## ## ## # ## ## ## ## ## ## ## ## ## ## ## ## ###
+
+module strings_impl
+depend symbol_table
+
+import encodings
+
+
+datum Symbol {
+    table_index Int
+}
+
+Symbol(s StringLiteral) = {
+    let size = s.length
+    let elements = s.block
+
+    encodings.validate('ascii', elements, size)
+    symbol = symbol_table.symbol(elements, size)
+}
+
+datum Text { ... }
+Text(s StringLiteral) = ..
+
+end
+
+### ## ## ## ## ## ## ## ## ## ## ## # ## ## ## ## ## ## ## ## ## ## ## ## ###

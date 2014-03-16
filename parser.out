@@ -1,0 +1,251 @@
+Created by PLY version 3.4 (http://www.dabeaz.com/ply)
+
+Unused terminals:
+
+    LPAR
+    RPAR
+    RBKT
+    SID
+    TID
+    MINUS
+    DOT
+    NL
+    POWER
+    LBRC
+    RBRC
+    PIPE
+    PLUS
+    COMMA
+    LBKT
+    DIVIDE
+    FOR
+    DOLLAR
+    TIMES
+    AT
+    SLASH
+    AMP
+    EQ
+    POUND
+    MOD
+
+Grammar
+
+Rule 0     S' -> module
+Rule 1     module -> MODULE expr END
+Rule 2     module -> MODULE VID expr END
+Rule 3     expr -> literal
+Rule 4     literal -> int
+Rule 5     literal -> real
+Rule 6     literal -> sci
+Rule 7     int -> INTD
+Rule 8     int -> INTX
+Rule 9     int -> INTP
+Rule 10    real -> REAL
+Rule 11    sci -> SCI
+
+Terminals, with rules where they appear
+
+AMP                  : 
+AT                   : 
+COMMA                : 
+DIVIDE               : 
+DOLLAR               : 
+DOT                  : 
+END                  : 1 2
+EQ                   : 
+FOR                  : 
+INTD                 : 7
+INTP                 : 9
+INTX                 : 8
+LBKT                 : 
+LBRC                 : 
+LPAR                 : 
+MINUS                : 
+MOD                  : 
+MODULE               : 1 2
+NL                   : 
+PIPE                 : 
+PLUS                 : 
+POUND                : 
+POWER                : 
+RBKT                 : 
+RBRC                 : 
+REAL                 : 10
+RPAR                 : 
+SCI                  : 11
+SID                  : 
+SLASH                : 
+TID                  : 
+TIMES                : 
+VID                  : 2
+error                : 
+
+Nonterminals, with rules where they appear
+
+expr                 : 1 2
+int                  : 4
+literal              : 3
+module               : 0
+real                 : 5
+sci                  : 6
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . module
+    (1) module -> . MODULE expr END
+    (2) module -> . MODULE VID expr END
+
+    MODULE          shift and go to state 1
+
+    module                         shift and go to state 2
+
+state 1
+
+    (1) module -> MODULE . expr END
+    (2) module -> MODULE . VID expr END
+    (3) expr -> . literal
+    (4) literal -> . int
+    (5) literal -> . real
+    (6) literal -> . sci
+    (7) int -> . INTD
+    (8) int -> . INTX
+    (9) int -> . INTP
+    (10) real -> . REAL
+    (11) sci -> . SCI
+
+    VID             shift and go to state 5
+    INTD            shift and go to state 4
+    INTX            shift and go to state 13
+    INTP            shift and go to state 10
+    REAL            shift and go to state 12
+    SCI             shift and go to state 9
+
+    int                            shift and go to state 6
+    expr                           shift and go to state 7
+    literal                        shift and go to state 8
+    real                           shift and go to state 3
+    sci                            shift and go to state 11
+
+state 2
+
+    (0) S' -> module .
+
+
+
+state 3
+
+    (5) literal -> real .
+
+    END             reduce using rule 5 (literal -> real .)
+
+
+state 4
+
+    (7) int -> INTD .
+
+    END             reduce using rule 7 (int -> INTD .)
+
+
+state 5
+
+    (2) module -> MODULE VID . expr END
+    (3) expr -> . literal
+    (4) literal -> . int
+    (5) literal -> . real
+    (6) literal -> . sci
+    (7) int -> . INTD
+    (8) int -> . INTX
+    (9) int -> . INTP
+    (10) real -> . REAL
+    (11) sci -> . SCI
+
+    INTD            shift and go to state 4
+    INTX            shift and go to state 13
+    INTP            shift and go to state 10
+    REAL            shift and go to state 12
+    SCI             shift and go to state 9
+
+    int                            shift and go to state 6
+    expr                           shift and go to state 14
+    literal                        shift and go to state 8
+    real                           shift and go to state 3
+    sci                            shift and go to state 11
+
+state 6
+
+    (4) literal -> int .
+
+    END             reduce using rule 4 (literal -> int .)
+
+
+state 7
+
+    (1) module -> MODULE expr . END
+
+    END             shift and go to state 15
+
+
+state 8
+
+    (3) expr -> literal .
+
+    END             reduce using rule 3 (expr -> literal .)
+
+
+state 9
+
+    (11) sci -> SCI .
+
+    END             reduce using rule 11 (sci -> SCI .)
+
+
+state 10
+
+    (9) int -> INTP .
+
+    END             reduce using rule 9 (int -> INTP .)
+
+
+state 11
+
+    (6) literal -> sci .
+
+    END             reduce using rule 6 (literal -> sci .)
+
+
+state 12
+
+    (10) real -> REAL .
+
+    END             reduce using rule 10 (real -> REAL .)
+
+
+state 13
+
+    (8) int -> INTX .
+
+    END             reduce using rule 8 (int -> INTX .)
+
+
+state 14
+
+    (2) module -> MODULE VID expr . END
+
+    END             shift and go to state 16
+
+
+state 15
+
+    (1) module -> MODULE expr END .
+
+    $end            reduce using rule 1 (module -> MODULE expr END .)
+
+
+state 16
+
+    (2) module -> MODULE VID expr END .
+
+    $end            reduce using rule 2 (module -> MODULE VID expr END .)
+

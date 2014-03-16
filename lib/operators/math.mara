@@ -1,0 +1,28 @@
+module example
+depend main
+
+
+
+
+end
+
+module collections
+
+alias('++', concat)
+alias('--', diff)
+alias('**', dotproduct)
+
+alias('//', intdiv)
+
+end
+
+
+module
+
+alias('+', plus  )
+alias('-', minus )
+alias('*', times )
+alias('/', divide)
+alias('^', power )
+
+end

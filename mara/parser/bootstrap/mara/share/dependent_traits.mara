@@ -1,0 +1,37 @@
+trait Comparable(T) {
+    def compare(a T, b T) -> Int
+
+    def eq  (a T, b T) -> Bool
+    def neq (a T, b T) -> Bool
+    def lt  (a T, b T) -> Bool
+    def gt  (a T, b T) -> Bool
+    def gteq(a T, b T) -> Bool
+    def lteq(a T, b T) -> Bool
+
+    compare(a, b) = match
+        as a < b -1
+        as a == b 0
+        as a > b 1
+        else ()
+
+    compare(a, b) = match
+        as a == b 0
+        as a <= b -1
+        as a >= b 1
+        else ()
+
+    compare(a, b) = match
+        as a != b match
+            as a >= b 1
+            as a <= b -1
+            else ()
+        as a <= b & a >= b 0
+        else ()
+
+    eq  (a, b) = compare(a, b) == 0
+    neq (a, b) = compare(a, b) != 0
+    lt  (a, b) = compare(a, b) <  0
+    gt  (a, b) = compare(a, b) >  0
+    lteq(a, b) = compare(a, b) <= 0
+    gteq(a, b) = compare(a, b) >= 0
+}

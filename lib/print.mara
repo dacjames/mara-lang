@@ -1,0 +1,14 @@
+module print
+
+trait Print {
+    def dump() -> String
+    def show() -> String
+    def display(Mimetype) -> String
+
+    print() = display(Mimetype.Plain)
+    print() = show()
+    print() = dump()
+}
+
+end
+

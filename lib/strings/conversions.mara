@@ -1,0 +1,28 @@
+module
+
+String::path = Path(this)
+String::url  = Url(this)
+
+end
+
+
+module test
+
+home = '/home/dcollins'.path
+dir  = '.config'.path
+f    = 'config.mara'.path
+
+home.path === AbsPath '/home/dcollins'  ===
+    AbsPath'/' ++ RelPath 'home' ++ RelPath 'dcollins'
+
+dir.path  === RelPath '.config'
+f.path    === RelPath 'config.mara'
+
+root = 'http://dac.io'.url
+method = 'user/:id/likes?limit=:limit'.url
+
+root.url === ProtoUrl 'http://dac.io' ==
+method.url === ''
+
+
+end test

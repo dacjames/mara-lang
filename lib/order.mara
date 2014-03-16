@@ -1,0 +1,51 @@
+module order
+
+# datum NGram2(T) = (a T, b T)
+
+trait NGram2(T)::Comparable {
+
+  def compare -> Int
+
+  compare = match
+    as a < b then -1
+    as a == b then 0
+    else 1
+
+  compare = match
+    as a > b then 1
+    as a == b then 0
+    else -1
+
+  compare = match
+    as a > b then 1
+    as a < b then -1
+    else 0
+
+  def eq  { this.compare == 0 }
+  def neq { this.compare != 0 }
+  def gt  { this.compare >  0 }
+  def lt  { this.compare <  0 }
+  def lteq{ this.compare <= 0 }
+  def gteq{ this.compare >= 0 }
+}
+
+trait Comparable.Collection::Sort {
+
+    def quicksort -> This
+    def quicksort {
+        smaller, larger, equal = this.partition compare
+        smaller.self ++ equal ++ larger.self
+    }
+
+    def mergesort -> This
+    def mergesort { ... }
+
+
+}
+
+
+
+
+
+
+end

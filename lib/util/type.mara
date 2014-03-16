@@ -1,0 +1,9 @@
+
+def proxy -> Unit
+
+def proxy (Type Any) =
+    for method in String.methods {
+        Type::$method = this.value.$method
+    }
+
+def proxy

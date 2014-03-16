@@ -1,0 +1,29 @@
+module windows
+
+provide {
+    OS/GROUP = 'windows'
+    OS/NAME = 'windows 7'
+    OS/ARCH = 64
+
+    FS/PATH/SEPERATOR = '\'.s
+    FS/PATH/ROOT ='[A-Z]:'.r
+}
+
+end
+
+module unix
+
+provide {
+    OS/GROUP = 'unix'
+    OS/NAME = 'linux'
+    OS/ARCH = 64
+
+    OS/LINUX/KERNEL = '...'
+
+    FS/PATH/SEPERATOR = '/'.s
+    FS/PATH/ROOT = '/'.s
+}
+
+
+
+end

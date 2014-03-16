@@ -16,12 +16,10 @@ Mara is a new programming language designed to be fast, fun, and functional.
 Okay, it doesn't offer all of those features today, but it will as development progressses.  Some of the driving principles behind Mara are:
 
     - Pragmatism over ideaology.
-    - Obey the programmer.
-    - Every symbol should have one meaning in all contexts.
     - Customizable means configurable with good defaults -- be customizable.
     - Be explicit but never repeat yourself.
     - Guesswork is the root of all evil.
-    - Parameterize everything.
+    - Every symbol should have one meaning in all contexts.
 
 ## What does Mara code look like?
 

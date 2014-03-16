@@ -1,0 +1,38 @@
+module
+import typeutil
+
+depend SEP = FS/PATH/SEPERATOR
+depend OS = OS/TMP_DIR
+
+trait Path {
+    def value -> Text
+    def isabs -> Bool
+    def isrel -> Bool
+    def istmp -> Bool
+}
+
+def Text::isabs = this[0] == SEP
+def Text::isrel = this[0] != SEP
+def Text::istmp = this.contains OS/TMP_DIR
+
+datum RelPath { value Text; path_offsets Int64.Array }
+datum AbsPath { value Text; path_offsets Int64.Array }
+datum TmpPath { value Text; rel_offset Int8 }
+
+typeutil.proxy (RelPath, AbsPath, TmpPath)
+
+def Path(value String) {
+    match value .= text
+    as value.isrel RelPath(value, value.findall '/'
+    as value.isabs AbsPath(value, value.findall '/')
+    as value.istmp TmpPath(value, value.lastindexof OS/TMP_DIR)
+}
+
+
+end
+
+
+module test
+
+
+end test
