@@ -98,3 +98,8 @@ class If(Node):
     def __init__(self, pred, body):
         self.pred = pred
         self.body = body
+
+class Assign(Node):
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value

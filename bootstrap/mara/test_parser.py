@@ -1,6 +1,8 @@
 from parser import parser
 import node as n
+import pytest
 
+xfail = pytest.mark.xfail
 
 def test_parse_literals():
     assert (
@@ -90,6 +92,43 @@ def test_parse_wrapped_if():
                     ]
                 ),
             ),
+        ],
+    )
+    assert parser.parse(given) == output
+
+def test_exprs_parse_assignment():
+    given = 'module assignment a = 10 end'
+
+    output = n.Module('assignment', [
+        n.Assign(name=n.ValueId('a'), value=n.Int('10'))
+    ])
+
+    assert parser.parse(given) == output
+
+
+@xfail
+def test_exprs_and_blocks():
+    given = '''module blocks
+                    block = {
+                        x = 10
+                        y = x   +
+                            10  *
+                            8   \
+                            .commit()
+                        _z = x + y; z = 2 * _x
+                    }
+                end
+                '''
+    output = n.Module(
+        name='simple',
+        exprs=[
+            n.Assign(
+                name='block',
+                value=n.Block(
+                    params=[],
+                    exprs=[],
+                ),
+            )
         ],
     )
     assert parser.parse(given) == output

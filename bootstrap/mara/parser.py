@@ -38,12 +38,12 @@ def p_expr(p):
             | binop
             | block
             | LPAR expr RPAR
+            | assign
     '''
     if p.slice[1].type == 'LPAR':
         p[0] = p[2]
     else:
         p[0] = p[1]
-
 
 
 def p_literal(p):
@@ -106,7 +106,14 @@ def p_block(p):
     p[0] = node.Block(exprs=[p[2]])
 
 
+def p_assign(p):
+    '''assign : expr EQ expr
+    '''
+    p[0] = node.Assign(name=p[1], value=p[3])
+
+
+def p_error(err):
+    raise ParseError(err)
+
 
 parser = yacc.yacc()
-
-print parser.parse('module simple if x < 0 {x * 2} end')
