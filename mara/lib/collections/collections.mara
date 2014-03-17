@@ -2,17 +2,17 @@ module impl
 using Collection
 
 datum(T) LinkedList =
-    | ListNode
+    | ListNode(T)
     | Nil
 
-datum(T) Node {
+datum(T) ListNode {
     head T
     tail This
 }
 
 def LinkedList = nil
 
-def Node::get index =
+def ListNode::get index =
     match   index
     as 0    this.head
     else    self(index - 1)
@@ -40,8 +40,9 @@ trait Collection(Index, Elem) {
     def put (Elem, Index) -> Elem
     def del (Index) -> Elem
 
-    def head -> Elem
+    def first -> Elem
     def tail -> This
+    def body -> This
     def last -> Elem
 
     def push (Elem) -> This | (Elem, This)
@@ -55,3 +56,20 @@ trait Collection(Index, Elem) {
 }
 
 end
+
+module test
+
+list = [1, 2, 3]
+
+
+list.first === 1
+list.body === [1, 2]
+list.tail === [2, 3]
+list.last === 3
+
+list.first << list.tail === list.body >> list.last
+
+
+[1, 2] << 0 === 0 << [1, 2] === [0, 1, 2]
+[1, 2] >> 3 === 3 << [1, 2] === [1, 2, 3]
+

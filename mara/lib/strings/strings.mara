@@ -66,6 +66,7 @@ trait StringLiteral::StringShortcuts {
     def s = this.value.to Symbol
     def f = this.value.format
     def r = this.value.to Regex
+    def m =
 }
 
 
