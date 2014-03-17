@@ -108,8 +108,18 @@ def p_block(p):
 
 def p_assign(p):
     '''assign : expr EQ expr
+              | expr TID EQ expr
     '''
-    p[0] = node.Assign(name=p[1], value=p[3])
+    if len(p) == 4:
+        p[0] = node.Assign(name=p[1], value=p[3], type_=None)
+        return
+
+    if len(p) == 5:
+        p[0] = node.Assign(name=p[1], value=p[4], type_=node.TypeId(p[2]))
+        return
+
+    raise ParseError(list(p), len(p))
+
 
 
 def p_error(err):

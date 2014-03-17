@@ -100,10 +100,19 @@ def test_exprs_parse_assignment():
     given = 'module assignment a = 10 end'
 
     output = n.Module('assignment', [
-        n.Assign(name=n.ValueId('a'), value=n.Int('10'))
+        n.Assign(name=n.ValueId('a'), value=n.Int('10'), type_=None)
     ])
 
     assert parser.parse(given) == output
+
+    given = 'module assignment a Real = 1.0 end'
+
+    output = n.Module('assignment', [
+        n.Assign(name=n.ValueId('a'), value=n.Int('1.0'), type_=n.TypeId('Real'))
+    ])
+
+    assert parser.parse(given) == output
+
 
 
 @xfail

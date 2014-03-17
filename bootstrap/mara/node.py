@@ -99,7 +99,9 @@ class If(Node):
         self.pred = pred
         self.body = body
 
+
 class Assign(Node):
-    def __init__(self, name, value):
+    def __init__(self, name, value, type_=None):
         self.name = name
         self.value = value
+        self.type_ = type_
