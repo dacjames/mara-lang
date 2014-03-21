@@ -105,3 +105,9 @@ class Assign(Node):
         self.name = name
         self.value = value
         self.type_ = type_
+
+
+class While(Node):
+    def __init__(self, pred, body):
+        self.pred = pred
+        self.body = body

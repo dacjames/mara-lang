@@ -4,9 +4,15 @@ import pytest
 
 xfail = pytest.mark.xfail
 
+
+def maramodule(code):
+    return 'module test {c} end'.format(c=code)
+
+
 @pytest.fixture
 def parser():
     return parser_module.build_parser()
+
 
 def test_parse_literals(parser):
     assert (
@@ -101,6 +107,35 @@ def test_parse_wrapped_if(parser):
         ],
     )
     assert parser.parse(given) == output
+
+def test_parse_postfix_while(parser):
+    given = maramodule('while (x > 0) {x * 2}')
+    output = n.Module(
+        name='test',
+        exprs=[
+            n.While(
+                pred=n.BinOp(
+                    func=n.SymbolId('>'),
+                    args=[
+                        n.ValueId('x'),
+                        n.Int(value='0'),
+                    ]
+                ),
+               body=n.Block(
+                    exprs=[
+                        n.BinOp(
+                            func=n.SymbolId('*'),
+                            args=[
+                                n.ValueId('x'),
+                                n.Real(value='2')
+                            ]
+                        ),
+                    ]
+                ),
+            )
+        ]
+    )
+
 
 def test_exprs_parse_assignment(parser):
     given = 'module assignment a = 10 end'

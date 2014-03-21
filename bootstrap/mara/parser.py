@@ -35,6 +35,7 @@ def p_expr(p):
     '''expr : literal
             | name
             | if
+            | while
             | binop
             | block
             | LPAR expr RPAR
@@ -90,6 +91,16 @@ def p_if(p):
         p[0] = node.If(pred=p[2], body=p[3])
     else:
         p[0] = node.If(pred=p[3], body=p[1])
+
+
+def p_while(p):
+    '''while : WHILE expr block
+             | expr WHILE expr'''
+
+    if p[1] == 'while':
+        p[0] = node.While(pred=p[2], body=p[3])
+    else:
+        p[0] = node.While(pred=p[3], body=p[1])
 
 
 def p_binop(p):
