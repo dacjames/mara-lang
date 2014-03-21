@@ -83,8 +83,13 @@ def p_name(p):
 
 
 def p_if(p):
-    '''if : IF expr expr'''
-    p[0] = node.If(pred=p[2], body=p[3])
+    '''if : IF expr block
+          | expr IF expr'''
+
+    if p[1] == 'if':
+        p[0] = node.If(pred=p[2], body=p[3])
+    else:
+        p[0] = node.If(pred=p[3], body=p[1])
 
 
 def p_binop(p):

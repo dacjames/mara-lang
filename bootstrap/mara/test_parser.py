@@ -47,7 +47,7 @@ def test_parse_simple_expr(parser):
     assert parser.parse(given) == output
 
 def test_parse_unwrapped_if(parser):
-    given = 'module simple if x > 0 x * 2.0 end'
+    given = 'module simple (x * 2.0) if (x > 0) end'
     output = n.Module(
         name='simple',
         exprs=[
@@ -69,10 +69,12 @@ def test_parse_unwrapped_if(parser):
             ),
         ],
     )
+
+    print output
     assert parser.parse(given) == output
 
 def test_parse_wrapped_if(parser):
-    given = 'module simple if (x > 0){x * 2.0} end'
+    given = 'module simple if (x > 0) {x * 2.0} end'
     output = n.Module(
         name='simple',
         exprs=[
