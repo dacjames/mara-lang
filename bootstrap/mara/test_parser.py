@@ -1,10 +1,14 @@
-from parser import parser
+import parser as parser_module
 import node as n
 import pytest
 
 xfail = pytest.mark.xfail
 
-def test_parse_literals():
+@pytest.fixture
+def parser():
+    return parser_module.build_parser()
+
+def test_parse_literals(parser):
     assert (
         parser.parse('module test 10 end') ==
         n.Module(name='test', exprs=[
@@ -26,7 +30,7 @@ def test_parse_literals():
         ])
     )
 
-def test_parse_simple_expr():
+def test_parse_simple_expr(parser):
     given = 'module x * 1 end'
     output = n.Module(
         name='_anon_module_0',
@@ -42,7 +46,7 @@ def test_parse_simple_expr():
     )
     assert parser.parse(given) == output
 
-def test_parse_unwrapped_if():
+def test_parse_unwrapped_if(parser):
     given = 'module simple if x > 0 x * 2.0 end'
     output = n.Module(
         name='simple',
@@ -67,7 +71,7 @@ def test_parse_unwrapped_if():
     )
     assert parser.parse(given) == output
 
-def test_parse_wrapped_if():
+def test_parse_wrapped_if(parser):
     given = 'module simple if (x > 0){x * 2.0} end'
     output = n.Module(
         name='simple',
@@ -96,7 +100,7 @@ def test_parse_wrapped_if():
     )
     assert parser.parse(given) == output
 
-def test_exprs_parse_assignment():
+def test_exprs_parse_assignment(parser):
     given = 'module assignment a = 10 end'
 
     output = n.Module('assignment', [

@@ -126,4 +126,5 @@ def p_error(err):
     raise ParseError(err)
 
 
-parser = yacc.yacc()
+def build_parser():
+    return yacc.yacc()
