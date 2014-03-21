@@ -2,10 +2,20 @@
 Tests for the Mara Lexer
 '''
 
-from lexer import lex_simple
+import pytest
+import lexer as lexer_module
+
+@pytest.fixture
+def lex_simple():
+    lexer = lexer_module.build_lexer()
+
+    def lex_simple(input):
+        return lexer_module.lex_simple(lexer, input)
+    return lex_simple
 
 
-def test_lex_wrappers():
+
+def test_lex_wrappers(lex_simple):
     given = 'module()[]{}end'
     output = list(lex_simple(given))
 
@@ -21,7 +31,7 @@ def test_lex_wrappers():
     ]
 
 
-def test_lex_distinct_symbols():
+def test_lex_distinct_symbols(lex_simple):
     given = 'module @ | & $ \ # , . = + - ^ / * end'
     output = list(lex_simple(given))
     assert output == [
@@ -44,7 +54,7 @@ def test_lex_distinct_symbols():
     ]
 
 
-def test_lex_keywords():
+def test_lex_keywords(lex_simple):
     given = '''module
         match as
         if else
@@ -75,7 +85,7 @@ def test_lex_keywords():
         ('END', 'end'),
     ]
 
-def test_lex_identifiers():
+def test_lex_identifiers(lex_simple):
     given = '''module
         forsight
         hello _goodbye
@@ -109,7 +119,7 @@ def test_lex_identifiers():
     ]
 
 
-def test_lex_literal_nums():
+def test_lex_literal_nums(lex_simple):
     given = ('module 1_000_000 1. 0.9 1231.0 -1 -19.0 +0 -10' +
              ' +3.14e-10 1.2e10 7.8e+10 1e10 0xAEF -0x12Aef end')
     output = list(lex_simple(given))

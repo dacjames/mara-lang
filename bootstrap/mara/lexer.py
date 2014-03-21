@@ -135,10 +135,8 @@ def t_code_SID(tok):
     return tok
 
 import ply.lex as lex
-lexer = lex.lex()
 
-
-def lex_tokens(input):
+def lex_tokens(lexer, input):
     '''Lex an input stream, yielding one token at a time.
     '''
     lexer.begin('INITIAL')
@@ -151,9 +149,12 @@ def lex_tokens(input):
 
 SimpleToken = namedtuple('SimpleToken', ['type', 'value'])
 
-
-def lex_simple(input):
+def lex_simple(lexer, input):
     '''Lex an input stream, yielding the a simplified namedtuple
     '''
-    for tok in lex_tokens(input):
+    for tok in lex_tokens(lexer, input):
         yield SimpleToken(tok.type, tok.value)
+
+
+def build_lexer():
+    return lex.lex()
