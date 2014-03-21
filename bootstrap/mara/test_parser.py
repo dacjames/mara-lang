@@ -36,6 +36,7 @@ def test_parse_literals(parser):
         ])
     )
 
+
 def test_parse_simple_expr(parser):
     given = 'module x * 1 end'
     output = n.Module(
@@ -51,6 +52,25 @@ def test_parse_simple_expr(parser):
         ],
     )
     assert parser.parse(given) == output
+
+
+def test_exprs_parse_assignment(parser):
+    given = 'module assignment a = 10 end'
+
+    output = n.Module('assignment', [
+        n.Assign(name=n.ValueId('a'), value=n.Int('10'), type_=None)
+    ])
+
+    assert parser.parse(given) == output
+
+    given = 'module assignment a Real = 1.0 end'
+
+    output = n.Module('assignment', [
+        n.Assign(name=n.ValueId('a'), value=n.Int('1.0'), type_=n.TypeId('Real'))
+    ])
+
+    assert parser.parse(given) == output
+
 
 def test_parse_unwrapped_if(parser):
     given = 'module simple (x * 2.0) if (x > 0) end'
@@ -75,9 +95,8 @@ def test_parse_unwrapped_if(parser):
             ),
         ],
     )
-
-    print output
     assert parser.parse(given) == output
+
 
 def test_parse_wrapped_if(parser):
     given = 'module simple if (x > 0) {x * 2.0} end'
@@ -108,6 +127,7 @@ def test_parse_wrapped_if(parser):
     )
     assert parser.parse(given) == output
 
+
 def test_parse_postfix_while(parser):
     given = maramodule('while (x > 0) {x * 2}')
     output = n.Module(
@@ -136,24 +156,7 @@ def test_parse_postfix_while(parser):
         ]
     )
 
-
-def test_exprs_parse_assignment(parser):
-    given = 'module assignment a = 10 end'
-
-    output = n.Module('assignment', [
-        n.Assign(name=n.ValueId('a'), value=n.Int('10'), type_=None)
-    ])
-
     assert parser.parse(given) == output
-
-    given = 'module assignment a Real = 1.0 end'
-
-    output = n.Module('assignment', [
-        n.Assign(name=n.ValueId('a'), value=n.Int('1.0'), type_=n.TypeId('Real'))
-    ])
-
-    assert parser.parse(given) == output
-
 
 
 @xfail
