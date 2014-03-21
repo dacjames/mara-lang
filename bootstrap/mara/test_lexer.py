@@ -9,9 +9,9 @@ import lexer as lexer_module
 def lex_simple():
     lexer = lexer_module.build_lexer()
 
-    def lex_simple(input):
+    def inner(input):
         return lexer_module.lex_simple(lexer, input)
-    return lex_simple
+    return inner
 
 
 
@@ -142,23 +142,25 @@ def test_lex_literal_nums(lex_simple):
         ('END', 'end'),
     ]
 
-def test_lex_expr_end():
+def test_lex_expr_end(lex_simple):
     given = '''module test
 x = 10
 y +
   5
-'''
+end'''
     output = list(lex_simple(given))
 
     assert output == [
         ('MODULE', 'module'),
         ('VID', 'test'),
+        ('TERM', '\n'),
         ('VID', 'x'),
         ('EQ', '='),
         ('INTD', '10'),
         ('TERM', '\n'),
         ('VID', 'y'),
-        ('SID', '+'),
+        ('PLUS', '+'),
         ('INTD', '5'),
         ('TERM', '\n'),
+        ('END', 'end'),
     ]

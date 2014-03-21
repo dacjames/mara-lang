@@ -1,9 +1,10 @@
 '''
 Mara Language Lexer
 '''
-
+import re
 from collections import namedtuple
 from ply.lex import TOKEN
+
 
 KEYWORDS = set([
     'match', 'as',
@@ -16,6 +17,7 @@ KEYWORDS = set([
 
 tokens = (
     'MODULE', 'END',
+    'TERM',
     'LPAR', 'RPAR',
     'LBKT', 'RBKT',
     'LBRC', 'RBRC',
@@ -73,7 +75,6 @@ t_code_SLASH = r'\\'
 t_code_POUND = r'\#'
 t_code_COMMA = r'\,'
 t_code_DOT = r'[.]'
-t_code_NL = r'\n'
 
 # Operators
 t_code_PLUS = r'[+]'
@@ -82,7 +83,6 @@ t_code_TIMES = r'[*]'
 t_code_DIVIDE = r'[/]'
 t_code_MOD = r'[%]'
 t_code_POWER = r'\^'
-
 
 # Literals
 def t_code_SCI(tok):
@@ -128,13 +128,19 @@ def t_code_TID(tok):
 
 SYMA = r'[~!?<>]'
 SYMB = r'[&|%=+\-^*/]'
+SYM_REGEX = re.compile(r'{A}|{B}'.format(A=SYMA, B=SYMB))
 
 
 @TOKEN(r'{A}+|{B}({A}|{B})+'.format(A=SYMA, B=SYMB))
 def t_code_SID(tok):
     return tok
 
-import ply.lex as lex
+
+def t_code_NL(tok):
+    r'\n'
+    if not SYM_REGEX.match(tok.lexer.lexdata[tok.lexer.lexpos - 2]):
+        tok.type = 'TERM'
+        return tok
 
 def lex_tokens(lexer, input):
     '''Lex an input stream, yielding one token at a time.
@@ -157,4 +163,5 @@ def lex_simple(lexer, input):
 
 
 def build_lexer():
+    import ply.lex as lex
     return lex.lex()
