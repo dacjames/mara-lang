@@ -131,3 +131,24 @@ def test_lex_literal_nums():
         ('INTX', '-0x12Aef'),
         ('END', 'end'),
     ]
+
+def test_lex_expr_end():
+    given = '''module test
+x = 10
+y +
+  5
+'''
+    output = list(lex_simple(given))
+
+    assert output == [
+        ('MODULE', 'module'),
+        ('VID', 'test'),
+        ('VID', 'x'),
+        ('EQ', '='),
+        ('INTD', '10'),
+        ('TERM', '\n'),
+        ('VID', 'y'),
+        ('SID', '+'),
+        ('INTD', '5'),
+        ('TERM', '\n'),
+    ]
