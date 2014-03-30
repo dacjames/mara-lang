@@ -153,7 +153,6 @@ end'''
     assert output == [
         ('MODULE', 'module'),
         ('VID', 'test'),
-        ('TERM', '\n'),
         ('VID', 'x'),
         ('EQ', '='),
         ('INTD', '10'),

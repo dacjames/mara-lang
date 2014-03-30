@@ -131,16 +131,43 @@ SYMB = r'[&|%=+\-^*/]'
 SYM_REGEX = re.compile(r'{A}|{B}'.format(A=SYMA, B=SYMB))
 
 
+
 @TOKEN(r'{A}+|{B}({A}|{B})+'.format(A=SYMA, B=SYMB))
 def t_code_SID(tok):
     return tok
 
 
+def _after_module(tok):
+    data = tok.lexer.lexdata
+    pos = tok.lexer.lexpos
+
+    start = pos - 1
+    current = data[start]
+
+    pos = start - 1
+    while data[pos] != current and pos > 0:
+        pos -= 1
+
+    after_module = ('module' in data[pos:start])
+    return after_module
+
+
+def newline_terminates(tok):
+    after_symbol = SYM_REGEX.match(tok.lexer.lexdata[tok.lexer.lexpos - 2])
+    after_module = _after_module(tok)
+
+    return (
+        not after_symbol and
+        not after_module
+    )
+
 def t_code_NL(tok):
-    r'\n'
-    if not SYM_REGEX.match(tok.lexer.lexdata[tok.lexer.lexpos - 2]):
+    r'(\n|\r)+'
+
+    if newline_terminates(tok):
         tok.type = 'TERM'
         return tok
+
 
 def lex_tokens(lexer, input):
     '''Lex an input stream, yielding one token at a time.
