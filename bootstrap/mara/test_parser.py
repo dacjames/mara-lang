@@ -167,7 +167,6 @@ def test_parse_postfix_while(parser):
     assert expected == result
 
 
-@xfail
 def test_exprs_and_blocks(parser):
     given = '''module blocks
                     block = {
