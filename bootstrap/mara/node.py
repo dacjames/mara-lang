@@ -42,6 +42,9 @@ class Node(object):
             fields=field_str,
         )
 
+    def visit(self, visitor):
+        return visitor(self)
+
 
 class Module(Node):
     def __init__(self, name=None, exprs=None):
@@ -112,3 +115,18 @@ class While(Node):
     def __init__(self, pred, body):
         self.pred = pred
         self.body = body
+
+
+class _Declaration(Node):
+    def __init__(self, name, value, type_=None):
+        self.name = name
+        self.value = value
+        self.type_ = type_
+
+class Val(_Declaration):
+    pass
+
+class Var(_Declaration):
+    pass
+
+

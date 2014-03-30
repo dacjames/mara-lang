@@ -5,8 +5,8 @@ import pytest
 xfail = pytest.mark.xfail
 
 
-def maramodule(code):
-    return 'module test {c} end'.format(c=code)
+def maramodule(name, code):
+    return 'module {n} {c} end'.format(n=name, c=code)
 
 
 @pytest.fixture
@@ -135,7 +135,7 @@ def test_parse_wrapped_if(parser):
 
 
 def test_parse_postfix_while(parser):
-    given = maramodule('while (x > 0) {x * 2}')
+    given = maramodule('test', 'while (x > 0) {x * 2}')
     expected = n.Module(
         name='test',
         exprs=[
@@ -200,14 +200,28 @@ def test_exprs_and_blocks(parser):
 
     result = parser.parse(given)
 
-
-    print result
-    print '---'
-    print expected
-
-
     assert result.name == expected.name
     assert result.exprs[0].name == expected.exprs[0].name
     assert result.exprs[0].value.exprs[0] == expected.exprs[0].value.exprs[0]
     assert result.exprs[0].value.exprs[1] == expected.exprs[0].value.exprs[1]
     assert  expected == result
+
+
+def test_declarations(parser):
+    given = '''module declarations
+               var x 10
+               val y 20
+               end'''
+
+    expected = n.Module(
+        name='declarations',
+        exprs=[
+            n.Var(name=n.ValueId('x'), value=n.Int('10'), type_=None),
+            n.Val(name=n.ValueId('y'), value=n.Int('20'), type_=None),
+        ],
+    )
+
+    result = parser.parse(given)
+
+    assert expected == result
+

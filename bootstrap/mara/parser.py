@@ -30,18 +30,19 @@ precedence = (
 )
 
 
-def p_module(prod):
+def p_module(p):
     '''module : MODULE expr_list END
               | MODULE VID expr_list END
     '''
-    if len(prod) == 4:
-        prod[0] = node.Module(
+    if len(p) == 4:
+        p[0] = node.Module(
             name=util.anonymous_name('module'),
-            exprs=prod[2],
+            exprs=p[2],
         )
-    elif len(prod) == 5:
-        prod[0] = node.Module(name=prod[2], exprs=prod[3])
+    elif len(p) == 5:
+        p[0] = node.Module(name=p[2], exprs=p[3])
 
+    return p[0]
 
 def p_expr(p):
     '''expr : literal
@@ -52,12 +53,14 @@ def p_expr(p):
             | block
             | LPAR expr RPAR
             | assign
+            | declaration
     '''
     if p.slice[1].type == 'LPAR':
         p[0] = p[2]
     else:
         p[0] = p[1]
 
+    return p[0]
 
 def p_literal(p):
     '''literal : INTD
@@ -77,6 +80,7 @@ def p_literal(p):
     if tok.type == 'SCI':
         p[0] = node.Sci(tok.value)
 
+    return p[0]
 
 def p_name(p):
     '''name : VID
@@ -94,6 +98,7 @@ def p_name(p):
     if tok.type == 'TID':
         p[0] = node.TypeId(tok.value)
 
+    return p[0]
 
 def p_if(p):
     '''if : IF expr block
@@ -104,6 +109,7 @@ def p_if(p):
     else:
         p[0] = node.If(pred=p[3], body=p[1])
 
+    return p[0]
 
 def p_while(p):
     '''while : WHILE expr block
@@ -114,6 +120,7 @@ def p_while(p):
     else:
         p[0] = node.While(pred=p[3], body=p[1])
 
+    return p[0]
 
 def p_binop(p):
     '''binop : expr PLUS expr
@@ -127,6 +134,7 @@ def p_binop(p):
     func = node.SymbolId(p.slice[2].value)
     p[0] = node.BinOp(func=func, args=[p[1], p[3]])
 
+    return p[0]
 
 def p_block(p):
     '''block : LBRC expr_list RBRC
@@ -142,6 +150,8 @@ def p_block(p):
     else:
         raise Exception(len(p))
 
+    return p[0]
+
 def p_expr_list(p):
     '''expr_list : expr TERM expr_list
                  | expr TERM
@@ -156,6 +166,7 @@ def p_expr_list(p):
     else:
         p[0] = [p[1]] + p[3]
 
+    return p[0]
 
 def p_assign(p):
     '''assign : expr EQ expr
@@ -171,6 +182,30 @@ def p_assign(p):
 
     raise ParseError(list(p), len(p))
 
+    return p[0]
+
+def p_declaration(p):
+    '''declaration : val
+                   | var
+    '''
+    p[0] = p[1]
+    return p[0]
+
+def _declaration(cls, p):
+
+    return cls(name=node.ValueId(p[2]), value=p[3], type_=None)
+
+def p_val(p):
+    '''val : VAL VID expr
+    '''
+    p[0] = _declaration(node.Val, p)
+
+    return p[0]
+
+def p_var(p):
+    '''var : VAR VID expr
+    '''
+    p[0] = _declaration(node.Var, p)
 
 
 def p_error(tok):
