@@ -7,9 +7,21 @@ from lexer import tokens
 import node
 import util
 
+ERROR_WINDOW = 10
 
 class ParseError(Exception):
-    pass
+    def __init__(self, tok, lexer):
+        data = lexer.lexdata
+        pos = lexer.lexpos
+
+        lex_state_string = (
+            data[pos - ERROR_WINDOW: pos] +
+            '<=' + data[pos] +
+            data[pos + 1: pos + ERROR_WINDOW]
+        )
+
+        Exception.__init__(self, (tok, lex_state_string))
+
 
 precedence = (
     ('left', 'PLUS', 'MINUS'),
@@ -138,8 +150,8 @@ def p_assign(p):
 
 
 
-def p_error(err):
-    raise ParseError(err)
+def p_error(tok):
+    raise ParseError(tok, tok.lexer)
 
 
 def build_parser():
