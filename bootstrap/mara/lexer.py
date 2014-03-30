@@ -141,6 +141,7 @@ def _after_module(tok):
     data = tok.lexer.lexdata
     pos = tok.lexer.lexpos
 
+    # slide to the beginning of the line
     start = pos - 1
     current = data[start]
 
