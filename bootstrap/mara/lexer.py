@@ -49,7 +49,6 @@ def t_code_END(tok):
 
 t_code_ignore = ' \t'
 
-
 def t_error(tok):
     return tok
 
@@ -128,14 +127,12 @@ def t_code_TID(tok):
 
 SYMA = r'[~!?<>]'
 SYMB = r'[&|%=+\-^*/]'
-SYM_REGEX = re.compile(r'{A}|{B}'.format(A=SYMA, B=SYMB))
-
-
+SYMC = r'(\{|\[|\(|\\)'
+SYM_REGEX = re.compile(r'{A}|{B}|{C}'.format(A=SYMA, B=SYMB, C=SYMC))
 
 @TOKEN(r'{A}+|{B}({A}|{B})+'.format(A=SYMA, B=SYMB))
 def t_code_SID(tok):
     return tok
-
 
 def _after_module(tok):
     data = tok.lexer.lexdata
@@ -168,6 +165,11 @@ def t_code_NL(tok):
     if newline_terminates(tok):
         tok.type = 'TERM'
         return tok
+
+def t_code_TERM(tok):
+    r';'
+
+    return tok
 
 
 def lex_tokens(lexer, input):
