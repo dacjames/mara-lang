@@ -31,16 +31,16 @@ precedence = (
 
 
 def p_module(prod):
-    '''module : MODULE expr END
-              | MODULE VID expr END
+    '''module : MODULE expr_list END
+              | MODULE VID expr_list END
     '''
     if len(prod) == 4:
         prod[0] = node.Module(
             name=util.anonymous_name('module'),
-            exprs=[prod[2]],
+            exprs=prod[2],
         )
     elif len(prod) == 5:
-        prod[0] = node.Module(name=prod[2], exprs=[prod[3]])
+        prod[0] = node.Module(name=prod[2], exprs=prod[3])
 
 
 def p_expr(p):
@@ -129,9 +129,32 @@ def p_binop(p):
 
 
 def p_block(p):
-    '''block : LBRC expr RBRC
+    '''block : LBRC expr_list RBRC
+             | LBRC RBRC
     '''
-    p[0] = node.Block(exprs=[p[2]])
+
+    if len(p) == 4:
+        p[0] = node.Block(exprs=p[2], params=[])
+
+    elif len(p) == 3:
+        p[0] = node.Block(exprs=[], params=[])
+
+    else:
+        raise Exception(len(p))
+
+def p_expr_list(p):
+    '''expr_list : expr TERM expr_list
+                 | expr TERM
+                 | expr
+    '''
+    if len(p) == 2:
+        p[0] = [p[1]]
+
+    elif len(p) == 3:
+        p[0] = [p[1]]
+
+    else:
+        p[0] = [p[1]] + p[3]
 
 
 def p_assign(p):

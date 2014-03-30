@@ -112,6 +112,7 @@ def test_parse_wrapped_if(parser):
                     ]
                 ),
                 body=n.Block(
+                    params=[],
                     exprs=[
                         n.BinOp(
                             func=n.SymbolId('*'),
@@ -142,6 +143,7 @@ def test_parse_postfix_while(parser):
                     ]
                 ),
                body=n.Block(
+                    params=[],
                     exprs=[
                         n.BinOp(
                             func=n.SymbolId('*'),
@@ -160,28 +162,47 @@ def test_parse_postfix_while(parser):
 
 
 @xfail
-def test_exprs_and_blocks():
+def test_exprs_and_blocks(parser):
     given = '''module blocks
                     block = {
                         x = 10
-                        y = x   +
-                            10  *
-                            8   \
-                            .commit()
-                        _z = x + y; z = 2 * _x
+                        y = x
                     }
-                end
-                '''
-    output = n.Module(
-        name='simple',
+                    empty = {}
+                end'''
+    expected = n.Module(
+        name='blocks',
         exprs=[
             n.Assign(
-                name='block',
+                name=n.ValueId('block'),
+                value=n.Block(
+                    params=[],
+                    exprs=[
+                        n.Assign(name=n.ValueId('x'), value=n.Int('10'), type_=None),
+                        n.Assign(name=n.ValueId('y'), value=n.ValueId('x'), type_=None),
+                    ],
+                ),
+            ),
+            n.Assign(
+                name=n.ValueId('empty'),
                 value=n.Block(
                     params=[],
                     exprs=[],
                 ),
-            )
+            ),
         ],
     )
-    assert parser.parse(given) == output
+
+    result = parser.parse(given)
+
+
+    print result
+    print '---'
+    print expected
+
+
+    assert result.name == expected.name
+    assert result.exprs[0].name == expected.exprs[0].name
+    assert result.exprs[0].value.exprs[0] == expected.exprs[0].value.exprs[0]
+    assert result.exprs[0].value.exprs[1] == expected.exprs[0].value.exprs[1]
+    assert  expected == result

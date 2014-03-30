@@ -84,8 +84,9 @@ class TypeId(_Value):
 
 
 class Block(Node):
-    def __init__(self, exprs):
+    def __init__(self, exprs, params):
         self.exprs = exprs
+        self.params = params
 
 
 class BinOp(Node):
