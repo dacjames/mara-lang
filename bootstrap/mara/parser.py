@@ -45,7 +45,9 @@ def p_module(p):
     return p[0]
 
 def p_expr(p):
-    '''expr : literal
+    '''expr : nop
+            | literal
+            | tuple
             | name
             | if
             | while
@@ -61,6 +63,10 @@ def p_expr(p):
         p[0] = p[1]
 
     return p[0]
+
+def p_nop(p):
+    '''nop : TERM'''
+    pass
 
 def p_literal(p):
     '''literal : INTD
@@ -81,6 +87,13 @@ def p_literal(p):
         p[0] = node.Sci(tok.value)
 
     return p[0]
+
+
+def p_tuple(p):
+    '''tuple : LPAR expr_list_comma RPAR
+    '''
+    p[0] = node.Tuple(p[2])
+
 
 def p_name(p):
     '''name : VID
@@ -122,6 +135,7 @@ def p_while(p):
 
     return p[0]
 
+
 def p_binop(p):
     '''binop : expr PLUS expr
              | expr MINUS expr
@@ -137,7 +151,7 @@ def p_binop(p):
     return p[0]
 
 def p_block(p):
-    '''block : LBRC expr_list RBRC
+    '''block : LBRC expr_list_term RBRC
              | LBRC RBRC
     '''
 
@@ -152,21 +166,31 @@ def p_block(p):
 
     return p[0]
 
-def p_expr_list(p):
-    '''expr_list : expr TERM expr_list
-                 | expr TERM
-                 | expr
-    '''
-    if len(p) == 2:
-        p[0] = [p[1]]
+def _seperated_expr_list(rule, sep):
+    def _expr_list(p):
 
-    elif len(p) == 3:
-        p[0] = [p[1]]
+        if len(p) == 2:
+            p[0] = [p[1]]
 
-    else:
-        p[0] = [p[1]] + p[3]
+        elif len(p) == 3:
+            p[0] = [p[1]]
 
-    return p[0]
+        else:
+            p[0] = [p[1]] + p[3]
+
+        return p[0]
+
+    _expr_list.__doc__ = '''
+        {rule} : expr {sep} {rule}
+                  | expr {sep}
+                  | expr
+        '''.format(rule=rule, sep=sep)
+
+    return _expr_list
+
+p_expr_list_term = _seperated_expr_list('expr_list_term', 'TERM')
+p_expr_list_comma = _seperated_expr_list('expr_list_comma', 'COMMA')
+
 
 def p_assign(p):
     '''assign : expr EQ expr

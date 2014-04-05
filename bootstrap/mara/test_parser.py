@@ -243,3 +243,34 @@ def test_declarations(parser):
 
     assert expected == result
 
+def test_parse_tuples(parser, lex_simple):
+    given = maramodule('tuples', '''
+        x = (1,)
+        x = (1, 2, 3)
+    ''')
+
+    expected = n.Module(
+        name='tuples',
+        exprs=[
+            n.Assign(
+                name=n.ValueId('x'),
+                value=n.Tuple(values=[
+                    n.Int('1'),
+                ]),
+            ),
+            n.Assign(
+                name=n.ValueId('x'),
+                value=n.Tuple(values=[
+                    n.Int('1'),
+                    n.Int('2'),
+                    n.Int('3'),
+                ]),
+            ),
+        ]
+    )
+
+    stream = list(lex_simple(given))
+    result = parser.parse(given)
+
+    assert expected == result
+
