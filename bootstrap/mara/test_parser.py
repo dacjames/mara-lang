@@ -280,7 +280,11 @@ def test_parse_lists(parser, lex_simple):
     given = maramodule('lists', '''
         x = [1, ]
         x = [1, 2, 3]
-        [(1), 2, 3,]
+        [
+            (1),
+            2,
+            3,
+        ]
     ''')
 
 
@@ -319,6 +323,11 @@ def test_parse_kvs(parser, lex_simple):
         x : 10
         y :
             20
+        [x: 10, y: 20]
+        [x: 10,
+         y:
+            20
+        ]
     ''')
 
     expected = n.Module(
@@ -326,6 +335,14 @@ def test_parse_kvs(parser, lex_simple):
         exprs=[
             n.KV(key=n.ValueId('x'), value=n.Int('10')),
             n.KV(key=n.ValueId('y'), value=n.Int('20')),
+            n.List(values=[
+                n.KV(key=n.ValueId('x'), value=n.Int('10')),
+                n.KV(key=n.ValueId('y'), value=n.Int('20')),
+            ]),
+            n.List(values=[
+                n.KV(key=n.ValueId('x'), value=n.Int('10')),
+                n.KV(key=n.ValueId('y'), value=n.Int('20')),
+            ]),
         ]
     )
 
