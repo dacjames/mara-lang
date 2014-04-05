@@ -172,6 +172,10 @@ def test_exprs_and_blocks(parser):
                     block = {
                         x = 10
                         y = x
+                        z =
+                          5
+                        t = 10 +
+                            5
                     }
                     empty = {}
                 end'''
@@ -185,6 +189,13 @@ def test_exprs_and_blocks(parser):
                     exprs=[
                         n.Assign(name=n.ValueId('x'), value=n.Int('10'), type_=None),
                         n.Assign(name=n.ValueId('y'), value=n.ValueId('x'), type_=None),
+                        n.Assign(name=n.ValueId('z'), value=n.Int('5'), type_=None),
+                        n.Assign(name=n.ValueId('t'), type_=None,
+                            value=n.BinOp(
+                                func=n.SymbolId('+'),
+                                args=[n.Int('10'), n.Int('5')]
+                            )
+                        )
                     ],
                 ),
             ),
@@ -204,6 +215,7 @@ def test_exprs_and_blocks(parser):
     assert result.exprs[0].name == expected.exprs[0].name
     assert result.exprs[0].value.exprs[0] == expected.exprs[0].value.exprs[0]
     assert result.exprs[0].value.exprs[1] == expected.exprs[0].value.exprs[1]
+    assert result.exprs[0].value.exprs[2] == expected.exprs[0].value.exprs[2]
     assert  expected == result
 
 
