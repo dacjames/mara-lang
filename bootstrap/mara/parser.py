@@ -226,6 +226,8 @@ def p_assign(p):
 def p_declaration(p):
     '''declaration : val
                    | var
+                   | mut
+                   | ref
     '''
     p[0] = p[1]
     return p[0]
@@ -245,6 +247,17 @@ def p_var(p):
     '''var : VAR VID expr
     '''
     p[0] = _declaration(node.Var, p)
+
+def p_ref(p):
+    '''ref : REF VID expr
+    '''
+    p[0] = _declaration(node.Ref, p)
+
+
+def p_mut(p):
+    '''mut : MUT VID expr
+    '''
+    p[0] = _declaration(node.Mut, p)
 
 
 def p_error(tok):

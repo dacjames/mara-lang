@@ -136,6 +136,14 @@ class Var(_Declaration):
     pass
 
 
+class Mut(_Declaration):
+    pass
+
+
+class Ref(_Declaration):
+    pass
+
+
 class For(Node):
     def __init__(self, clauses, body):
         self.clauses = clauses

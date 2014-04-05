@@ -230,6 +230,8 @@ def test_declarations(parser):
     given = '''module declarations
                var x 10
                val y 20
+               ref r 10
+               mut m 20
                end'''
 
     expected = n.Module(
@@ -237,11 +239,17 @@ def test_declarations(parser):
         exprs=[
             n.Var(name=n.ValueId('x'), value=n.Int('10'), type_=None),
             n.Val(name=n.ValueId('y'), value=n.Int('20'), type_=None),
+            n.Ref(name=n.ValueId('r'), value=n.Int('10'), type_=None),
+            n.Mut(name=n.ValueId('m'), value=n.Int('20'), type_=None),
         ],
     )
 
     result = parser.parse(given)
 
+    assert expected.exprs[0] == result.exprs[0]
+    assert expected.exprs[1] == result.exprs[1]
+    assert expected.exprs[2] == result.exprs[2]
+    assert expected.exprs[3] == result.exprs[3]
     assert expected == result
 
 def test_parse_tuples(parser, lex_simple):
