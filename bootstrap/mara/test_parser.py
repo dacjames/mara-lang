@@ -181,7 +181,6 @@ def test_parse_else(parser):
             ),
         ],
     )
-
     result = parser.parse(given)
     assert result == expected
 
@@ -230,6 +229,8 @@ def test_exprs_and_blocks(parser):
                           5
                         t = 10 +
                             5
+                        t = 10 \
+                            + 5
                     }
                     empty = {}
                 end'''
@@ -249,7 +250,15 @@ def test_exprs_and_blocks(parser):
                                 func=n.SymbolId('+'),
                                 args=[n.Int('10'), n.Int('5')]
                             )
-                        )
+                        ),
+                        n.Assign(name=n.ValueId('t'), type_=None,
+                            value=n.BinOp(
+                                func=n.SymbolId('+'),
+                                args=[n.Int('10'), n.Int('5')]
+                            )
+                        ),
+                        
+
                     ],
                 ),
             ),

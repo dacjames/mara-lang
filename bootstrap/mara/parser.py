@@ -68,7 +68,9 @@ def p_expr(p):
     return p[0]
 
 def p_nop(p):
-    '''nop : TERM'''
+    '''nop : TERM
+           | SLASH
+    '''
     pass
 
 def p_literal(p):
