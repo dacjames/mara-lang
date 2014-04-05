@@ -53,6 +53,7 @@ def p_expr(p):
             | if
             | while
             | binop
+            | kv
             | block
             | LPAR expr RPAR
             | assign
@@ -156,6 +157,13 @@ def p_binop(p):
     p[0] = node.BinOp(func=func, args=[p[1], p[3]])
 
     return p[0]
+
+
+def p_kv(p):
+    '''kv : expr COLON expr
+    '''
+    p[0] = node.KV(key=p[1], value=p[3])
+
 
 def p_block(p):
     '''block : LBRC expr_list_term RBRC

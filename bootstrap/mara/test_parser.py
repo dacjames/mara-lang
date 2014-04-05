@@ -307,4 +307,23 @@ def test_parse_lists(parser, lex_simple):
 
     assert expected == result
 
+def test_parse_kvs(parser, lex_simple):
+    given = maramodule('kvs', '''
+        x : 10
+        y :
+            20
+    ''')
+
+    expected = n.Module(
+        name='kvs',
+        exprs=[
+            n.KV(key=n.ValueId('x'), value=n.Int('10')),
+            n.KV(key=n.ValueId('y'), value=n.Int('20')),
+        ]
+    )
+
+    stream = list(lex_simple(given))
+    result = parser.parse(given)
+
+    assert expected == result
 

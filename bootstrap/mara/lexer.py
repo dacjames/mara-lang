@@ -23,7 +23,7 @@ tokens = (
     'LBRC', 'RBRC',
 
     'PIPE', 'AMP', 'DOLLAR', 'AT', 'SLASH',
-    'POUND', 'COMMA', 'DOT', 'NL',
+    'POUND', 'COMMA', 'DOT', 'COLON', 'NL',
     'EQ', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'MOD', 'POWER',
 
     'VID', 'TID', 'SID',
@@ -74,6 +74,7 @@ t_code_SLASH = r'\\'
 t_code_POUND = r'\#'
 t_code_COMMA = r'\,'
 t_code_DOT = r'[.]'
+t_code_COLON = r'\:'
 
 # Operators
 t_code_PLUS = r'[+]'
@@ -126,7 +127,7 @@ def t_code_TID(tok):
     return tok
 
 SYMA = r'[~!?<>]'
-SYMB = r'[&|%=+\-^*/]'
+SYMB = r'[&|%=+\-^*/:]'
 SYMC = r'(\{|\[|\(|\\)'
 SYM_REGEX = re.compile(r'{A}|{B}|{C}'.format(A=SYMA, B=SYMB, C=SYMC))
 

@@ -147,3 +147,9 @@ class ForClause(Node):
         self.bind = bind
         self.in_ = in_
 
+
+class KV(Node):
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+
