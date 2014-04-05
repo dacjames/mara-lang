@@ -31,16 +31,16 @@ precedence = (
 
 
 def p_module(p):
-    '''module : MODULE expr_list END
-              | MODULE VID expr_list END
+    '''module : MODULE TERM expr_list END
+              | MODULE VID TERM expr_list END
     '''
-    if len(p) == 4:
+    if len(p) == 5:
         p[0] = node.Module(
             name=util.anonymous_name('module'),
-            exprs=p[2],
+            exprs=p[3],
         )
-    elif len(p) == 5:
-        p[0] = node.Module(name=p[2], exprs=p[3])
+    elif len(p) == 6:
+        p[0] = node.Module(name=p[2], exprs=p[4])
 
     return p[0]
 

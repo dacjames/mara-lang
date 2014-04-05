@@ -6,7 +6,7 @@ xfail = pytest.mark.xfail
 
 
 def maramodule(name, code):
-    return 'module {n} {c} end'.format(n=name, c=code)
+    return 'module {n}; {c} end'.format(n=name, c=code)
 
 
 @pytest.fixture
@@ -16,21 +16,21 @@ def parser():
 
 def test_parse_literals(parser):
     assert (
-        parser.parse('module test 10 end') ==
+        parser.parse('module test; 10 end') ==
         n.Module(name='test', exprs=[
             n.Int(value='10')
         ])
     )
 
     assert (
-        parser.parse('module test 10.0 end') ==
+        parser.parse('module test; 10.0 end') ==
         n.Module(name='test', exprs=[
             n.Real(value='10.0')
         ])
     )
 
     assert (
-        parser.parse('module test 1e10 end') ==
+        parser.parse('module test; 1e10 end') ==
         n.Module(name='test', exprs=[
             n.Sci(value='1e10')
         ])
@@ -38,7 +38,7 @@ def test_parse_literals(parser):
 
 
 def test_parse_simple_expr(parser):
-    given = 'module x * 1 end'
+    given = 'module; x * 1 end'
     expected = n.Module(
         name='_anon_module_0',
         exprs=[
@@ -56,7 +56,7 @@ def test_parse_simple_expr(parser):
 
 
 def test_exprs_parse_assignment(parser):
-    given = 'module assignment a = 10 end'
+    given = 'module assignment; a = 10 end'
 
     expected = n.Module('assignment', [
         n.Assign(name=n.ValueId('a'), value=n.Int('10'), type_=None)
@@ -65,7 +65,7 @@ def test_exprs_parse_assignment(parser):
     result = parser.parse(given)
     assert expected == result
 
-    given = 'module assignment a Real = 1.0 end'
+    given = 'module assignment; a Real = 1.0 end'
 
     expected = n.Module('assignment', [
         n.Assign(name=n.ValueId('a'), value=n.Int('1.0'), type_=n.TypeId('Real'))
@@ -76,7 +76,7 @@ def test_exprs_parse_assignment(parser):
 
 
 def test_parse_unwrapped_if(parser):
-    given = 'module simple (x * 2.0) if (x > 0) end'
+    given = 'module simple; (x * 2.0) if (x > 0) end'
     expected = n.Module(
         name='simple',
         exprs=[
@@ -103,7 +103,7 @@ def test_parse_unwrapped_if(parser):
 
 
 def test_parse_wrapped_if(parser):
-    given = 'module simple if (x > 0) {x * 2.0} end'
+    given = 'module simple; if (x > 0) {x * 2.0} end'
     expected = n.Module(
         name='simple',
         exprs=[

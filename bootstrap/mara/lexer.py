@@ -155,8 +155,8 @@ def newline_terminates(tok):
     after_module = _after_module(tok)
 
     return (
-        not after_symbol and
-        not after_module
+        not after_symbol
+        # and not after_module
     )
 
 def t_code_NL(tok):
@@ -170,7 +170,6 @@ def t_code_TERM(tok):
     r';'
 
     return tok
-
 
 def lex_tokens(lexer, input):
     '''Lex an input stream, yielding one token at a time.

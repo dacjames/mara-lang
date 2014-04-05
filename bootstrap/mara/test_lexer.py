@@ -62,26 +62,33 @@ def test_lex_keywords(lex_simple):
         while
         def val var ref mut
         datum trait type
-    end'''.replace('\n', ' ')
+    end'''
 
     output = list(lex_simple(given))
     assert output == [
         ('MODULE', 'module'),
+        ('TERM', '\n'),
         ('MATCH', 'match'),
         ('AS', 'as'),
+        ('TERM', '\n'),
         ('IF', 'if'),
         ('ELSE', 'else'),
+        ('TERM', '\n'),
         ('FOR', 'for'),
         ('IN', 'in'),
+        ('TERM', '\n'),
         ('WHILE', 'while'),
+        ('TERM', '\n'),
         ('DEF', 'def'),
         ('VAL', 'val'),
         ('VAR', 'var'),
         ('REF', 'ref'),
         ('MUT', 'mut'),
+        ('TERM', '\n'),
         ('DATUM', 'datum'),
         ('TRAIT', 'trait'),
         ('TYPE', 'type'),
+        ('TERM', '\n'),
         ('END', 'end'),
     ]
 
@@ -153,6 +160,7 @@ end'''
     assert output == [
         ('MODULE', 'module'),
         ('VID', 'test'),
+        ('TERM', '\n'),
         ('VID', 'x'),
         ('EQ', '='),
         ('INTD', '10'),
