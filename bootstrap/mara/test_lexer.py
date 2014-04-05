@@ -175,3 +175,59 @@ end'''
         ('TERM', '\n'),
         ('END', 'end'),
     ]
+
+
+def test_open_state(lex_simple):
+    given = '''module test
+        [
+            x +
+            y
+            z
+        ]
+        (
+            x +
+            y
+            z
+        )
+        {
+            x +
+            y
+            z
+        }
+    '''
+
+    expected = [
+        ('MODULE', 'module'),
+        ('VID', 'test'),
+        ('TERM', '\n'),
+
+        ('LBKT', '['),
+        ('VID', 'x'),
+        ('PLUS', '+'),
+        ('VID', 'y'),
+        ('VID', 'z'),
+        ('RBKT', ']'),
+        ('TERM', '\n'),
+
+        ('LPAR', '('),
+        ('VID', 'x'),
+        ('PLUS', '+'),
+        ('VID', 'y'),
+        ('VID', 'z'),
+        ('RPAR', ')'),
+        ('TERM', '\n'),
+
+        ('LBRC', '{'),
+        ('VID', 'x'),
+        ('PLUS', '+'),
+        ('VID', 'y'),
+        ('TERM', '\n'),
+        ('VID', 'z'),
+        ('TERM', '\n'),
+        ('RBRC', '}'),
+        ('TERM', '\n'),
+    ]
+
+    result = list(lex_simple(given))
+
+    assert result == expected
