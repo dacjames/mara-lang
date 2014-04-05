@@ -7,3 +7,15 @@ def proxy (Type Any) =
     }
 
 def proxy
+
+datum Maybe(T) = Yes(T) | No
+
+datum DoublePoint   { val x Int, val y Int }
+
+def DoublePoint::x  { this['x'] * 2 }
+def DoublePoint::y  { this['y'] * 2 }
+
+p = DoublePoint(3, 5)
+
+p.x === p['x'] * 2
+p.y === p['y'] * 2

@@ -47,9 +47,10 @@ trait String::StringFunctions {
     def find String -> String?
     def contains String -> Bool
 
-    contains(string) = match (this.find string)
-        as item! true
-        as ?     false
+    contains(string) =
+        match (this.find string)
+        as _.Yes { true }
+        as No { false }
 
     def upper -> String
     def lower -> String
@@ -66,7 +67,6 @@ trait StringLiteral::StringShortcuts {
     def s = this.value.to Symbol
     def f = this.value.format
     def r = this.value.to Regex
-    def m =
 }
 
 
@@ -74,8 +74,6 @@ trait StringLiteral::StringShortcuts {
 
 def Symbol::to Text = this.c.decode 'utf8'
 def Symbol::to Char.Array = this.elements
-
-
 
 
 end
