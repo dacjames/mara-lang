@@ -31,8 +31,8 @@ precedence = (
 
 
 def p_module(p):
-    '''module : MODULE TERM expr_list END
-              | MODULE VID TERM expr_list END
+    '''module : MODULE TERM expr_list_term END
+              | MODULE VID TERM expr_list_term END
     '''
     if len(p) == 5:
         p[0] = node.Module(

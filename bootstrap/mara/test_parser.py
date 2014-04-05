@@ -4,9 +4,11 @@ import pytest
 
 xfail = pytest.mark.xfail
 
+from test_lexer import lex_simple
+
 
 def maramodule(name, code):
-    return 'module {n}; {c} end'.format(n=name, c=code)
+    return 'module {n} {c} end'.format(n=name, c=code)
 
 
 @pytest.fixture
@@ -56,7 +58,9 @@ def test_parse_simple_expr(parser):
 
 
 def test_exprs_parse_assignment(parser):
-    given = 'module assignment; a = 10 end'
+    given = maramodule('assignment', '''
+        a = 10
+    ''')
 
     expected = n.Module('assignment', [
         n.Assign(name=n.ValueId('a'), value=n.Int('10'), type_=None)
@@ -135,7 +139,9 @@ def test_parse_wrapped_if(parser):
 
 
 def test_parse_postfix_while(parser):
-    given = maramodule('test', 'while (x > 0) {x * 2}')
+    given = maramodule('test', '''
+        while (x > 0) {x * 2}
+    ''')
     expected = n.Module(
         name='test',
         exprs=[
