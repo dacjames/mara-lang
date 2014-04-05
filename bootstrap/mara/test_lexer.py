@@ -249,7 +249,9 @@ def test_lex_comments(lex_simple):
         ('VID', 'x'),
         ('TERM', '\n'),
         ('TCOMMENT', ' asdf'),
+        ('TERM', '\n'),
         ('DCOMMENT', ' asdf'),
+        ('TERM', '\n'),
         ('BCOMMENT', '\n    asdf\n    qwerty\n    '),
         ('TERM', '\n'),
     ]

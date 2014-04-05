@@ -167,3 +167,21 @@ class KV(Node):
         self.key = key
         self.value = value
 
+
+class _Comment(Node):
+    def __init__(self, content):
+        self.content = content
+
+
+class TempComment(_Comment):
+    pass
+
+
+class DocComment(_Comment):
+    pass
+
+
+class BlockComment(_Comment):
+    pass
+
+

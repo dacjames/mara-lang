@@ -109,9 +109,10 @@ def t_dcomment_DCOMMENT(tok):
     r'[^\n]+'
     return tok
 
-def t_dcomment_NL(tok):
+def t_dcomment_TERM(tok):
     r'(\n|\r)+'
     tok.lexer.pop_state()
+    return tok
 
 ## Temp Comment
 
@@ -123,9 +124,11 @@ def t_tcomment_TCOMMENT(tok):
     r'[^\n]+'
     return tok
 
-def t_tcomment_NL(tok):
+def t_tcomment_TERM(tok):
     r'(\n|\r)+'
     tok.lexer.pop_state()
+    return tok
+
 
 ## End Comments
 

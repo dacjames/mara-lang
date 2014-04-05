@@ -413,3 +413,29 @@ def test_parse_kvs(parser, lex_simple):
     stream = list(lex_simple(given))
     result = parser.parse(given)
     assert expected == result
+
+def test_parse_comments(parser):
+    given = maramodule('comments', '''
+    # asdf
+    ## asdf
+    ###
+    asdf
+    qwerty
+    ###
+    ''')
+
+    expected = n.Module(name='comments', exprs=[
+        n.TempComment(' asdf'),
+        n.DocComment(' asdf'),
+        n.BlockComment('''
+    asdf
+    qwerty
+    '''),
+    ])
+
+    result = parser.parse(given)
+    assert expected == result
+
+@pytest.mark.xfail
+def test_always_fail(parser):
+    raise Exception

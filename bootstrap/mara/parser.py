@@ -46,6 +46,7 @@ def p_module(p):
 
 def p_expr(p):
     '''expr : nop
+            | comment
             | literal
             | tuple
             | list
@@ -72,6 +73,25 @@ def p_nop(p):
            | SLASH
     '''
     pass
+
+def p_comment(p):
+    '''comment : temp_comment
+               | doc_comment
+               | block_comment
+    '''
+    p[0] = p[1]
+
+def _comment(rule, cls, tok):
+    def p_comment(p):
+        p[0] = cls(p[1])
+
+    p_comment.__doc__ = '{rule} : {tok}'.format(rule=rule, tok=tok)
+    return p_comment
+
+p_temp_comment = _comment('temp_comment', node.TempComment, 'TCOMMENT')
+p_doc_comment = _comment('doc_comment', node.DocComment, 'DCOMMENT')
+p_block_comment = _comment('block_comment', node.BlockComment, 'BCOMMENT')
+
 
 def p_literal(p):
     '''literal : INTD
