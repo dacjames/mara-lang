@@ -48,6 +48,7 @@ def p_expr(p):
     '''expr : nop
             | literal
             | tuple
+            | list
             | name
             | if
             | while
@@ -93,6 +94,12 @@ def p_tuple(p):
     '''tuple : LPAR expr_list_comma RPAR
     '''
     p[0] = node.Tuple(p[2])
+
+
+def p_list(p):
+    '''list : LBKT expr_list_comma RBKT
+    '''
+    p[0] = node.List(p[2])
 
 
 def p_name(p):

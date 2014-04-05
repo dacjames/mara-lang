@@ -51,11 +51,15 @@ class Module(Node):
         self.name = name
         self.exprs = exprs
 
-
-class Tuple(Node):
+class _Collection(Node):
     def __init__(self, values=[]):
         self.values = values
 
+class Tuple(_Collection):
+    pass
+
+class List(_Collection):
+    pass
 
 class _Value(Node):
     def __init__(self, value):
