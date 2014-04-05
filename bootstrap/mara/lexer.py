@@ -41,7 +41,7 @@ class Balancer(object):
         return isopen
 
 
-KEYWORDS = set([
+KEYWORDS = set(k.upper() for k in [
     'match', 'as',
     'if', 'else',
     'for', 'in',
@@ -66,7 +66,7 @@ tokens = (
     'VID', 'TID', 'SID',
 
     'INTD', 'INTX', 'INTP', 'REAL', 'SCI',
-) + tuple([kw.upper() for kw in KEYWORDS])
+) + tuple(KEYWORDS)
 
 states = (
     ('code', 'exclusive'),
@@ -228,7 +228,7 @@ def t_code_INTD(tok):
 def t_code_VID(tok):
     r'(_+[0-9]|_*[a-z])[A-Za-z_0-9]*'
 
-    if tok.value in KEYWORDS:
+    if tok.value.upper() in KEYWORDS:
         tok.type = tok.value.upper()
 
     return tok

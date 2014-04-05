@@ -4,6 +4,7 @@ Mara Parser
 import ply.yacc as yacc
 
 from lexer import tokens
+from lexer import KEYWORDS
 import node
 import util
 
@@ -24,6 +25,9 @@ class ParseError(Exception):
 
 
 precedence = (
+    tuple(['right'] + list(KEYWORDS)),
+    ('right', 'SID'),
+    ('right', 'VID', 'TID'),
     ('left', 'PLUS', 'MINUS'),
     ('left', 'TIMES', 'DIVIDE', 'MOD'),
     ('left', 'POWER'),
