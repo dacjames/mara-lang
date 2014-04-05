@@ -164,6 +164,7 @@ def t_code_NL(tok):
 
     if newline_terminates(tok):
         tok.type = 'TERM'
+        tok.value = '\n'
         return tok
 
 def t_code_TERM(tok):

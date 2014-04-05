@@ -152,6 +152,9 @@ def test_lex_literal_nums(lex_simple):
 def test_lex_expr_end(lex_simple):
     given = '''module test
 x = 10
+
+
+
 y +
   5
 end'''
