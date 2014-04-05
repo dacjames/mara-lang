@@ -16,10 +16,11 @@ def parser():
     return parser_module.build_parser()
 
 
-def test_parse_literals(parser):
+def test_parse_literals(parser, lex_simple):
     assert (
-        parser.parse('module test; 10 end') ==
-        n.Module(name='test', exprs=[
+        parser.parse(maramodule('test', '''
+            10
+        ''')) == n.Module(name='test', exprs=[
             n.Int(value='10')
         ])
     )
@@ -279,6 +280,7 @@ def test_parse_lists(parser, lex_simple):
     given = maramodule('lists', '''
         x = [1, ]
         x = [1, 2, 3]
+        [(1), 2, 3,]
     ''')
 
 
@@ -299,6 +301,11 @@ def test_parse_lists(parser, lex_simple):
                     n.Int('3'),
                 ]),
             ),
+            n.List(values=[
+                n.Int('1'),
+                n.Int('2'),
+                n.Int('3'),
+            ]),
         ]
     )
 
@@ -326,4 +333,3 @@ def test_parse_kvs(parser, lex_simple):
     result = parser.parse(given)
 
     assert expected == result
-
