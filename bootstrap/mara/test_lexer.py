@@ -32,7 +32,7 @@ def test_lex_wrappers(lex_simple):
 
 
 def test_lex_distinct_symbols(lex_simple):
-    given = 'module @ | & $ \ # , . = + - ^ / * : end'
+    given = 'module @ | & $ \ , . = + - ^ / * : end'
     output = list(lex_simple(given))
     assert output == [
         ('MODULE', 'module'),
@@ -41,7 +41,6 @@ def test_lex_distinct_symbols(lex_simple):
         ('AMP', '&'),
         ('DOLLAR', '$'),
         ('SLASH', '\\'),
-        ('POUND', '#'),
         ('COMMA', ','),
         ('DOT', '.'),
         ('EQ', '='),
@@ -225,6 +224,33 @@ def test_open_state(lex_simple):
         ('VID', 'z'),
         ('TERM', '\n'),
         ('RBRC', '}'),
+        ('TERM', '\n'),
+    ]
+
+    result = list(lex_simple(given))
+
+    assert result == expected
+
+def test_lex_comments(lex_simple):
+    given = '''module test
+    x
+    # asdf
+    ## asdf
+    ###
+    asdf
+    qwerty
+    ###
+    '''
+
+    expected = [
+        ('MODULE', 'module'),
+        ('VID', 'test'),
+        ('TERM', '\n'),
+        ('VID', 'x'),
+        ('TERM', '\n'),
+        ('TCOMMENT', ' asdf'),
+        ('DCOMMENT', ' asdf'),
+        ('BCOMMENT', '\n    asdf\n    qwerty\n    '),
         ('TERM', '\n'),
     ]
 

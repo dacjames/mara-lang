@@ -412,5 +412,4 @@ def test_parse_kvs(parser, lex_simple):
 
     stream = list(lex_simple(given))
     result = parser.parse(given)
-
     assert expected == result

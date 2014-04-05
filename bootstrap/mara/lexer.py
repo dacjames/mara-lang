@@ -58,8 +58,10 @@ tokens = (
     'LBRC', 'RBRC',
 
     'PIPE', 'AMP', 'DOLLAR', 'AT', 'SLASH',
-    'POUND', 'COMMA', 'DOT', 'COLON', 'NL',
+    'COMMA', 'DOT', 'COLON', 'NL',
     'EQ', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'MOD', 'POWER',
+
+    'TCOMMENT', 'DCOMMENT', 'BCOMMENT',
 
     'VID', 'TID', 'SID',
 
@@ -68,6 +70,9 @@ tokens = (
 
 states = (
     ('code', 'exclusive'),
+    ('tcomment', 'exclusive'),
+    ('dcomment', 'exclusive'),
+    ('bcomment', 'exclusive'),
 )
 
 
@@ -77,6 +82,52 @@ def t_MODULE(tok):
     tok.lexer.marabalancer = Balancer()
     return tok
 
+## Block Comment
+
+def t_code_BCOMMENT(tok):
+    r'\#\#\#'
+    tok.lexer.push_state('bcomment')
+
+def t_bcomment_END(tok):
+    r'\#\#\#'
+    tok.lexer.pop_state()
+
+def t_bcomment_BCOMMENT(tok):
+    r'((?!\#\#\#)(.|\n|\r))+'
+    return tok
+
+def t_bcomment_error(tok):
+    return tok
+
+## Doc Comment
+
+def t_code_DCOMMENT(tok):
+    r'\#\#'
+    tok.lexer.push_state('dcomment')
+
+def t_dcomment_DCOMMENT(tok):
+    r'[^\n]+'
+    return tok
+
+def t_dcomment_NL(tok):
+    r'(\n|\r)+'
+    tok.lexer.pop_state()
+
+## Temp Comment
+
+def t_code_TCOMMENT(tok):
+    r'\#'
+    tok.lexer.push_state('tcomment')
+
+def t_tcomment_TCOMMENT(tok):
+    r'[^\n]+'
+    return tok
+
+def t_tcomment_NL(tok):
+    r'(\n|\r)+'
+    tok.lexer.pop_state()
+
+## End Comments
 
 def t_code_END(tok):
     'end'
@@ -130,7 +181,6 @@ t_code_AMP = r'\&'
 t_code_DOLLAR = r'\$'
 t_code_AT = r'@'
 t_code_SLASH = r'\\'
-t_code_POUND = r'\#'
 t_code_COMMA = r'\,'
 t_code_DOT = r'[.]'
 t_code_COLON = r'\:'
