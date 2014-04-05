@@ -6,6 +6,41 @@ from collections import namedtuple
 from ply.lex import TOKEN
 
 
+class Balancer(object):
+    def __init__(self):
+        self.par = 0
+        self.bkt = 0
+
+    def track(self, tok):
+        if tok.type == 'LPAR':
+            self._openpar()
+        if tok.type == 'RPAR':
+            self._closepar()
+        if tok.type == 'LBKT':
+            self._openbkt()
+        if tok.type == 'RBKT':
+            self._closebkt()
+
+    def _openpar(self):
+        self.par += 1
+
+    def _closepar(self):
+        self.par -= 1
+
+    def _openbkt(self):
+        self.bkt += 1
+
+    def _closebkt(self):
+        self.bkt -= 1
+
+    def isopen(self):
+        isopen = (
+            self.par > 0
+            or self.bkt > 0
+        )
+        return isopen
+
+
 KEYWORDS = set([
     'match', 'as',
     'if', 'else',
@@ -39,6 +74,7 @@ states = (
 def t_MODULE(tok):
     'module'
     tok.lexer.begin('code')
+    tok.lexer.marabalancer = Balancer()
     return tok
 
 
@@ -57,12 +93,35 @@ def t_code_error(tok):
     return tok
 
 # Wrappers
-t_code_LPAR = r'\('
-t_code_RPAR = r'\)'
-t_code_LBKT = r'\['
-t_code_RBKT = r'\]'
-t_code_LBRC = r'\{'
-t_code_RBRC = r'\}'
+def t_code_LPAR(tok):
+    r'\('
+    tok.lexer.marabalancer.track(tok)
+    return tok
+
+def t_code_RPAR(tok):
+    r'\)'
+    tok.lexer.marabalancer.track(tok)
+    return tok
+
+def t_code_LBKT(tok):
+    r'\['
+    tok.lexer.marabalancer.track(tok)
+    return tok
+
+def t_code_RBKT(tok):
+    r'\]'
+    tok.lexer.marabalancer.track(tok)
+    return tok
+
+def t_code_LBRC(tok):
+    r'\{'
+    tok.lexer.marabalancer.track(tok)
+    return tok
+
+def t_code_RBRC(tok):
+    r'\}'
+    tok.lexer.marabalancer.track(tok)
+    return tok
 
 # Distinct symbols
 t_code_EQ = r'='
@@ -155,8 +214,11 @@ def newline_terminates(tok):
     after_symbol = SYM_REGEX.match(tok.lexer.lexdata[tok.lexer.lexpos - 2])
     after_module = _after_module(tok)
 
+    print tok.lexer.marabalancer.isopen()
+
     return (
         not after_symbol
+        and not tok.lexer.marabalancer.isopen()
         # and not after_module
     )
 
