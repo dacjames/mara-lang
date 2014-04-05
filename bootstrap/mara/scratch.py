@@ -88,3 +88,48 @@ def test_parse_wrapped_if():
         ],
     )
     assert parser.parse(given) == output
+
+def p_for(p):
+    '''for : FOR expr IN expr block'''
+    p[0] = p[1]
+
+def p_prefix_for(p):
+    '''prefix_for : expr for_clauses'''
+    pass
+
+def p_postfix_for(p):
+    '''postfix_for : for_clauses block'''
+    pass
+
+def p_for_clauses(p):
+    '''for_clauses : for_clause'''
+    p[0] = p[1]
+
+def p_for_clause(p):
+    '''for_clause : FOR expr IN expr TERM
+    '''
+    p[0] = node.ForClause(bind=p[2], in_=p[4])
+
+def test_for_expr(parser):
+    given = maramodule('for_loops', '''
+        for x in xs; { x + 1 }
+    ''')
+
+    expected = n.Module(
+        name='declarations',
+        exprs=[
+            n.For(
+                clauses=[
+                    n.ForClause(bind=n.ValueId('x'), in_=n.ValueId('xs'))
+                ],
+                body=n.BinOp(
+                    func=n.SymbolId('+'),
+                    args=[n.ValueId('x'), n.Int('1')],
+                ),
+            )
+        ]
+    )
+
+    result = parser.parse(given)
+
+    assert expected == result

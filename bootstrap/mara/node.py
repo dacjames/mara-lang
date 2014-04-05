@@ -123,10 +123,23 @@ class _Declaration(Node):
         self.value = value
         self.type_ = type_
 
+
 class Val(_Declaration):
     pass
+
 
 class Var(_Declaration):
     pass
 
+
+class For(Node):
+    def __init__(self, clauses, body):
+        self.clauses = clauses
+        self.body = body
+
+
+class ForClause(Node):
+    def __init__(self, bind, in_):
+        self.bind = bind
+        self.in_ = in_
 
