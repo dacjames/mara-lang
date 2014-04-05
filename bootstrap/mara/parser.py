@@ -51,6 +51,7 @@ def p_expr(p):
             | list
             | name
             | if
+            | else
             | while
             | binop
             | kv
@@ -90,7 +91,6 @@ def p_literal(p):
 
     return p[0]
 
-
 def p_tuple(p):
     '''tuple : LPAR expr_list_comma RPAR
     '''
@@ -122,14 +122,45 @@ def p_name(p):
     return p[0]
 
 def p_if(p):
-    '''if : IF expr block
-          | expr IF expr'''
+    '''if : prefix_if
+          | postfix_if
+    '''
 
-    if p[1] == 'if':
-        p[0] = node.If(pred=p[2], body=p[3])
-    else:
-        p[0] = node.If(pred=p[3], body=p[1])
+    p[0] = p[1]
 
+    return p[0]
+
+def p_prefix_if(p):
+    '''prefix_if : IF expr block
+    '''
+    p[0] = node.If(pred=p[2], body=p[3])
+
+    return p[0]
+
+def p_postfix_if(p):
+    '''postfix_if : expr IF expr
+    '''
+    p[0] = node.If(pred=p[3], body=p[1])
+
+    return p[0]
+
+def p_else(p):
+    '''else : prefix_else
+            | postfix_else
+    '''
+    p[0] = p[1]
+    return p[0]
+
+def p_prefix_else(p):
+    '''prefix_else : ELSE block
+    '''
+    p[0] = node.Else(body=p[2], expr=None)
+    return p[0]
+
+def p_postfix_else(p):
+    '''postfix_else : expr ELSE expr
+    '''
+    p[0] = node.Else(body=p[3], expr=p[1])
     return p[0]
 
 def p_while(p):

@@ -108,6 +108,12 @@ class If(Node):
         self.body = body
 
 
+class Else(Node):
+    def __init__(self, expr, body):
+        self.expr = expr
+        self.body = body
+
+
 class Assign(Node):
     def __init__(self, name, value, type_=None):
         self.name = name

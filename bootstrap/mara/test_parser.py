@@ -138,6 +138,53 @@ def test_parse_wrapped_if(parser):
     result = parser.parse(given)
     assert expected == result
 
+def test_parse_else(parser):
+    given = maramodule('elses', '''
+        if (x > 0) { x * 2.0 }
+        else { 10.0 }
+        20 else 10
+    ''')
+
+    expected = n.Module(
+        name='elses',
+        exprs=[
+            n.If(
+                pred=n.BinOp(
+                    func=n.SymbolId('>'),
+                    args=[
+                        n.ValueId('x'),
+                        n.Int(value='0'),
+                    ]
+                ),
+                body=n.Block(
+                    params=[],
+                    exprs=[
+                        n.BinOp(
+                            func=n.SymbolId('*'),
+                            args=[
+                                n.ValueId('x'),
+                                n.Real(value='2.0')
+                            ]
+                        ),
+                    ]
+                ),
+            ),
+            n.Else(
+                expr=None,
+                body=n.Block(params=[], exprs=[
+                    n.Real('10.0')
+                ])
+            ),
+            n.Else(
+                expr=n.Int('20'),
+                body=n.Int('10'),
+            ),
+        ],
+    )
+
+    result = parser.parse(given)
+    assert result == expected
+
 
 def test_parse_postfix_while(parser):
     given = maramodule('test', '''
