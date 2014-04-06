@@ -5,28 +5,24 @@ def multimethod(store):
 
     def generic_decorator(f):
 
-        class Generic(object):
-            def __init__(self):
-                self.__name__ = f.__name__
+        @wraps(f)
+        def generic(*args):
+            return store[f.__name__][
+                tuple(a.__class__ for a in args[1:])
+            ](*args)
 
-            def __call__(self, *args):
-                return store[f.__name__][
-                    tuple(a.__class__ for a in args)
-                ](self, *args)
 
-            def dispatch(self, *clses):
-                print 'clses', clses
-                def dispatch_decorator(handler):
-                    store[f.__name__][clses] = handler
-                    return handler
+        def dispatch(*clses):
+            print 'clses', clses
+            def dispatch_decorator(handler):
+                store[f.__name__][clses] = handler
+                return handler
 
-                return dispatch_decorator
+            return dispatch_decorator
 
-            d = dispatch
+        generic.d = generic.dispatch = dispatch
 
-        # generic(0, 1, 2)
-
-        return wraps(f)(Generic())
+        return generic
 
     return generic_decorator
 

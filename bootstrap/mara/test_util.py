@@ -95,6 +95,9 @@ def test_mutlimethods():
     class Eval(object):
         store = method_store()
 
+        def dummy(self):
+            return True
+
         @multimethod(store)
         def visit(self, a):
             pass
@@ -117,9 +120,6 @@ def test_mutlimethods():
         def _(self, a, b):
             assert self.dummy()
             return 'Real', 'Real', a, b
-
-        def dummmy(self):
-            return True
 
     eval_ = Eval()
 
