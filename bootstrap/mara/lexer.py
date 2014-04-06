@@ -253,38 +253,19 @@ SYM_REGEX = re.compile(r'{A}|{B}|{C}'.format(A=SYMA, B=SYMB, C=SYMC))
 def t_code_SID(tok):
     return tok
 
-def _after_module(tok):
-    data = tok.lexer.lexdata
-    pos = tok.lexer.lexpos
 
-    # slide to the beginning of the line
-    start = pos - 1
-    current = data[start]
-
-    pos = start - 1
-    while data[pos] != current and pos > 0:
-        pos -= 1
-
-    after_module = ('module' in data[pos:start])
-    return after_module
-
-
-def newline_terminates(tok):
+def _newline_terminates(tok):
     after_symbol = SYM_REGEX.match(tok.lexer.lexdata[tok.lexer.lexpos - 2])
-    after_module = _after_module(tok)
-
-    print tok.lexer.marabalancer.isopen()
 
     return (
         not after_symbol
         and not tok.lexer.marabalancer.isopen()
-        # and not after_module
     )
 
 def t_code_NL(tok):
     r'(\n|\r)+'
 
-    if newline_terminates(tok):
+    if _newline_terminates(tok):
         tok.type = 'TERM'
         tok.value = '\n'
         return tok

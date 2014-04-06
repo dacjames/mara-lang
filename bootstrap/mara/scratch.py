@@ -133,3 +133,25 @@ def test_for_expr(parser):
     result = parser.parse(given)
 
     assert expected == result
+
+
+def _after_module(tok):
+    data = tok.lexer.lexdata
+    pos = tok.lexer.lexpos
+
+    # slide to the beginning of the line
+    start = pos - 1
+    current = data[start]
+
+    pos = start - 1
+    while data[pos] != current and pos > 0:
+        pos -= 1
+
+    after_module = ('module' in data[pos:start])
+    return after_module
+
+
+class LinkVariables(Visitor)
+    
+    @
+    def link(self, )
