@@ -3,6 +3,7 @@ import random
 
 import util
 
+
 def _random_prefixes():
     prefixes = {
         None: 10
@@ -86,3 +87,40 @@ def test_public_attrs_field_methods():
     assert util.class_fields(test) == class_fields
     assert util.class_methods(test) == class_methods
     assert util.class_attrs(test) ==  class_fields + class_methods
+
+def test_mutlimethods():
+
+    from util.dispatch import method_store, multimethod
+
+    class Eval(object):
+        store = method_store()
+
+        @multimethod(store)
+        def visit(self, a):
+            pass
+
+        @visit.dispatch(int)
+        def _(self, a):
+            return 'Int', a
+
+        @multimethod(store)
+        def multi(self, a, b):
+            pass
+
+        @multi.dispatch(int, float)
+        def _(self, a, b):
+            return 'Int', 'Real', a, b
+
+        @multi.dispatch(float, float)
+        def _(self, a, b):
+            return 'Real', 'Real', a, b
+
+    eval_ = Eval()
+
+    assert eval_.visit.__name__ == 'visit'
+
+    assert eval_.visit(10) == ('Int', 10)
+    assert eval_.multi(10, 10.0) == ('Int', 'Real', 10, 10.0)
+    assert eval_.multi(10.0, 10.0) == ('Real', 'Real', 10, 10.0)
+
+

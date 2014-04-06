@@ -81,7 +81,7 @@ def test_exprs_parse_assignment(parser):
 
 
 def test_parse_unwrapped_if(parser):
-    given = 'module simple; (x * 2.0) if (x > 0) end'
+    given = 'module simple; x * 2.0 if x > 0 end'
     expected = n.Module(
         name='simple',
         exprs=[

@@ -43,7 +43,7 @@ class Node(object):
         )
 
     def visit(self, visitor):
-        return visitor(self)
+        visitor(self, self.children())
 
 
 class Module(Node):
