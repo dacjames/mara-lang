@@ -15,6 +15,10 @@ def multimethod(store):
         def dispatch(*clses):
             print 'clses', clses
             def dispatch_decorator(handler):
+                handler.__name__ = '_'.join(
+                    [f.__name__] +
+                    [c.__name__ for c in clses]
+                )
                 store[f.__name__][clses] = handler
                 return handler
 
