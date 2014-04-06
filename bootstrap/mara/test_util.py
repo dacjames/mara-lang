@@ -101,6 +101,7 @@ def test_mutlimethods():
 
         @visit.dispatch(int)
         def _(self, a):
+            assert self.dummy()
             return 'Int', a
 
         @multimethod(store)
@@ -109,11 +110,16 @@ def test_mutlimethods():
 
         @multi.dispatch(int, float)
         def _(self, a, b):
+            assert self.dummy()
             return 'Int', 'Real', a, b
 
         @multi.dispatch(float, float)
         def _(self, a, b):
+            assert self.dummy()
             return 'Real', 'Real', a, b
+
+        def dummmy(self):
+            return True
 
     eval_ = Eval()
 

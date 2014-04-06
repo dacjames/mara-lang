@@ -1,4 +1,4 @@
-from functools import update_wrapper
+from functools import update_wrapper, wraps
 from collections import defaultdict
 
 def multimethod(store):
@@ -6,22 +6,27 @@ def multimethod(store):
     def generic_decorator(f):
 
         class Generic(object):
-            def __call__(*args):
+            def __init__(self):
+                self.__name__ = f.__name__
+
+            def __call__(self, *args):
                 return store[f.__name__][
-                    tuple(a.__class__ for a in args[1:])
-                ](*args)
+                    tuple(a.__class__ for a in args)
+                ](self, *args)
 
             def dispatch(self, *clses):
+                print 'clses', clses
                 def dispatch_decorator(handler):
                     store[f.__name__][clses] = handler
-                    return f
+                    return handler
 
                 return dispatch_decorator
 
-        generic = Generic()
-        update_wrapper(generic, f)
+            d = dispatch
 
-        return generic
+        # generic(0, 1, 2)
+
+        return wraps(f)(Generic())
 
     return generic_decorator
 
