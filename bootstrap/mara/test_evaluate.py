@@ -18,7 +18,7 @@ def test_eval_numbers(evaluator, lex_simple, parser):
     ''')
 
 
-    expected = 4
+    expected = 4.0
     ast = parser.parse(given)
     result = evaluator.visit(ast)
 

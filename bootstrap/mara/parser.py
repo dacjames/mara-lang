@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 '''
 Mara Parser
 '''
@@ -17,7 +19,7 @@ class ParseError(Exception):
 
         lex_state_string = (
             data[pos - ERROR_WINDOW: pos] +
-            '<=' + data[pos] +
+            u'⇤' + data[pos] +
             data[pos + 1: pos + ERROR_WINDOW]
         )
 

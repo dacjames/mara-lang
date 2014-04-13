@@ -18,7 +18,7 @@ Options:
     -p, --pretty                    Pretty print any output
 
     -f, --file      [<file>]        Write/Load file
-    -s, --string    [<string>]      Write/Read string
+    -s, --string    [<string>]      Write/Read utf8 encoded string
     -j, --json      [<object>]      Write/Read utf8 encoded json
     -b, --bytecode  [<msgpack>]     Write/Read binary msgpack
 '''

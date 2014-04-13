@@ -44,4 +44,3 @@ class Eval(object):
             last = self.visit(expr)
 
         return last
-
