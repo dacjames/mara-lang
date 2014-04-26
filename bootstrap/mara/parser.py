@@ -182,13 +182,13 @@ def p_else(p):
 def p_prefix_else(p):
     '''prefix_else : ELSE block
     '''
-    p[0] = node.Else(body=p[2], pred=None)
+    p[0] = node.Else(body=p[2], expr=None)
     return p[0]
 
 def p_postfix_else(p):
     '''postfix_else : expr ELSE expr
     '''
-    p[0] = node.Else(body=p[3], pred=p[1])
+    p[0] = node.Else(body=p[3], expr=p[1])
     return p[0]
 
 def p_while(p):

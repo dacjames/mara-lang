@@ -58,12 +58,12 @@ class Eval(object):
 
     @visit.d(node.Else)
     def _(self, node):
-        pred = node.pred
+        expr = node.expr
         body = node.body
 
-        pred_value = self.visit(pred)
-        if pred_value is not None:
-            return pred_value
+        value = self.visit(expr)
+        if value is not None:
+            return value
         else:
             return self.visit(body)
 
