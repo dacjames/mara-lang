@@ -1,0 +1,3 @@
+[submodule "HAMT"]
+	path = HAMT
+	url = ./src/vendor/HAMT/
