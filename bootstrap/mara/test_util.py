@@ -129,4 +129,42 @@ def test_mutlimethods():
     assert eval_.multi(10, 10.0) == ('Int', 'Real', 10, 10.0)
     assert eval_.multi(10.0, 10.0) == ('Real', 'Real', 10, 10.0)
 
+def test_deriving():
+    from util.reflection import deriving
 
+    class EqAble(deriving('eq')):
+        def __init__(self, x):
+            self.x = x
+            self.y = 0
+
+    class ShowAble(deriving('show')):
+        def __init__(self, x):
+            self.x = x
+            self.y = 'a'
+
+    class EqShowAble(deriving('eq', 'show')):
+        def __init__(self, x):
+            self.x = x
+            self.y = {}
+
+    eq0 = EqAble(0)
+    eq1 = EqAble(0)
+    eq2 = EqAble(1)
+
+    show = ShowAble(1)
+
+    eq_show0 = EqShowAble(0)
+    eq_show1 = EqShowAble(0)
+    eq_show2 = EqShowAble(1)
+
+    assert repr(show) == "ShowAble(x=1, y='a')"
+    assert str(show) == "ShowAble(x=1, y=a)"
+    assert eq0 == eq1
+    assert eq2 != eq1
+
+    assert repr(eq_show0) == 'EqShowAble(x=0, y={})'
+    assert repr(eq_show1) == 'EqShowAble(x=0, y={})'
+    assert repr(eq_show2) == 'EqShowAble(x=1, y={})'
+
+    assert eq_show0 == eq_show1
+    assert eq_show2 != eq_show1

@@ -1,46 +1,14 @@
-
-import util
 from abc import ABCMeta, abstractmethod
 
+from util.reflection import deriving
 
-class Node(object):
+
+class Node(deriving('eq', 'show')):
     __metaclass__ = ABCMeta
 
     def __init__(self):
         if self.__class__ is Node:
             raise TypeError('Node is abstract and should not be instantiated.')
-
-    def __eq__(self, other):
-        '''Universal equality method based on inspecting the "public fields".
-        '''
-        canary = object()
-        for attr in util.instance_fields(self):
-
-            attribute = getattr(self, attr)
-            other_attribute = getattr(other, attr, canary)
-            equal = (other_attribute is not canary and attribute == other_attribute)
-
-            if not equal:
-                return False
-        return True
-
-    def __repr__(self):
-        '''Universal representation of the node based on inspecting the name
-        and "public fields".
-        '''
-        fields = [
-            (attr, repr(getattr(self, attr)))
-            for attr in util.instance_fields(self)
-        ]
-
-        field_str = ', '.join([
-            '{name}={value}'.format(name=name, value=value) for
-            (name, value) in fields
-        ])
-        return '{cls}({fields})'.format(
-            cls=self.__class__.__name__,
-            fields=field_str,
-        )
 
     def visit(self, visitor):
         visitor(self, self.children())
