@@ -19,7 +19,7 @@ class ParseError(Exception):
 
         lex_state_string = (
             data[pos - ERROR_WINDOW: pos] +
-            u'⇤' + data[pos] +
+            '`' + data[pos] + '`' +
             data[pos + 1: pos + ERROR_WINDOW]
         )
 
@@ -293,7 +293,12 @@ def p_declaration(p):
 
 def _declaration(cls, p):
 
-    return cls(name=node.ValueId(p[2]), value=p[3], type_=None)
+    if len(p) == 4:
+        value = p[3]
+    else:
+        value = None
+
+    return cls(name=node.ValueId(p[2]), value=value, type_=None)
 
 def p_val(p):
     '''val : VAL VID expr

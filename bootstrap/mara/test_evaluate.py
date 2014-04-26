@@ -41,3 +41,38 @@ def test_simple_control_flow(evaluator, lex_simple, parser):
 
     assert expected == result
 
+
+def test_values_and_variables(evaluator, lex_simple, parser):
+    given = maramodule('val_and_var', u'''
+        val x 10
+        val y { 20 }
+        val z ()
+        z = 30
+
+        val t { x + y + z}
+
+        var a 1
+        var b { 2 }
+        var c ()
+        c = 3
+
+        val u (a + b + c)
+
+        a = 101
+        b = 102
+        c = 103
+
+        val v ()
+        v = a + b + c +
+            t + u
+    ''')
+
+    expected = (
+        101 + 102 + 103 +
+        (10 + 20 + 30) + (1 + 2 + 3)
+    )
+
+    ast = parser.parse(given)
+    result = evaluator.visit(ast)
+
+    assert expected == result
