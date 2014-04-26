@@ -14,6 +14,8 @@ class Eval(object):
         '*': lambda a, b: a * b,
         '/': lambda a, b: a // b,
         '^': lambda a, b: a ** b,
+        '>': lambda a, b: a > b,
+        '<': lambda a, b: a < b,
     }
 
     @multimethod(_store)
@@ -44,3 +46,33 @@ class Eval(object):
             last = self.visit(expr)
 
         return last
+
+    @visit.d(node.Block)
+    def _(self, node):
+        last = None
+        for expr in node.exprs:
+            last = self.visit(expr)
+
+        return last
+
+
+    @visit.d(node.Else)
+    def _(self, node):
+        pred = node.pred
+        body = node.body
+
+        pred_value = self.visit(pred)
+        if pred_value is not None:
+            return pred_value
+        else:
+            return self.visit(body)
+
+    @visit.d(node.If)
+    def _(self, node):
+        pred = node.pred
+        body = node.body
+
+        if self.visit(pred):
+            return self.visit(body)
+        else:
+            return None
