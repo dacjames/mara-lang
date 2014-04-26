@@ -120,9 +120,13 @@ def p_literal(p):
     return p[0]
 
 def p_tuple(p):
-    '''tuple : LPAR expr_list_comma RPAR
+    '''tuple : LPAR RPAR
+             | LPAR expr_list_comma RPAR
     '''
-    p[0] = node.Tuple(p[2])
+    if len(p) == 3:
+        p[0] = node.Tuple(None)
+    else:
+        p[0] = node.Tuple(p[2])
 
 
 def p_list(p):
