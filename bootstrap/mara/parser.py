@@ -124,15 +124,19 @@ def p_tuple(p):
              | LPAR expr_list_comma RPAR
     '''
     if len(p) == 3:
-        p[0] = node.Tuple(None)
+        p[0] = node.Tuple([])
     else:
         p[0] = node.Tuple(p[2])
 
 
 def p_list(p):
-    '''list : LBKT expr_list_comma RBKT
+    '''list : LBKT RBKT
+            | LBKT expr_list_comma RBKT
     '''
-    p[0] = node.List(p[2])
+    if len(p) == 3:
+        p[0] = node.List([])
+    else:
+        p[0] = node.List(p[2])
 
 
 def p_name(p):

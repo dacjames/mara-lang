@@ -257,7 +257,7 @@ def test_exprs_and_blocks(parser):
                                 args=[n.Int('10'), n.Int('5')]
                             )
                         ),
-                        
+
 
                     ],
                 ),
@@ -310,6 +310,7 @@ def test_declarations(parser):
 
 def test_parse_tuples(parser, lex_simple):
     given = maramodule('tuples', '''
+        x = ()
         x = (1,)
         x = (1, 2, 3)
     ''')
@@ -317,6 +318,10 @@ def test_parse_tuples(parser, lex_simple):
     expected = n.Module(
         name='tuples',
         exprs=[
+            n.Assign(
+                name=n.ValueId('x'),
+                value=n.Tuple(values=[]),
+            ),
             n.Assign(
                 name=n.ValueId('x'),
                 value=n.Tuple(values=[
@@ -342,6 +347,7 @@ def test_parse_tuples(parser, lex_simple):
 def test_parse_lists(parser, lex_simple):
 
     given = maramodule('lists', '''
+        x = []
         x = [1, ]
         x = [1, 2, 3]
         [
@@ -351,10 +357,13 @@ def test_parse_lists(parser, lex_simple):
         ]
     ''')
 
-
     expected = n.Module(
         name='lists',
         exprs=[
+            n.Assign(
+                name=n.ValueId('x'),
+                value=n.List(values=[]),
+            ),
             n.Assign(
                 name=n.ValueId('x'),
                 value=n.List(values=[
