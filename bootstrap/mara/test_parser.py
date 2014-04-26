@@ -170,13 +170,13 @@ def test_parse_else(parser):
                 ),
             ),
             n.Else(
-                expr=None,
+                pred=None,
                 body=n.Block(params=[], exprs=[
                     n.Real('10.0')
                 ])
             ),
             n.Else(
-                expr=n.Int('20'),
+                pred=n.Int('20'),
                 body=n.Int('10'),
             ),
         ],
@@ -257,7 +257,7 @@ def test_exprs_and_blocks(parser):
                                 args=[n.Int('10'), n.Int('5')]
                             )
                         ),
-                        
+
 
                     ],
                 ),

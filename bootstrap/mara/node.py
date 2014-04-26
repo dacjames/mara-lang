@@ -109,8 +109,8 @@ class If(Node):
 
 
 class Else(Node):
-    def __init__(self, expr, body):
-        self.expr = expr
+    def __init__(self, pred, body):
+        self.pred = pred
         self.body = body
 
 
