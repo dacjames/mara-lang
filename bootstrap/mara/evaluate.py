@@ -34,6 +34,8 @@ class Eval(object):
         self.root = scope.Root()
         self.scope = self.root
 
+    ##########################################################################
+
     @multimethod(_store)
     def visit(self, node):
         pass
@@ -71,7 +73,6 @@ class Eval(object):
 
         return last
 
-
     @visit.d(node.Else)
     def _(self, node):
         expr = node.expr
@@ -101,28 +102,6 @@ class Eval(object):
         )
 
         return value
-
-    @multimethod(_store)
-    def _assign_to(self, ident, value):
-        pass
-
-    @_assign_to.d(Val)
-    def _(self, container):
-        def inner(value):
-            if container.value == ():
-                container.value = value
-                return value
-            else:
-                raise TypeError('Cannot reassign initialized val')
-        return inner
-
-    @_assign_to.d(Var)
-    def _(self, container):
-        def inner(value):
-            container.value = value
-            return value
-        return inner
-
 
     @visit.d(node.Assign)
     def _(self, node):
@@ -155,4 +134,27 @@ class Eval(object):
         value = boxed.value
 
         return value
+
+    ##########################################################################
+
+    @multimethod(_store)
+    def _assign_to(self, ident, value):
+        pass
+
+    @_assign_to.d(Val)
+    def _(self, container):
+        def inner(value):
+            if container.value == ():
+                container.value = value
+                return value
+            else:
+                raise TypeError('Cannot reassign initialized val')
+        return inner
+
+    @_assign_to.d(Var)
+    def _(self, container):
+        def inner(value):
+            container.value = value
+            return value
+        return inner
 
