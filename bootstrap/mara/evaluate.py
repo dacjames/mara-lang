@@ -120,15 +120,8 @@ class Eval(object):
     def _(self, n):
         ident = n.name.value
 
-        # current_scope = self.scope
-        # print 'saving: ' + str(current_scope)
-
         value = self.visit(n.value)
         self.scope.declare(ident, scope.ValBox(value))
-
-        # print 'dropping: ' + str(self.scope)
-
-        # self.scope = current_scope
 
         return value
 

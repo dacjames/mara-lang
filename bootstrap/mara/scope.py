@@ -5,11 +5,12 @@ Scope Objects
 '''
 
 from util.dispatch import method_store, multimethod
+from util.reflection import deriving
 
 import node
 
 
-class ScopeBox(node.Node):
+class ScopeBox(deriving('show', 'eq')):
     def __init__(self, value):
         self.value = value
 
@@ -22,7 +23,7 @@ class VarBox(ScopeBox):
     pass
 
 
-class _Scope(node.Node):
+class _Scope(deriving('show', 'eq')):
     _store = method_store()
 
     def __init__(self):
@@ -82,7 +83,6 @@ class _Scope(node.Node):
     ##########################################################################
 
     def child(self):
-        print 'creating child scope'
         return Scope(parent=self)
 
     def merge(self, other):
@@ -90,9 +90,6 @@ class _Scope(node.Node):
         return self
 
     def declare(self, ident, boxed):
-        print 'before: ' + str(self)
-        print 'declaring: {id}'.format(id=ident)
-
         assert isinstance(boxed, ScopeBox), 'method Scope::declare expected a boxed value.'
 
         if ident in self.members:
@@ -100,7 +97,6 @@ class _Scope(node.Node):
         else:
             self.members[ident] = boxed
 
-        print 'after: ' + str(self)
         return boxed
 
     def assign(self, ident, unboxed):
