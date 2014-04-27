@@ -1,29 +1,29 @@
-module windows
+module arch64
 
-provide {
-    OS/GROUP = 'windows'
-    OS/NAME = 'windows 7'
-    OS/ARCH = 64
+require 'os/*'
 
-    FS/PATH/SEPERATOR = '\'.s
-    FS/PATH/ROOT ='[A-Z]:'.r
+provide 'os/arch' {
+    match context['os/group']
+    as _ == 'windows' .and context['os/version'] > '6.0' { 'WOW64' }
+    else { 'amd64' }
 }
 
 end
 
-module unix
+module windows
 
-provide {
-    OS/GROUP = 'unix'
-    OS/NAME = 'linux'
-    OS/ARCH = 64
+provide 'os/group'   { 'windows' }
+provide 'os/name'    { 'windows 7' }
+provide 'os/version' { '7.1'.version }
 
-    OS/LINUX/KERNEL = '...'
+end
 
-    FS/PATH/SEPERATOR = '/'.s
-    FS/PATH/ROOT = '/'.s
-}
+module debian
 
-
+provide 'os/group'   { 'linux' }
+provide 'os/family'  { 'debian'}
+provide 'os/name'    { 'debian wheezy' }
+provide 'os/version' { '7.4'.version }
+provide 'os/kernel'  { '3.12.24'.version }
 
 end
