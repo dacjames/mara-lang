@@ -4,9 +4,27 @@
 Scope Objects
 '''
 
+from util.dispatch import method_store, multimethod
+
 import node
 
+
+class ScopeBox(node.Node):
+    def __init__(self, value):
+        self.value = value
+
+
+class ValBox(ScopeBox):
+    pass
+
+
+class VarBox(ScopeBox):
+    pass
+
+
 class _Scope(node.Node):
+    _store = method_store()
+
     def __init__(self):
         self.members = {}
 
@@ -61,8 +79,58 @@ class _Scope(node.Node):
     def copy(self):
         return self.members.copy()
 
+    ##########################################################################
+
     def child(self):
+        print 'creating child scope'
         return Scope(parent=self)
+
+    def merge(self, other):
+        self.members = dict(self.members.items() + other.members.items())
+        return self
+
+    def declare(self, ident, boxed):
+        print 'before: ' + str(self)
+        print 'declaring: {id}'.format(id=ident)
+
+        assert isinstance(boxed, ScopeBox), 'method Scope::declare expected a boxed value.'
+
+        if ident in self.members:
+            raise TypeError('Cannot re-declare variable: ' + ident)
+        else:
+            self.members[ident] = boxed
+
+        print 'after: ' + str(self)
+        return boxed
+
+    def assign(self, ident, unboxed):
+        if ident in self:
+            box = self[ident]
+            return self._assign(box)(unboxed)
+        else:
+            self.declare(ident, ValBox(unboxed))
+
+    @multimethod(_store)
+    def _assign(self, box):
+        pass
+
+    @_assign.d(ValBox)
+    def _(self, box):
+        def inner(value):
+            if box.value == ():
+                box.value = value
+                return value
+            else:
+                raise TypeError('Cannot reassign initialized val')
+        return inner
+
+    @_assign.d(VarBox)
+    def _(self, box):
+        def inner(value):
+            box.value = value
+            return value
+        return inner
+
 
 class Root(_Scope):
     def __init__(self):

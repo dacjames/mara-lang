@@ -8,16 +8,6 @@ import scope
 from util.dispatch import method_store, multimethod
 
 
-class Val(object):
-    def __init__(self, value):
-        self.value = value
-
-
-class Var(object):
-    def __init__(self, value):
-        self.value = value
-
-
 class Eval(object):
     _store = method_store()
     _builtins = {
@@ -33,6 +23,9 @@ class Eval(object):
     def __init__(self):
         self.root = scope.Root()
         self.scope = self.root
+
+        self.root.declare('true', scope.ValBox(True))
+        self.root.declare('false', scope.ValBox(False))
 
     ##########################################################################
 
@@ -68,8 +61,11 @@ class Eval(object):
     @visit.d(node.Block)
     def _(self, node):
         last = None
+        self.scope = self.scope.child()
         for expr in node.exprs:
             last = self.visit(expr)
+
+        self.scope = self.scope.parent
 
         return last
 
@@ -94,6 +90,15 @@ class Eval(object):
         else:
             return None
 
+    @visit.d(node.While)
+    def _(self, node):
+        pred = node.pred
+        body = node.body
+
+        while self.visit(pred):
+            self.visit(body)
+
+
     @visit.d(node.Tuple)
     def _(self, node):
         value = tuple(
@@ -108,15 +113,23 @@ class Eval(object):
         ident = node.name.value
         value = self.visit(node.value)
 
-        self._assign_to(self.scope[ident])(value)
+        self.scope.assign(ident, value)
         return value
 
     @visit.d(node.Val)
-    def _(self, node):
-        ident = node.name.value
-        value = self.visit(node.value)
+    def _(self, n):
+        ident = n.name.value
 
-        self.scope[ident] = Val(value)
+        # current_scope = self.scope
+        # print 'saving: ' + str(current_scope)
+
+        value = self.visit(n.value)
+        self.scope.declare(ident, scope.ValBox(value))
+
+        # print 'dropping: ' + str(self.scope)
+
+        # self.scope = current_scope
+
         return value
 
     @visit.d(node.Var)
@@ -124,7 +137,7 @@ class Eval(object):
         ident = node.name.value
         value = self.visit(node.value)
 
-        self.scope[ident] = Var(value)
+        self.scope.declare(ident, scope.VarBox(value))
         return value
 
     @visit.d(node.ValueId)
@@ -134,27 +147,3 @@ class Eval(object):
         value = boxed.value
 
         return value
-
-    ##########################################################################
-
-    @multimethod(_store)
-    def _assign_to(self, ident, value):
-        pass
-
-    @_assign_to.d(Val)
-    def _(self, container):
-        def inner(value):
-            if container.value == ():
-                container.value = value
-                return value
-            else:
-                raise TypeError('Cannot reassign initialized val')
-        return inner
-
-    @_assign_to.d(Var)
-    def _(self, container):
-        def inner(value):
-            container.value = value
-            return value
-        return inner
-

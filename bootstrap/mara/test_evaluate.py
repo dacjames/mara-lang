@@ -49,7 +49,7 @@ def test_values_and_variables(evaluator, lex_simple, parser):
         val z ()
         z = 30
 
-        val t { x + y + z}
+        val t { x + y + z }
 
         var a 1
         var b { 2 }
@@ -76,3 +76,27 @@ def test_values_and_variables(evaluator, lex_simple, parser):
     result = evaluator.visit(ast)
 
     assert expected == result
+
+
+def test_nested_variables(evaluator, lex_simple, parser):
+    given = maramodule('test_nested_variables', '''
+        val x { 10 }
+        var y 3
+
+        while y > 0 {
+            val x ()
+            x = 20
+            y = y - 1
+        }
+
+        x + y
+    ''')
+
+    expected = 10
+
+    ast = parser.parse(given)
+    result = evaluator.visit(ast)
+
+    assert expected == result
+
+
