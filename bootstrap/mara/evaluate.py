@@ -4,7 +4,19 @@ from singledispatch import singledispatch
 from collections import defaultdict
 
 import node
+import scope
 from util.dispatch import method_store, multimethod
+
+
+class Val(object):
+    def __init__(self, value):
+        self.value = value
+
+
+class Var(object):
+    def __init__(self, value):
+        self.value = value
+
 
 class Eval(object):
     _store = method_store()
@@ -17,6 +29,10 @@ class Eval(object):
         '>': lambda a, b: a > b,
         '<': lambda a, b: a < b,
     }
+
+    def __init__(self):
+        self.root = scope.Root()
+        self.scope = self.root
 
     @multimethod(_store)
     def visit(self, node):
@@ -76,3 +92,67 @@ class Eval(object):
             return self.visit(body)
         else:
             return None
+
+    @visit.d(node.Tuple)
+    def _(self, node):
+        value = tuple(
+            self.visit(value)
+            for value in node.values
+        )
+
+        return value
+
+    @multimethod(_store)
+    def _assign_to(self, ident, value):
+        pass
+
+    @_assign_to.d(Val)
+    def _(self, container):
+        def inner(value):
+            if container.value == ():
+                container.value = value
+                return value
+            else:
+                raise TypeError('Cannot reassign initialized val')
+        return inner
+
+    @_assign_to.d(Var)
+    def _(self, container):
+        def inner(value):
+            container.value = value
+            return value
+        return inner
+
+
+    @visit.d(node.Assign)
+    def _(self, node):
+        ident = node.name.value
+        value = self.visit(node.value)
+
+        self._assign_to(self.scope[ident])(value)
+        return value
+
+    @visit.d(node.Val)
+    def _(self, node):
+        ident = node.name.value
+        value = self.visit(node.value)
+
+        self.scope[ident] = Val(value)
+        return value
+
+    @visit.d(node.Var)
+    def _(self, node):
+        ident = node.name.value
+        value = self.visit(node.value)
+
+        self.scope[ident] = Var(value)
+        return value
+
+    @visit.d(node.ValueId)
+    def _(self, node):
+        ident = node.value
+        boxed = self.scope[ident]
+        value = boxed.value
+
+        return value
+
