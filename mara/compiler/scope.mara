@@ -1,0 +1,17 @@
+module
+
+datum Scope { var value Hash () }
+
+def Scope::assign (ident String, unboxed Any) {
+    match box = this[ident]
+    as box.Yes { self(ident, box, unboxed) }
+    as No  { this.declare(ident, unboxed.ValBox) }
+}
+
+def Scope::assign (ident String, boxed ScopeBox, value Any) {
+    match boxed
+    as ValBox(value) { raise ValAssignError(ident) }
+    as VarBox(value) { boxed.set value }
+}
+
+end
