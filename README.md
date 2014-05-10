@@ -45,7 +45,7 @@ Below is a simple implimentation of a program like the unix `tree` utility.
         print file.name.indented for file in files
         for folder in folders {
             print folder.name.indented
-            self(folder, indent * 2)
+            self(folder, indent + 2)
         }
     }
 
