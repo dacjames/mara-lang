@@ -38,7 +38,7 @@ Below is a simple implimentation of a program like the unix `tree` utility.
     do (path = path, indent = 0, depth = 0) {
         raise "Maximum recursion depth reached" if depth > 10
 
-        files, folders = partition(fs.ls path) (f){ f.is_file }
+        files, folders = partition(fs.ls path) def(f){ f.is_file }
 
         String::indented = " ".repeat(indent) ++ this
 
