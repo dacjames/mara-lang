@@ -25,8 +25,9 @@ Okay, it doesn't offer all of those features today, but it will as development p
 
 Below is a simple implimentation of a program like the unix `tree` utility.
 
-    module main(argv)
-    using core
+    module main
+    using 'core'
+    depend 'sys/argv'
 
     path_arg = argv[0] else raise "I need a file!"
     path = path_arg.Path else raise
@@ -52,4 +53,4 @@ Below is a simple implimentation of a program like the unix `tree` utility.
 
 ## What is Mara good for?
 
-Mara strives to be a general purpose programming language, useful for everthing from utilities to web services to distributed computing frameworks.  If you're a Python or Ruby hacker looking for more structure, a Java developer looking to write less boilerplate, or a C# programmer ready to move past inheritence, Mara might appeal to you.  If you're writing embedded code, operating systems, or games, you'll probably be better served by [Rust]() or [Nimrod]().
+Mara strives to be a general purpose programming language, useful for everything from utilities to web services to distributed computing frameworks.  If you're a Python or Ruby hacker looking for more structure, a Java developer looking to write less boilerplate, or a C# programmer ready to move past inheritence, Mara might appeal to you.  If you're writing embedded code, operating systems, or games, you'll probably be better served by [Rust]() or [Nimrod]().
