@@ -1,5 +1,7 @@
 module llvm
 
+module private
+
 macro TypeOpcode8(format_number Int) {
     assert (1 .. 4).has format_number
 
@@ -9,8 +11,12 @@ macro TypeOpcode8(format_number Int) {
     }
 }
 
+end private
+
+module impl
 ##
 # This format encodes the opcode, type and a single operand into a single uint32:
+##
 datum Format0 {
     pack Uint32 {
         @constant
@@ -36,6 +42,7 @@ datum Format0 {
 
 ##
 # This format encodes the opcode, type and a single operand into a single uint32:
+##
 datum Format1 {
     pack Uint32 {
         use TypeOpcode8(1)
@@ -47,6 +54,7 @@ datum Format1 {
 
 ##
 # This format encodes the opcode, type and two operands into a single uint32:
+##
 datum Format2 {
     ##
     pack Int64 {
@@ -61,6 +69,7 @@ datum Format2 {
 
 ##
 # This format encodes the opcode, type and three operands into a single uint32:
+##
 datum Format3 {
     ##
     pack Int64 {
@@ -73,6 +82,10 @@ datum Format3 {
         val padding Bits(16)
     }
 }
+
+end impl
+
+module
 
 trait Bytecode {
     op Int8
@@ -92,16 +105,18 @@ Format2::args = [this._0, this._1, this._2]
 Format3::args = [this._0, this._1, this._2, this._3]
 
 def Bytecode(op Int8, args Array) {
+    mapping = inject 'llvm/bytcode/returncode_mapping'
+
     match args.length
     as 0 { llvm.Foramt1(op, null, null) }
     as 1 { llvm.Format1(op, args._0, null) }
     as 2 { llvm.Format1(op, args._0, args._1) }
     as 3 { llvm.Format2(op, args._0, args._1, args._2) }
     as 4 { llvm.Format3(op, args._0, args._1, args._2, args._3) }
-    else (
-        llvm.Format0()
-    )
+    else { llvm.Format0(op, mapping[op], args.length, args.chunk) }
 }
+
+end
 
 end llvm
 
@@ -117,24 +132,20 @@ datum Bytecode {
     }
 }
 
-Opcode = Enum {
-    val call {0}
-    val assign
-    val if_
-    val match_
-    val for_
-}
+Opcode = Enum [
+    call_:,
+    for_:,
+    if_:,
+    match_:,
+]
 
-def Opcode::eval (Opcode.call) {
+def Opcode::eval (Opcode.call_) {
     Call(this.args).eval
 }
 
 def Call::convert Bytecode {
     Bytecode(Opcode.call, [this.func, this.arg])
 }
-
-
-
 
 
 end mara
