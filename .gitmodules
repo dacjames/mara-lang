@@ -1,6 +1,6 @@
-[submodule "HAMT"]
-	path = HAMT
-	url = ./src/vendor/HAMT/
 [submodule "src/vendor/HAMT"]
 	path = src/vendor/HAMT
 	url = https://github.com/chaelim/HAMT.git
+[submodule "src/vendor/llvm"]
+	path = src/vendor/llvm
+	url = http://llvm.org/git/llvm.git
