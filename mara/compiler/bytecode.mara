@@ -6,7 +6,8 @@ macro TypeOpcode8(format_number Int) {
     assert (1 .. 4).has format_number
 
     pack Int8 {
-        type Bits(2)
+        @constant
+        type Bits(2) = format_number
         opcode Bits(6)
     }
 }
