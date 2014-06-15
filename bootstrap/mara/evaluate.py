@@ -1,6 +1,5 @@
 import functools
 
-from singledispatch import singledispatch
 from collections import defaultdict
 
 import node
