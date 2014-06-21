@@ -1,5 +1,6 @@
-from functools import update_wrapper, wraps
+from functools import wraps
 from collections import defaultdict
+
 
 def multimethod(store):
 
@@ -10,7 +11,6 @@ def multimethod(store):
             return store[f.__name__][
                 tuple(a.__class__ for a in args[1:])
             ](*args)
-
 
         def dispatch(*clses):
 
@@ -29,6 +29,7 @@ def multimethod(store):
         return generic
 
     return generic_decorator
+
 
 def method_store():
     return defaultdict(lambda: {})
