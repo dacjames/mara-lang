@@ -37,7 +37,7 @@ class _Scope(deriving('show', 'eq')):
         return self.members.__delitem__(key)
 
     def __contains__(self, key):
-        return self.has_key(key)
+        return self.has_key(key)  # noqa
 
     def keys(self):
         return self.members.keys()
@@ -50,7 +50,7 @@ class _Scope(deriving('show', 'eq')):
 
     def has_key(self, key):
         # pylint: disable=E1101
-        return self.members.has_key(key)
+        return self.members.has_key(key)  # noqa
 
     def get(self, key, default=None):
         return self.members.get(key, default)
