@@ -7,8 +7,6 @@ Scope Objects
 from util.dispatch import method_store, multimethod
 from util.reflection import deriving
 
-import node
-
 
 class ScopeBox(deriving('show', 'eq')):
     def __init__(self, value):
@@ -51,6 +49,7 @@ class _Scope(deriving('show', 'eq')):
         return self.members.items()
 
     def has_key(self, key):
+        # pylint: disable=E1101
         return self.members.has_key(key)
 
     def get(self, key, default=None):
@@ -63,12 +62,15 @@ class _Scope(deriving('show', 'eq')):
         return self.members.setdefault(default)
 
     def iterkeys(self):
+        # pylint: disable=E1101
         return self.members.iterkeys()
 
     def itervalues(self):
+        # pylint: disable=E1101
         return self.members.itervalues()
 
     def iteritems(self):
+        # pylint: disable=E1101
         return self.members.iteritems()
 
     def pop(self):
@@ -141,15 +143,13 @@ class Scope(_Scope):
         self.parent = parent
 
     def has_key(self, key):
-        if self.members.has_key(key):
+        if key in self.members:
             return True
         else:
-            return self.parent.has_key(key)
+            return key in self.parent
 
     def __getitem__(self, key):
         try:
             return self.members.__getitem__(key)
         except KeyError:
             return self.parent.__getitem__(key)
-
-
