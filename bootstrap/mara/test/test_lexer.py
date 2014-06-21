@@ -3,7 +3,7 @@ Tests for the Mara Lexer
 '''
 
 import pytest
-import lexer as lexer_module
+from .. import lexer as lexer_module
 
 @pytest.fixture
 def lex_simple():

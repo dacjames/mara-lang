@@ -1,7 +1,7 @@
 import string
 import random
 
-import util
+from .. import util
 
 
 def _random_prefixes():
@@ -90,7 +90,7 @@ def test_public_attrs_field_methods():
 
 def test_mutlimethods():
 
-    from util.dispatch import method_store, multimethod
+    from ..util.dispatch import method_store, multimethod
 
     class Eval(object):
         store = method_store()
@@ -130,7 +130,7 @@ def test_mutlimethods():
     assert eval_.multi(10.0, 10.0) == ('Real', 'Real', 10, 10.0)
 
 def test_deriving():
-    from util.reflection import deriving
+    from ..util.reflection import deriving
 
     class EqAble(deriving('eq')):
         def __init__(self, x):

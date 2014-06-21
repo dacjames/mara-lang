@@ -1,5 +1,5 @@
-import parser as parser_module
-import node as n
+from .. import parser as parser_module
+from .. import node as n
 import pytest
 
 xfail = pytest.mark.xfail
