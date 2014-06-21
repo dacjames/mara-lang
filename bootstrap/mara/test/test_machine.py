@@ -1,6 +1,9 @@
-from machine import Machine, Register
-
 import pytest
+
+from ..machine import Machine, Register
+
+# pylint: disable=W0621
+# pylint: disable=W0212
 
 r = Register
 
@@ -12,7 +15,6 @@ def machine():
 
 def test_machine(machine):
     machine._load([
-        ['label', 'main'],
         ['print_const', 0],
         ['print_const', 1],
         ['load_const', r(0), 1],

@@ -26,7 +26,7 @@ class Machine(object):
             self.buffer.append(arg)
 
         def _raw_print(arg):
-            print arg
+            print(arg)
 
         if buffered:
             self._print = _buffered_print
