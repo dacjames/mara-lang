@@ -5,14 +5,16 @@ Tests for the Mara Lexer
 import pytest
 from .. import lexer as lexer_module
 
+# pylint: disable=W0621
+
+
 @pytest.fixture
 def lex_simple():
     lexer = lexer_module.build_lexer()
 
-    def inner(input):
-        return lexer_module.lex_simple(lexer, input)
+    def inner(input_stream):
+        return lexer_module.lex_simple(lexer, input_stream)
     return inner
-
 
 
 def test_lex_wrappers(lex_simple):
@@ -32,7 +34,7 @@ def test_lex_wrappers(lex_simple):
 
 
 def test_lex_distinct_symbols(lex_simple):
-    given = 'module @ | & $ \ , . = + - ^ / * : end'
+    given = r'module @ | & $ \ , . = + - ^ / * : end'
     output = list(lex_simple(given))
     assert output == [
         ('MODULE', 'module'),
@@ -92,6 +94,7 @@ def test_lex_keywords(lex_simple):
         ('END', 'end'),
     ]
 
+
 def test_lex_identifiers(lex_simple):
     given = '''module
         forsight
@@ -148,6 +151,7 @@ def test_lex_literal_nums(lex_simple):
         ('INTX', '-0x12Aef'),
         ('END', 'end'),
     ]
+
 
 def test_lex_expr_end(lex_simple):
     given = '''module test
@@ -230,6 +234,7 @@ def test_open_state(lex_simple):
     result = list(lex_simple(given))
 
     assert result == expected
+
 
 def test_lex_comments(lex_simple):
     given = '''module test
