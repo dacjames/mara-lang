@@ -2,9 +2,12 @@ from .. import parser as parser_module
 from .. import node as n
 import pytest
 
+# pylint: disable=W0621
+# pylint: disable=C0330
+
 xfail = pytest.mark.xfail
 
-from test_lexer import lex_simple
+from test_lexer import lex_simple  # pylint: disable=W0611
 
 
 def maramodule(name, code):
@@ -12,11 +15,14 @@ def maramodule(name, code):
 
 
 @pytest.fixture
-def parser():
+def parser(lex_simple):
+    # pylint:disable=W0612
+    # this is dirty hack because we need to trigger a lexer import.
+    lex_simple = lex_simple
     return parser_module.build_parser()
 
 
-def test_parse_literals(parser, lex_simple):
+def test_parse_literals(parser):
     assert (
         parser.parse(maramodule('test', '''
             10
@@ -138,6 +144,7 @@ def test_parse_wrapped_if(parser):
     result = parser.parse(given)
     assert expected == result
 
+
 def test_parse_else(parser):
     given = maramodule('elses', '''
         if (x > 0) { x * 2.0 }
@@ -200,7 +207,7 @@ def test_parse_postfix_while(parser):
                         n.Int(value='0'),
                     ]
                 ),
-               body=n.Block(
+                body=n.Block(
                     params=[],
                     exprs=[
                         n.BinOp(
@@ -270,7 +277,7 @@ def test_exprs_and_blocks(parser):
                 ),
             ),
         ],
-    )
+    )  # noqa
 
     result = parser.parse(given)
 
@@ -279,7 +286,7 @@ def test_exprs_and_blocks(parser):
     assert result.exprs[0].value.exprs[0] == expected.exprs[0].value.exprs[0]
     assert result.exprs[0].value.exprs[1] == expected.exprs[0].value.exprs[1]
     assert result.exprs[0].value.exprs[2] == expected.exprs[0].value.exprs[2]
-    assert  expected == result
+    assert expected == result
 
 
 def test_declarations(parser):
@@ -307,6 +314,7 @@ def test_declarations(parser):
     assert expected.exprs[2] == result.exprs[2]
     assert expected.exprs[3] == result.exprs[3]
     assert expected == result
+
 
 def test_parse_tuples(parser, lex_simple):
     given = maramodule('tuples', '''
@@ -339,10 +347,11 @@ def test_parse_tuples(parser, lex_simple):
         ]
     )
 
-    stream = list(lex_simple(given))
+    stream = list(lex_simple(given))  # pylint:disable=W0612
     result = parser.parse(given)
 
     assert expected == result
+
 
 def test_parse_lists(parser, lex_simple):
 
@@ -386,10 +395,11 @@ def test_parse_lists(parser, lex_simple):
         ]
     )
 
-    stream = list(lex_simple(given))
+    stream = list(lex_simple(given))  # pylint:disable=W0612
     result = parser.parse(given)
 
     assert expected == result
+
 
 def test_parse_kvs(parser, lex_simple):
     given = maramodule('kvs', '''
@@ -419,9 +429,10 @@ def test_parse_kvs(parser, lex_simple):
         ]
     )
 
-    stream = list(lex_simple(given))
+    stream = list(lex_simple(given))  # pylint:disable=W0612
     result = parser.parse(given)
     assert expected == result
+
 
 def test_parse_comments(parser):
     given = maramodule('comments', '''
@@ -445,6 +456,7 @@ def test_parse_comments(parser):
     result = parser.parse(given)
     assert expected == result
 
+
 @pytest.mark.xfail
-def test_always_fail(parser):
+def test_always_fail():
     raise Exception
