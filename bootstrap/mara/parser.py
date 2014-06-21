@@ -5,14 +5,16 @@ Mara Parser
 '''
 import ply.yacc as yacc
 
-from lexer import tokens
+from lexer import tokens  # pylint: disable=W0611
 from lexer import KEYWORDS
 import node
 import util
 
 ERROR_WINDOW = 10
 
+
 class ParseError(Exception):
+
     def __init__(self, tok, lexer):
         data = lexer.lexdata
         pos = lexer.lexpos
@@ -50,6 +52,7 @@ def p_module(p):
 
     return p[0]
 
+
 def p_expr(p):
     '''expr : nop
             | comment
@@ -74,11 +77,13 @@ def p_expr(p):
 
     return p[0]
 
-def p_nop(p):
+
+def p_nop(p):  # pylint: disable=W0613
     '''nop : TERM
            | SLASH
     '''
     pass
+
 
 def p_comment(p):
     '''comment : temp_comment
@@ -87,7 +92,10 @@ def p_comment(p):
     '''
     p[0] = p[1]
 
+
 def _comment(rule, cls, tok):
+    # pylint: disable=W0621
+
     def p_comment(p):
         p[0] = cls(p[1])
 
@@ -118,6 +126,7 @@ def p_literal(p):
         p[0] = node.Sci(tok.value)
 
     return p[0]
+
 
 def p_tuple(p):
     '''tuple : LPAR RPAR
@@ -157,6 +166,7 @@ def p_name(p):
 
     return p[0]
 
+
 def p_if(p):
     '''if : prefix_if
           | postfix_if
@@ -166,12 +176,14 @@ def p_if(p):
 
     return p[0]
 
+
 def p_prefix_if(p):
     '''prefix_if : IF expr block
     '''
     p[0] = node.If(pred=p[2], body=p[3])
 
     return p[0]
+
 
 def p_postfix_if(p):
     '''postfix_if : expr IF expr
@@ -180,6 +192,7 @@ def p_postfix_if(p):
 
     return p[0]
 
+
 def p_else(p):
     '''else : prefix_else
             | postfix_else
@@ -187,17 +200,20 @@ def p_else(p):
     p[0] = p[1]
     return p[0]
 
+
 def p_prefix_else(p):
     '''prefix_else : ELSE block
     '''
     p[0] = node.Else(body=p[2], expr=None)
     return p[0]
 
+
 def p_postfix_else(p):
     '''postfix_else : expr ELSE expr
     '''
     p[0] = node.Else(body=p[3], expr=p[1])
     return p[0]
+
 
 def p_while(p):
     '''while : WHILE expr block
@@ -248,6 +264,7 @@ def p_block(p):
 
     return p[0]
 
+
 def _seperated_expr_list(rule, sep):
     def _expr_list(p):
 
@@ -288,7 +305,6 @@ def p_assign(p):
 
     raise ParseError(list(p), len(p))
 
-    return p[0]
 
 def p_declaration(p):
     '''declaration : val
@@ -299,6 +315,7 @@ def p_declaration(p):
     p[0] = p[1]
     return p[0]
 
+
 def _declaration(cls, p):
 
     if len(p) == 4:
@@ -308,6 +325,7 @@ def _declaration(cls, p):
 
     return cls(name=node.ValueId(p[2]), value=value, type_=None)
 
+
 def p_val(p):
     '''val : VAL VID expr
     '''
@@ -315,10 +333,12 @@ def p_val(p):
 
     return p[0]
 
+
 def p_var(p):
     '''var : VAR VID expr
     '''
     p[0] = _declaration(node.Var, p)
+
 
 def p_ref(p):
     '''ref : REF VID expr
@@ -337,4 +357,4 @@ def p_error(tok):
 
 
 def build_parser():
-    return yacc.yacc()
+    return yacc.yacc(tabmodule='__plycache__/parser.out', outputdir='./__plycache__')

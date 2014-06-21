@@ -1,7 +1,6 @@
 '''Simple Utility Functions'''
 
 from collections import defaultdict
-import types
 
 _unique_ids = defaultdict(lambda: 0)
 

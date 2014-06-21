@@ -4,7 +4,7 @@
 import types
 
 ##############################################################################
-## Deriving
+# Deriving
 ##############################################################################
 
 
@@ -72,7 +72,6 @@ def _derived__str__(self):
     )
 
 
-
 def _deriving(*method_ids):
     '''Generates a deriving class containing the given method identifiers.
     '''
@@ -131,7 +130,7 @@ def deriving(*method_names):
 
 
 ##############################################################################
-## Reflection Functions
+# Reflection Functions
 ##############################################################################
 
 

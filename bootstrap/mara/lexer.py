@@ -7,6 +7,7 @@ from ply.lex import TOKEN
 
 
 class Balancer(object):
+
     def __init__(self):
         self.par = 0
         self.bkt = 0
@@ -82,68 +83,77 @@ def t_MODULE(tok):
     tok.lexer.marabalancer = Balancer()
     return tok
 
-## Block Comment
 
+# Block Comment
 def t_code_BCOMMENT(tok):
     r'\#\#\#'
     tok.lexer.push_state('bcomment')
+
 
 def t_bcomment_END(tok):
     r'\#\#\#'
     tok.lexer.pop_state()
 
+
 def t_bcomment_BCOMMENT(tok):
     r'((?!\#\#\#)(.|\n|\r))+'
     return tok
 
+
 def t_bcomment_error(tok):
     return tok
 
-## Doc Comment
 
+# Doc Comment
 def t_code_DCOMMENT(tok):
     r'\#\#'
     tok.lexer.push_state('dcomment')
 
+
 def t_dcomment_DCOMMENT(tok):
     r'[^\n]+'
     return tok
+
 
 def t_dcomment_TERM(tok):
     r'(\n|\r)+'
     tok.lexer.pop_state()
     return tok
 
+
 def t_dcomment_error(tok):
     return tok
 
-## Temp Comment
 
+# Temp Comment
 def t_code_TCOMMENT(tok):
     r'\#'
     tok.lexer.push_state('tcomment')
 
+
 def t_tcomment_TCOMMENT(tok):
     r'[^\n]+'
     return tok
+
 
 def t_tcomment_TERM(tok):
     r'(\n|\r)+'
     tok.lexer.pop_state()
     return tok
 
+
 def t_tcomment_error(tok):
     return tok
 
 
-## End Comments
-
+# End Comments
 def t_code_END(tok):
     'end'
     tok.lexer.begin('INITIAL')
     return tok
 
 t_code_ignore = ' \t'
+
 
 def t_error(tok):
     return tok
@@ -152,31 +162,37 @@ def t_error(tok):
 def t_code_error(tok):
     return tok
 
+
 # Wrappers
 def t_code_LPAR(tok):
     r'\('
     tok.lexer.marabalancer.track(tok)
     return tok
 
+
 def t_code_RPAR(tok):
     r'\)'
     tok.lexer.marabalancer.track(tok)
     return tok
+
 
 def t_code_LBKT(tok):
     r'\['
     tok.lexer.marabalancer.track(tok)
     return tok
 
+
 def t_code_RBKT(tok):
     r'\]'
     tok.lexer.marabalancer.track(tok)
     return tok
 
+
 def t_code_LBRC(tok):
     r'\{'
     tok.lexer.marabalancer.track(tok)
     return tok
+
 
 def t_code_RBRC(tok):
     r'\}'
@@ -203,6 +219,8 @@ t_code_MOD = r'[%]'
 t_code_POWER = r'\^'
 
 # Literals
+
+
 def t_code_SCI(tok):
     r'[-+]?[0-9]+(\.?|\.[0-9]+)e[-+]?[0-9]+(\.|\.[0-9]+)?'
     return tok
@@ -249,6 +267,7 @@ SYMB = r'[&|%=+\-^*/:]'
 SYMC = r'(\{|\[|\(|\\)'
 SYM_REGEX = re.compile(r'{A}|{B}|{C}'.format(A=SYMA, B=SYMB, C=SYMC))
 
+
 @TOKEN(r'{A}+|{B}({A}|{B})+'.format(A=SYMA, B=SYMB))
 def t_code_SID(tok):
     return tok
@@ -262,6 +281,7 @@ def _newline_terminates(tok):
         and not tok.lexer.marabalancer.isopen()
     )
 
+
 def t_code_NL(tok):
     r'(\n|\r)+'
 
@@ -270,16 +290,18 @@ def t_code_NL(tok):
         tok.value = '\n'
         return tok
 
+
 def t_code_TERM(tok):
     r';'
 
     return tok
 
-def lex_tokens(lexer, input):
+
+def lex_tokens(lexer, input_stream):
     '''Lex an input stream, yielding one token at a time.
     '''
     lexer.begin('INITIAL')
-    lexer.input(input)
+    lexer.input(input_stream)
     while True:
         tok = lexer.next()
         if tok is None:
@@ -288,10 +310,11 @@ def lex_tokens(lexer, input):
 
 SimpleToken = namedtuple('SimpleToken', ['type', 'value'])
 
-def lex_simple(lexer, input):
-    '''Lex an input stream, yielding the a simplified namedtuple
+
+def lex_simple(lexer, input_stream):
+    '''Lex an input_stream stream, yielding the a simplified namedtuple
     '''
-    for tok in lex_tokens(lexer, input):
+    for tok in lex_tokens(lexer, input_stream):
         yield SimpleToken(tok.type, tok.value)
 
 

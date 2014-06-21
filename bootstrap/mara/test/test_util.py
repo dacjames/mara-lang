@@ -1,15 +1,16 @@
 import string
 import random
 
-import util
+from .. import util
 
 
 def _random_prefixes():
+    # pylint: disable=E1101
     prefixes = {
         None: 10
     }
     for _ in range(100):
-        length = random.choice(range(1,20))
+        length = random.choice(range(1, 20))
         prefix = ''.join([random.choice(string.letters) for _ in range(length)])
         count = random.choice(range(10, 100))
         prefixes[prefix] = count
@@ -19,7 +20,7 @@ def _random_prefixes():
 def test_unique_ids():
     prefixes = _random_prefixes()
     ids = []
-    for prefix, count in prefixes.items():
+    for prefix, _ in prefixes.items():
         ids.append(util.unique_id(prefix))
 
     assert sorted(ids) == sorted(list(set(ids)))
@@ -28,7 +29,7 @@ def test_unique_ids():
 def test_anonymous_names():
     prefixes = _random_prefixes()
     names = []
-    for prefix, count in prefixes.items():
+    for prefix, _ in prefixes.items():
         names.append(util.anonymous_name(kind=prefix))
 
     for name in names:
@@ -69,13 +70,15 @@ class AttrTest(object):
 
 
 def test_public_attrs_field_methods():
-
-
     test = AttrTest()
 
     instance_fields = ['instance_field0', 'instance_field1', 'property0', 'property1']
     instance_methods = ['instance_method0', 'instance_method1']
-    instance_attrs = ['instance_field0', 'instance_field1', 'instance_method0', 'instance_method1', 'property0', 'property1']
+    instance_attrs = [
+        'instance_field0', 'instance_field1',
+        'instance_method0', 'instance_method1',
+        'property0', 'property1',
+    ]
 
     assert util.instance_fields(test) == instance_fields
     assert util.instance_methods(test) == instance_methods
@@ -86,11 +89,12 @@ def test_public_attrs_field_methods():
 
     assert util.class_fields(test) == class_fields
     assert util.class_methods(test) == class_methods
-    assert util.class_attrs(test) ==  class_fields + class_methods
+    assert util.class_attrs(test) == class_fields + class_methods
+
 
 def test_mutlimethods():
 
-    from util.dispatch import method_store, multimethod
+    from ..util.dispatch import method_store, multimethod
 
     class Eval(object):
         store = method_store()
@@ -129,8 +133,9 @@ def test_mutlimethods():
     assert eval_.multi(10, 10.0) == ('Int', 'Real', 10, 10.0)
     assert eval_.multi(10.0, 10.0) == ('Real', 'Real', 10, 10.0)
 
+
 def test_deriving():
-    from util.reflection import deriving
+    from ..util.reflection import deriving
 
     class EqAble(deriving('eq')):
         def __init__(self, x):

@@ -1,11 +1,11 @@
 import pytest
 
-import evaluate
+from .. import evaluate
 
-from test_parser import maramodule
+from .test_parser import maramodule
 
-from test_lexer import lex_simple
-from test_parser import parser
+from .test_lexer import lex_simple
+from .test_parser import parser
 
 
 @pytest.fixture
