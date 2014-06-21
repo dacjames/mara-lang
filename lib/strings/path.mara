@@ -1,8 +1,8 @@
 module
 import typeutil
 
-depend SEP = FS/PATH/SEPERATOR
-depend OS = OS/TMP_DIR
+SEP = depend 'fs/path/SEPERATOR'
+OS = depend 'fs/os/TMP_DIR'
 
 trait Path {
     def value -> Text
@@ -13,7 +13,7 @@ trait Path {
 
 def Text::isabs = this[0] == SEP
 def Text::isrel = this[0] != SEP
-def Text::istmp = this.contains OS/TMP_DIR
+def Text::istmp = this.startswith OS/TMP_DIR
 
 datum RelPath { value Text; path_offsets Int64.Array }
 datum AbsPath { value Text; path_offsets Int64.Array }
@@ -23,7 +23,7 @@ typeutil.proxy (RelPath, AbsPath, TmpPath)
 
 def Path(value String) {
     match value .= text
-    as value.isrel RelPath(value, value.findall '/'
+    as value.isrel RelPath(value, value.findall '/')
     as value.isabs AbsPath(value, value.findall '/')
     as value.istmp TmpPath(value, value.lastindexof OS/TMP_DIR)
 }

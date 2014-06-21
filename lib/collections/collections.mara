@@ -1,11 +1,11 @@
 module impl
 using Collection
 
-datum(T) LinkedList =
-    | ListNode
+object T.LinkedList =
+    | T.ListNode
     | Nil
 
-datum(T) Node {
+datum T.Node {
     head T
     tail This
 }

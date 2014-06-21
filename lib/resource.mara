@@ -1,0 +1,13 @@
+Resource.mara
+=============
+
+The `Resource` trait is used to manage sharable or external resources like files, sockets, and mutexes. The Resource trait is special in that the compiler will automatically call the `release` method when an object adopting Resource goes out of scope.
+
+module
+
+trait Resource {
+    def acquire -> This.Maybe { this }
+    def release -> Maybe
+}
+
+end

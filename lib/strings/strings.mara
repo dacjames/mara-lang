@@ -1,5 +1,3 @@
-end string
-
 ###
 # strings module
 
@@ -24,14 +22,14 @@ module strings
 import strings_impl/(Text, Symbol, Char.Array)
 import chars_impl/(Rune, Byte)
 
-export {
-    String
-    Text
-    Symbol
-    Char.Array
-    Rune
-    Byte
-}
+export [
+    'String',
+    'Text',
+    'Symbol',
+    'Char.Array',
+    'Rune',
+    'Byte',
+]
 
 
 trait String =
