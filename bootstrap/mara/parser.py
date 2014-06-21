@@ -357,4 +357,4 @@ def p_error(tok):
 
 
 def build_parser():
-    return yacc.yacc()
+    return yacc.yacc(tabmodule='__plycache__/parser.out', outputdir='./__plycache__')
