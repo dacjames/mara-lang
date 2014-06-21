@@ -4,6 +4,7 @@ import pytest
 
 r = Register
 
+
 @pytest.fixture
 def machine():
     return Machine(buffered=True)
@@ -11,6 +12,7 @@ def machine():
 
 def test_machine(machine):
     machine._load([
+        ['label', 'main'],
         ['print_const', 0],
         ['print_const', 1],
         ['load_const', r(0), 1],
