@@ -1,6 +1,9 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 
 from util.reflection import deriving
+
+
+# pylint: disable=W0231
 
 
 class Node(deriving('eq', 'show')):
@@ -10,26 +13,32 @@ class Node(deriving('eq', 'show')):
         if self.__class__ is Node:
             raise TypeError('Node is abstract and should not be instantiated.')
 
-    def visit(self, visitor):
-        visitor(self, self.children())
-
 
 class Module(Node):
+
     def __init__(self, name=None, exprs=None):
         self.name = name
         self.exprs = exprs
 
+
 class _Collection(Node):
-    def __init__(self, values=[]):
+
+    def __init__(self, values=None):
+        if values is None:
+            values = []
         self.values = values
+
 
 class Tuple(_Collection):
     pass
 
+
 class List(_Collection):
     pass
 
+
 class _Value(Node):
+
     def __init__(self, value):
         self.value = value
 
@@ -59,30 +68,35 @@ class TypeId(_Value):
 
 
 class Block(Node):
+
     def __init__(self, exprs, params):
         self.exprs = exprs
         self.params = params
 
 
 class BinOp(Node):
+
     def __init__(self, func, args):
         self.func = func
         self.args = args
 
 
 class If(Node):
+
     def __init__(self, pred, body):
         self.pred = pred
         self.body = body
 
 
 class Else(Node):
+
     def __init__(self, expr, body):
         self.expr = expr
         self.body = body
 
 
 class Assign(Node):
+
     def __init__(self, name, value, type_=None):
         self.name = name
         self.value = value
@@ -90,12 +104,14 @@ class Assign(Node):
 
 
 class While(Node):
+
     def __init__(self, pred, body):
         self.pred = pred
         self.body = body
 
 
 class _Declaration(Node):
+
     def __init__(self, name, value, type_=None):
         self.name = name
         self.value = value
@@ -119,24 +135,28 @@ class Ref(_Declaration):
 
 
 class For(Node):
+
     def __init__(self, clauses, body):
         self.clauses = clauses
         self.body = body
 
 
 class ForClause(Node):
+
     def __init__(self, bind, in_):
         self.bind = bind
         self.in_ = in_
 
 
 class KV(Node):
+
     def __init__(self, key, value):
         self.key = key
         self.value = value
 
 
 class _Comment(Node):
+
     def __init__(self, content):
         self.content = content
 
@@ -151,5 +171,3 @@ class DocComment(_Comment):
 
 class BlockComment(_Comment):
     pass
-
-
