@@ -53,13 +53,12 @@ VERBAL: left to right, terminating
 
 ## Truth-ness
 
-Only `false`, `null`, and `No` are treated as false in Mara.  Other values, such as empty strings and lists, must be converted to boolean using the `?` "truthy" operator.  The following values are converted to `false`, everything else is `true`.
+Only `false`, `null`, and `No` are treated as false in Mara.  Other values, such as empty strings and lists, must be converted to boolean explicity.  The `truthy` function converts the following values to `false`, everything else is `true`.
 
   - `0`
   - `0.0`
   - `[]`
   - `{}`
-  - `()`
   - `""`, `''`
 
 

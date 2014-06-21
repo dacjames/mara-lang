@@ -24,10 +24,9 @@ Mara defines the following symbols.  Notice that all but a few symbols are mappe
 ## Declarations
 *---------*-------------*
 | `def`   | Function    |
-| `val`   | Value       |
+| ``val`   | Value       |
 | `var`   | Variable    |
 | `ref`   | Reference   |
-| `mut`   | Pointer     |
 *---------*-------------*
 | `trait` | Trait       |
 | `datum` | Datum       |
