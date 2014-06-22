@@ -84,8 +84,10 @@ def test_function_calls(machine):
     machine._load([
         # main { print f(6) }
         ['load_const', r(0), 6],
-        ['call', 8, r(0)],
+        ['load_const', r(1), 99],
+        ['call', 10, r(0)],
         ['print_reg', r(0)],
+        ['print_reg', r(1)],
         ['halt'],
         # g(x, y) { x + y }
         ['load_param', r(1), 0],        # r1 = load x
@@ -95,9 +97,9 @@ def test_function_calls(machine):
         # f(x) { a = g(x, 10); g(a, a) }
         ['load_param', r(1), 0],        # r1 = load x
         ['load_const', r(2), 10],       # r2 = load 10
-        ['call', 4, r(1), r(2)],        # r0 = g(r1, r2)
+        ['call', 6, r(1), r(2)],        # r0 = g(r1, r2)
         ['add_rc', r(1), r(0), 0],      # r1 = r0 + 0
-        ['call', 4, r(1), r(1)],        # r0 = call(r1, r1)
+        ['call', 6, r(1), r(1)],        # r0 = call(r1, r1)
         ['ret'],
     ])
 
@@ -105,4 +107,5 @@ def test_function_calls(machine):
 
     assert machine._buffer == [
         'r0:32',
+        'r1:99',
     ]
