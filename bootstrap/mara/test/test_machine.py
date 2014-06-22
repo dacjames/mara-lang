@@ -86,6 +86,56 @@ def test_stack_manipulation(machine):
     ]
 
 
+def test_int_math(machine):
+    machine._load([
+        ['load_const', r(0), 10],
+        ['load_const', r(1), 20],
+        ['load_const', r(2), 33],
+        ['add_rc', r(4), r(0), 2],
+        ['print_reg', r(4)],
+        ['add_rr', r(4), r(0), r(1)],
+        ['print_reg', r(4)],
+        ['sub_rc', r(4), r(0), 20],
+        ['print_reg', r(4)],
+        ['sub_rr', r(4), r(2), r(1)],
+        ['print_reg', r(4)],
+        ['mul_rc', r(4), r(0), 2],
+        ['print_reg', r(4)],
+        ['mul_rr', r(4), r(0), r(2)],
+        ['print_reg', r(4)],
+        ['div_rc', r(4), r(0), 2],
+        ['print_reg', r(4)],
+        ['div_rc', r(4), r(0), 20],
+        ['print_reg', r(4)],
+        ['div_rr', r(4), r(2), r(0)],
+        ['print_reg', r(4)],
+        ['div_rr', r(4), r(1), r(0)],
+        ['print_reg', r(4)],
+        ['rem_rc', r(4), r(0), 3],
+        ['print_reg', r(4)],
+        ['rem_rr', r(4), r(2), r(0)],
+        ['print_reg', r(4)],
+        ['halt'],
+    ])
+
+    machine._loop()
+
+    assert machine._print_buffer == [
+        'r4:12',
+        'r4:30',
+        'r4:-10',
+        'r4:13',
+        'r4:20',
+        'r4:330',
+        'r4:5',
+        'r4:0',
+        'r4:3',
+        'r4:2',
+        'r4:1',
+        'r4:3',
+    ]
+
+
 def test_function_calls(machine):
     machine._load([
         # main { print f(6) }

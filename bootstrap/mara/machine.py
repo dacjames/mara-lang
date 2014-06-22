@@ -218,11 +218,9 @@ class Machine(object):
         '''
         return HALT
 
-    def add_cc(self, dst, left, right):
-        '''
-        Add two constants into reg dst.
-        '''
-        self._set(dst, left + right)
+    ##########################################################################
+    # Math
+    ##########################################################################
 
     def add_rc(self, dst, left, right):
         '''
@@ -236,11 +234,57 @@ class Machine(object):
         '''
         self._set(dst, self._get(left) + self._get(right))
 
-    def new_sym(self, dst, value):
+    def sub_rc(self, dst, left, right):
         '''
-        Allocate a new symbol.
+        Subtract the constant right from the value in reg left and store the result in dst.
         '''
-        self._set(dst, self._allocate(value))
+        self._set(dst, self._get(left) - right)
+
+    def sub_rr(self, dst, left, right):
+        '''
+        Subtract the the value in reg right from the value in reg left and store the result in dst.
+        '''
+        self._set(dst, self._get(left) - self._get(right))
+
+    def mul_rc(self, dst, left, right):
+        '''
+        Multiply the the value in reg left by the constant right and store the result in dst.
+        '''
+        self._set(dst, self._get(left) * right)
+
+    def mul_rr(self, dst, left, right):
+        '''
+        Multiply the the value in reg left by the value in reg right and store the result in dst.
+        '''
+        self._set(dst, self._get(left) * self._get(right))
+
+    def div_rc(self, dst, left, right):
+        '''
+        Divide the the value in reg left by the constant left and store the result in dst.
+        Truncates to an integer result.
+        '''
+        self._set(dst, self._get(left) // right)
+
+    def div_rr(self, dst, left, right):
+        '''
+        Divide the the value in reg left from the value in reg right and store the result in dst.
+        Truncates to an integer result.
+        '''
+        self._set(dst, self._get(left) // self._get(right))
+
+    def rem_rc(self, dst, left, right):
+        '''
+        Compute the remainder of the the value in reg left divided bv the constant left
+        and store the result in dst.
+        '''
+        self._set(dst, self._get(left) % right)
+
+    def rem_rr(self, dst, left, right):
+        '''
+        Compute the remainder of value in reg left divided by the value in reg right
+        and store the result in dst.
+        '''
+        self._set(dst, self._get(left) % self._get(right))
 
     def branch_zero(self, pred, jmp_offset):
         '''
@@ -346,6 +390,13 @@ class Machine(object):
         Pop a value off the stack into the dst register.
         '''
         self._set(dst, self._pop())
+
+    def new_sym(self, dst, value):
+        '''
+        Allocate a new symbol.
+        '''
+        self._set(dst, self._allocate(value))
+
 
     def load_const(self, reg, value):
         '''
