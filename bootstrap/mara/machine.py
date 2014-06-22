@@ -490,13 +490,13 @@ class Machine(object):
     # Load & Store
     ##########################################################################
 
-    def load_const(self, reg, value):
+    def load_c(self, reg, value):
         '''
         Load a constant number into a register.
         '''
         self._set(reg, value)
 
-    def load_param(self, dst, index):
+    def load_p(self, dst, index):
         '''
         Load a function parameter in a register.
         '''

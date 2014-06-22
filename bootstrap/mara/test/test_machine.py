@@ -22,7 +22,7 @@ def test_simple_machine(machine):
     machine._load([
         ['print_const', 0],
         ['print_const', 1],
-        ['load_const', r(0), 1],
+        ['load_c', r(0), 1],
         ['print_reg', r(0)],
         ['add_rc', r(0), r(0), 1],
         ['add_rr', r(1), r(0), r(0)],
@@ -33,7 +33,7 @@ def test_simple_machine(machine):
         ['add_rc', r(1), r(1), 10],
         ['add_rc', r(1), r(1), -10],
         ['print_reg', r(1)],
-        ['load_const', r(3), 0],
+        ['load_c', r(3), 0],
         ['branch_gte', r(1), r(3), -4],
         ['halt'],
     ])
@@ -54,9 +54,9 @@ def test_simple_machine(machine):
 
 def test_stack_manipulation(machine):
     machine._load([
-        ['load_const', r(0), 0],
+        ['load_c', r(0), 0],
         ['push', r(0)],
-        ['load_const', r(0), 1],
+        ['load_c', r(0), 1],
         ['print_reg', r(0)],
         ['peak', r(0)],
         ['print_reg', r(0)],
@@ -88,9 +88,9 @@ def test_stack_manipulation(machine):
 
 def test_int_math(machine):
     machine._load([
-        ['load_const', r(0), 10],
-        ['load_const', r(1), 20],
-        ['load_const', r(2), 33],
+        ['load_c', r(0), 10],
+        ['load_c', r(1), 20],
+        ['load_c', r(2), 33],
         ['add_rc', r(4), r(0), 2],
         ['print_reg', r(4)],
         ['add_rr', r(4), r(0), r(1)],
@@ -139,20 +139,20 @@ def test_int_math(machine):
 def test_function_calls(machine):
     machine._load([
         # main { print f(6) }
-        ['load_const', r(0), 6],
-        ['load_const', r(1), 99],
+        ['load_c', r(0), 6],
+        ['load_c', r(1), 99],
         ['call', 10, r(0)],
         ['print_reg', r(0)],
         ['print_reg', r(1)],
         ['halt'],
         # g(x, y) { x + y }
-        ['load_param', r(1), 0],        # r1 = load x
-        ['load_param', r(2), 1],        # r2 = load y
+        ['load_p', r(1), 0],        # r1 = load x
+        ['load_p', r(2), 1],        # r2 = load y
         ['add_rr', r(0), r(1), r(2)],   # r0 = x + y
         ['ret'],
         # f(x) { a = g(x, 10); g(a, a) }
-        ['load_param', r(1), 0],        # r1 = load x
-        ['load_const', r(2), 10],       # r2 = load 10
+        ['load_p', r(1), 0],        # r1 = load x
+        ['load_c', r(2), 10],       # r2 = load 10
         ['call', 6, r(1), r(2)],        # r0 = g(r1, r2)
         ['add_rc', r(1), r(0), 0],      # r1 = r0 + 0
         ['call', 6, r(1), r(1)],        # r0 = call(r1, r1)
@@ -176,18 +176,18 @@ def test_heap(machine):
         ['store_c', r(0), 4],
         ['store_c', r(1), 5],
 
-        ['load_const', r(20), 6],
+        ['load_c', r(20), 6],
         ['store_d', r(20), r(2)],
-        ['load_const', r(20), 7],
+        ['load_c', r(20), 7],
         ['store_d', r(20), r(3)],
 
-        ['load_const', r(20), 8],
+        ['load_c', r(20), 8],
         ['store_i', r(20), r(0), 4],
-        ['load_const', r(20), 9],
+        ['load_c', r(20), 9],
         ['store_i', r(20), r(0), 5],
-        ['load_const', r(20), 10],
+        ['load_c', r(20), 10],
         ['store_i', r(20), r(0), 6],
-        ['load_const', r(20), 11],
+        ['load_c', r(20), 11],
         ['store_i', r(20), r(0), 7],
 
         ['load_d', r(4), r(0)],
