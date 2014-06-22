@@ -136,8 +136,8 @@ class Machine(object):
             fp = self._frame_ptr
 
         # the closest you can get to realloc in python
-        while reg >= len(self._regs_buffer[fp]):
-            self._regs_buffer[fp] += ([None] * len(self._regs_buffer))
+        if reg >= len(self._regs_buffer[fp]):
+            self._regs_buffer[fp] += [None] * max(len(self._regs_buffer), reg)
 
         self._regs_buffer[fp][reg] = value
 
