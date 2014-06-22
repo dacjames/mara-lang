@@ -186,7 +186,17 @@ class Machine(object):
         return value
 
     ##########################################################################
-    # Op Codes
+    # Special Purpose
+    ##########################################################################
+
+    def halt(self):
+        '''
+        End execution of the machine.
+        '''
+        return HALT
+
+    ##########################################################################
+    # Printing
     ##########################################################################
 
     def print_const(self, arg):
@@ -211,12 +221,6 @@ class Machine(object):
         address = self._get(reg)
         value = self._heaplet[address]
         self._print('r{i}:{a}=>{v}'.format(i=reg, a=address, v=repr(value)))
-
-    def halt(self):
-        '''
-        End execution of the machine.
-        '''
-        return HALT
 
     ##########################################################################
     # Math
@@ -286,6 +290,10 @@ class Machine(object):
         '''
         self._set(dst, self._get(left) % self._get(right))
 
+    ##########################################################################
+    # Branching
+    ##########################################################################
+
     def branch_zero(self, pred, jmp_offset):
         '''
         Branch relative if the value in reg pred is zero.
@@ -329,6 +337,10 @@ class Machine(object):
         '''
         if self._get(left) <= self._get(right):
             self._pc += jmp_offset
+
+    ##########################################################################
+    # Function Call and Return
+    ##########################################################################
 
     def call(self, func, *params):
         '''
@@ -379,6 +391,10 @@ class Machine(object):
         # jump to the return address
         self._pc = ret_addr
 
+    ##########################################################################
+    # Stack Manipulation
+    ##########################################################################
+
     def push(self, src):
         '''
         Push a value from the src register onto the stack.
@@ -391,12 +407,32 @@ class Machine(object):
         '''
         self._set(dst, self._pop())
 
+    def peak(self, dst, offset=0):
+        '''
+        Load a value from the stack.
+        '''
+        self._set(dst, self._stack_buffer[self._stack_ptr - offset])
+
+    ##########################################################################
+    # Allocation
+    ##########################################################################
+
     def new_sym(self, dst, value):
         '''
-        Allocate a new symbol.
+        Allocate a new symbol and store the pointer in reg dst.
         '''
         self._set(dst, self._allocate(value))
 
+    def new_chunk(self, dst, size):
+        '''
+        Allocate a new chunk of memory and return the pointer in reg dst.
+        '''
+        chunk = [None] * size
+        self._set(dst, self._allocate(chunk))
+
+    ##########################################################################
+    # Loading
+    ##########################################################################
 
     def load_const(self, reg, value):
         '''
@@ -416,12 +452,6 @@ class Machine(object):
 
         # load the value into a register
         self._set(dst, self._stack_buffer[self._frame_ptr - offset])
-
-    def load_stack(self, dst, offset=0):
-        '''
-        Load a value from the stack.
-        '''
-        self._set(dst, self._stack_buffer[self._stack_ptr - offset])
 
     def on_error(self, *args):
         print('error: ' + repr(args))
