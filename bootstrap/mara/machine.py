@@ -231,14 +231,11 @@ class Machine(object):
         self._pc = ret_addr
 
     def load_param(self, dst, index):
-        # saved frame_ptr, return address
-        fixed_offset = 2
-
-        # number of paramters
-        num_params = self._stack_buffer[self._frame_ptr - fixed_offset]
+        # saved frame_ptr, return address, num_params
+        fixed_offset = 3
 
         # compute the negative offset
-        offset = fixed_offset + num_params - index
+        offset = fixed_offset + index
 
         # load the value into a register
         self._set(dst, self._stack_buffer[self._frame_ptr - offset])
