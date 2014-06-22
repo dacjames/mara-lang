@@ -133,8 +133,10 @@ class Machine(object):
         else:
             fp = self._frame_ptr
 
+        # the closest you can get to realloc in python
         if reg >= len(self._regs_buffer[fp]):
             self._regs_buffer[fp] += ([None] * max(len(self._regs_buffer), 8))
+
         self._regs_buffer[fp][reg] = value
 
     def _get(self, reg):
@@ -254,32 +256,34 @@ class Machine(object):
         if self._get(pred) != 0:
             self._pc += jmp_offset
 
-    def branch_gt(self, pred, jmp_offset):
+    def branch_gt(self, left, right, jmp_offset):
         '''
-        Branch relative if the value in reg pred is greater than zero.
+        Branch relative if the value in reg left is greater than the value in reg right.
         '''
-        if self._get(pred) > 0:
+        if self._get(left) > self._get(right):
             self._pc += jmp_offset
 
-    def branch_lt(self, pred, jmp_offset):
+    def branch_lt(self, left, right, jmp_offset):
         '''
-        Branch relative if the value in reg pred is less than zero.
+        Branch relative if the value in reg pred is less than the value in reg right.
         '''
-        if self._get(pred) < 0:
+        if self._get(left) < self._get(right):
             self._pc += jmp_offset
 
-    def branch_gte(self, pred, jmp_offset):
+    def branch_gte(self, left, right, jmp_offset):
         '''
-        Branch relative if the value in reg pred is greater than or equal to zero.
+        Branch relative if the value in reg pred is
+        greater than or equal to the value in reg right.
         '''
-        if self._get(pred) >= 0:
+        if self._get(left) >= self._get(right):
             self._pc += jmp_offset
 
-    def branch_lte(self, pred, jmp_offset):
+    def branch_lte(self, left, right, jmp_offset):
         '''
-        Branch relative if the value in reg pred is less than or equal to zero.
+        Branch relative if the value in reg pred is
+        less than or equal to the value in reg right.
         '''
-        if self._get(pred) <= 0:
+        if self._get(left) <= self._get(right):
             self._pc += jmp_offset
 
     def call(self, func, *params):

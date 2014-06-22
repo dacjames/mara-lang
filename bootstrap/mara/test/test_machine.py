@@ -33,7 +33,8 @@ def test_simple_machine(machine):
         ['add_rc', r(1), r(1), 10],
         ['add_rc', r(1), r(1), -10],
         ['print_reg', r(1)],
-        ['branch_gte', r(1), -3],
+        ['load_const', r(3), 0],
+        ['branch_gte', r(1), r(3), -4],
         ['halt'],
     ])
 
