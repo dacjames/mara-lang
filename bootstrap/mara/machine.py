@@ -5,14 +5,13 @@
 from collections import defaultdict
 
 
-halt_canary = object()
-
-
-class Register(int):
-    pass
+HALT = object()
 
 
 class Machine(object):
+    '''
+    A simple, register-based virtual machine.
+    '''
     def __init__(self, buffered=False, traced=False):
         self._code = []
         self._regs_buffer = defaultdict(lambda: [])
@@ -23,16 +22,13 @@ class Machine(object):
         self._frame_ptr = 0
 
         self._heaplet = []
-        self._heap_ptr = -1
 
-        self._root_scope = {}
-
-        self._buffer = []
+        self._print_buffer = []
 
         self._trace = traced
 
         def _buffered_print(arg):
-            self._buffer.append(arg)
+            self._print_buffer.append(arg)
 
         def _raw_print(arg):
             print(arg)
@@ -48,10 +44,16 @@ class Machine(object):
 
     @property
     def _stack(self):
+        '''
+        A list copy of the stack.
+        '''
         return self._stack_buffer[:self._stack_ptr+1]
 
     @property
     def _regs(self):
+        '''
+        A dictionary copy of the registers for the frame.
+        '''
         fp = self._frame_ptr
 
         if self._frame_ptr == 0:
@@ -69,12 +71,18 @@ class Machine(object):
         self._code = code
 
     def _describe(self):
+        '''
+        The instruction about to be executed.
+        '''
         return '{pc}: {instruction}'.format(
             pc=self._pc,
             instruction=' '.join(str(instruction) for instruction in self._code[self._pc])
         )
 
     def _describe_result(self):
+        '''
+        State of the machine after executing an instruction.
+        '''
         return '{pc}= {{{regs}}} {stack}'.format(
             pc=self._pc,
             regs=', '.join('r{0}:{1}'.format(r, v) for r, v in self._regs.items()),
@@ -82,6 +90,9 @@ class Machine(object):
         )
 
     def _loop(self):
+        '''
+        Main Interpretor Loop.
+        '''
         if len(self._code) == 0:
             return
 
@@ -104,7 +115,7 @@ class Machine(object):
             if self._trace:
                 print(self._describe_result())
 
-            if result is halt_canary:
+            if result is HALT:
                 break
             else:
                 self._pc += 1
@@ -112,6 +123,9 @@ class Machine(object):
             # iterations += 1
 
     def _set(self, reg, value):
+        '''
+        Set the value in a register for the current frame.
+        '''
 
         # r0 is sharded by all frames
         if reg == 0:
@@ -124,7 +138,9 @@ class Machine(object):
         self._regs_buffer[fp][reg] = value
 
     def _get(self, reg):
-
+        '''
+        Get the value in a regester for the current frame.
+        '''
         # r0 is sharded by all frames
         if reg == 0:
             fp = 0
@@ -134,16 +150,25 @@ class Machine(object):
         return self._regs_buffer[fp][reg]
 
     def _allocate(self, obj):
+        '''
+        Allocate a new object in the heap.
+        '''
         index = len(self._heaplet)
         self._heaplet.append(obj)
         return index
 
     def _flush(self):
-        for line in self._buffer:
+        '''
+        Flush the print buffer.
+        '''
+        for line in self._print_buffer:
             print(line)
-        self._buffer = []
+        self._print_buffer = []
 
     def _push(self, arg):
+        '''
+        Push a value onto the stack.
+        '''
         self._stack_ptr += 1
         if self._stack_ptr == len(self._stack_buffer):
             self._stack_buffer.append(arg)
@@ -151,6 +176,9 @@ class Machine(object):
             self._stack_buffer[self._stack_ptr] = arg
 
     def _pop(self):
+        '''
+        Pop a value off the stack.
+        '''
         value = self._stack_buffer[self._stack_ptr]
         self._stack_ptr -= 1
         return value
@@ -160,63 +188,103 @@ class Machine(object):
     ##########################################################################
 
     def print_const(self, arg):
+        '''
+        Print a constant value.
+        '''
         self._print(repr(arg))
 
     def print_reg(self, arg):
+        '''
+        Print a description of a register.
+        '''
         self._print('r{i}:{v}'.format(
             i=arg,
             v=repr(self._get(arg)),
         ))
 
     def print_object(self, reg):
+        '''
+        Print an object referenced by reg.
+        '''
         address = self._get(reg)
         value = self._heaplet[address]
         self._print('r{i}:{a}=>{v}'.format(i=reg, a=address, v=repr(value)))
 
     def halt(self):
-        return halt_canary
-
-    def load_const(self, reg, value):
-        self._set(reg, value)
+        '''
+        End execution of the machine.
+        '''
+        return HALT
 
     def add_cc(self, dst, left, right):
+        '''
+        Add two constants into reg dst.
+        '''
         self._set(dst, left + right)
 
     def add_rc(self, dst, left, right):
+        '''
+        Add the value in reg left to the constant right and store the result in dst.
+        '''
         self._set(dst, self._get(left) + right)
 
     def add_rr(self, dst, left, right):
+        '''
+        Add the value in reg left to the value in reg right and store the result in dst.
+        '''
         self._set(dst, self._get(left) + self._get(right))
 
-    def new_str(self, dst, value):
+    def new_sym(self, dst, value):
+        '''
+        Allocate a new symbol.
+        '''
         self._set(dst, self._allocate(value))
 
     def branch_zero(self, pred, jmp_offset):
+        '''
+        Branch relative if the value in reg pred is zero.
+        '''
         if self._get(pred) == 0:
             self._pc += jmp_offset
 
     def branch_nonzero(self, pred, jmp_offset):
+        '''
+        Branch relative if the value in reg pred is not zero.
+        '''
         if self._get(pred) != 0:
             self._pc += jmp_offset
 
     def branch_gt(self, pred, jmp_offset):
+        '''
+        Branch relative if the value in reg pred is greater than zero.
+        '''
         if self._get(pred) > 0:
             self._pc += jmp_offset
 
     def branch_lt(self, pred, jmp_offset):
+        '''
+        Branch relative if the value in reg pred is less than zero.
+        '''
         if self._get(pred) < 0:
             self._pc += jmp_offset
 
     def branch_gte(self, pred, jmp_offset):
+        '''
+        Branch relative if the value in reg pred is greater than or equal to zero.
+        '''
         if self._get(pred) >= 0:
             self._pc += jmp_offset
 
     def branch_lte(self, pred, jmp_offset):
+        '''
+        Branch relative if the value in reg pred is less than or equal to zero.
+        '''
         if self._get(pred) <= 0:
             self._pc += jmp_offset
 
     def call(self, func, *params):
-        '''Call a function at address func with a variable number of params
+        '''
+        Call a function at absolute address func with a variable number of params.
         '''
         # push arguments
         for param in params:
@@ -242,6 +310,9 @@ class Machine(object):
         self._pc -= 1
 
     def ret(self):
+        '''
+        Return from a function call, cleaning up the stack before leaving.
+        '''
         # saved frame_ptr, return address
         fixed_offset = 2
 
@@ -260,7 +331,28 @@ class Machine(object):
         # jump to the return address
         self._pc = ret_addr
 
+    def push(self, src):
+        '''
+        Push a value from the src register onto the stack.
+        '''
+        self._push(self._get(src))
+
+    def pop(self, dst):
+        '''
+        Pop a value off the stack into the dst register.
+        '''
+        self._set(dst, self._pop())
+
+    def load_const(self, reg, value):
+        '''
+        Load a constant number into a register.
+        '''
+        self._set(reg, value)
+
     def load_param(self, dst, index):
+        '''
+        Load a function parameter in a register.
+        '''
         # saved frame_ptr, return address, num_params
         fixed_offset = 3
 
@@ -270,21 +362,12 @@ class Machine(object):
         # load the value into a register
         self._set(dst, self._stack_buffer[self._frame_ptr - offset])
 
-    def push(self, src):
-        '''Push a value from the src register onto the stack.
-        '''
-        self._push(self._get(src))
-
-    def pop(self, dst):
-        '''Pop a value off the stack into the dst register.
-        '''
-        self._set(dst, self._pop())
-
     def load_stack(self, dst, offset=0):
-        '''Load a value from the stack
+        '''
+        Load a value from the stack.
         '''
         self._set(dst, self._stack_buffer[self._stack_ptr - offset])
 
     def on_error(self, *args):
         print('error: ' + repr(args))
-        return halt_canary
+        return HALT

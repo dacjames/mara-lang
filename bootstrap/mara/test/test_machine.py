@@ -1,11 +1,16 @@
 import pytest
 
-from ..machine import Machine, Register
+from ..machine import Machine
 
 # pylint: disable=W0621
 # pylint: disable=W0212
 
-r = Register
+
+class r(int):
+    '''
+    Just a convenience class to make the bytecode easier to read.
+    '''
+    pass
 
 
 @pytest.fixture
@@ -23,7 +28,7 @@ def test_simple_machine(machine):
         ['add_rr', r(1), r(0), r(0)],
         ['print_reg', r(0)],
         ['print_reg', r(1)],
-        ['new_str', r(2), 'hello, world'],
+        ['new_sym', r(2), 'hello, world'],
         ['print_object', r(2)],
         ['add_rc', r(1), r(1), 10],
         ['add_rc', r(1), r(1), -10],
@@ -34,7 +39,7 @@ def test_simple_machine(machine):
 
     machine._loop()
 
-    assert machine._buffer == [
+    assert machine._print_buffer == [
         '0',
         '1',
         'r0:1',
@@ -72,7 +77,7 @@ def test_stack_manipulation(machine):
 
     assert machine._stack == [0, 1, 2]
 
-    assert machine._buffer == [
+    assert machine._print_buffer == [
         'r0:1',
         'r0:0',
         'r1:2',
@@ -105,7 +110,7 @@ def test_function_calls(machine):
 
     machine._loop()
 
-    assert machine._buffer == [
+    assert machine._print_buffer == [
         'r0:32',
         'r1:99',
     ]
