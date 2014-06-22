@@ -29,7 +29,7 @@ def test_simple_machine(machine):
         ['print_reg', r(0)],
         ['print_reg', r(1)],
         ['new_sym', r(2), 'hello, world'],
-        ['print_object', r(2)],
+        ['print_sym', r(2)],
         ['add_rc', r(1), r(1), 10],
         ['add_rc', r(1), r(1), -10],
         ['print_reg', r(1)],
@@ -58,7 +58,7 @@ def test_stack_manipulation(machine):
         ['push', r(0)],
         ['load_const', r(0), 1],
         ['print_reg', r(0)],
-        ['load_stack', r(0)],
+        ['peak', r(0)],
         ['print_reg', r(0)],
         ['add_rc', r(0), r(0), 1],
         ['push', r(0)],
@@ -67,8 +67,8 @@ def test_stack_manipulation(machine):
         ['add_rc', r(0), r(0), 1],
         ['push', r(0)],
         ['pop', r(0)],
-        ['load_stack', r(1)],
-        ['load_stack', r(2), 1],
+        ['peak', r(1)],
+        ['peak', r(2), 1],
         ['print_reg', r(1)],
         ['print_reg', r(2)],
         ['halt'],
@@ -164,4 +164,59 @@ def test_function_calls(machine):
     assert machine._print_buffer == [
         'r0:32',
         'r1:99',
+    ]
+
+
+def test_heap(machine):
+    machine._load([
+        ['new_chunk', r(0), 8],
+        ['add_rc', r(1), r(0), 1],
+        ['add_rc', r(2), r(0), 2],
+        ['add_rc', r(3), r(0), 3],
+        ['store_c', r(0), 4],
+        ['store_c', r(1), 5],
+
+        ['load_const', r(20), 6],
+        ['store_d', r(20), r(2)],
+        ['load_const', r(20), 7],
+        ['store_d', r(20), r(3)],
+
+        ['load_const', r(20), 8],
+        ['store_i', r(20), r(0), 4],
+        ['load_const', r(20), 9],
+        ['store_i', r(20), r(0), 5],
+        ['load_const', r(20), 10],
+        ['store_i', r(20), r(0), 6],
+        ['load_const', r(20), 11],
+        ['store_i', r(20), r(0), 7],
+
+        ['load_d', r(4), r(0)],
+        ['load_d', r(5), r(1)],
+        ['load_d', r(6), r(2)],
+        ['load_d', r(7), r(3)],
+        ['load_i', r(8), r(0), 4],
+        ['load_i', r(9), r(0), 5],
+        ['load_i', r(10), r(0), 6],
+        ['load_i', r(11), r(0), 7],
+    ] + [
+        ['print_reg', r(n)] for n in range(12)
+    ] + [
+        ['halt'],
+    ])
+
+    machine._loop()
+
+    assert machine._print_buffer == [
+        'r0:0',
+        'r1:1',
+        'r2:2',
+        'r3:3',
+        'r4:4',
+        'r5:5',
+        'r6:6',
+        'r7:7',
+        'r8:8',
+        'r9:9',
+        'r10:10',
+        'r11:11',
     ]

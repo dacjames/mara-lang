@@ -14,14 +14,16 @@ class Machine(object):
     '''
     def __init__(self, buffered=False, traced=False):
         self._code = []
-        self._regs_buffer = defaultdict(lambda: [])
+        self._regs_buffer = defaultdict(lambda: [None] * 4)
         self._pc = 0
 
         self._stack_buffer = []
         self._stack_ptr = -1
         self._frame_ptr = 0
 
-        self._heaplet = []
+        self._heaplet = [None] * 8
+        self._free_ptr = 0
+        self._end_ptr = 7
 
         self._print_buffer = []
 
@@ -134,8 +136,8 @@ class Machine(object):
             fp = self._frame_ptr
 
         # the closest you can get to realloc in python
-        if reg >= len(self._regs_buffer[fp]):
-            self._regs_buffer[fp] += ([None] * max(len(self._regs_buffer), 8))
+        while reg >= len(self._regs_buffer[fp]):
+            self._regs_buffer[fp] += ([None] * len(self._regs_buffer))
 
         self._regs_buffer[fp][reg] = value
 
@@ -151,13 +153,42 @@ class Machine(object):
 
         return self._regs_buffer[fp][reg]
 
-    def _allocate(self, obj):
+    def _allocate(self, size):
         '''
         Allocate a new object in the heap.
         '''
-        index = len(self._heaplet)
-        self._heaplet.append(obj)
-        return index
+        # prepare for not having Python
+        length = self._end_ptr - self._free_ptr
+
+        # Do we have space?  Hit fast path.
+        if self._free_ptr + size < length:
+            # remeber the start of the chunk
+            chunk_ptr = self._free_ptr
+
+            # move the free ptr past the chunk
+            self._free_ptr += size
+
+            return chunk_ptr
+
+        # Not enough space? Hit slow path.
+        else:
+            # allocate more heap space.
+            new_length = (length * 2)
+            new_heap = [None] * new_length
+            self._end_ptr = new_length - 1
+
+            # pythonism: locals are faster than self attributes
+            old_heap = self._heaplet
+
+            # copy over existing objects
+            for i in range(length):
+                new_heap[i] = old_heap[i]
+
+            # replace heaps
+            self._heaplet = new_heap
+
+            # recurse to hit the fast path
+            return self._allocate(size)
 
     def _flush(self):
         '''
@@ -214,13 +245,25 @@ class Machine(object):
             v=repr(self._get(arg)),
         ))
 
-    def print_object(self, reg):
+    def print_sym(self, reg):
         '''
-        Print an object referenced by reg.
+        Print a symbol referenced by reg.
         '''
+        heaplet = self._heaplet
+
+        # get the pointer
         address = self._get(reg)
-        value = self._heaplet[address]
-        self._print('r{i}:{a}=>{v}'.format(i=reg, a=address, v=repr(value)))
+
+        # load the symbol length
+        length = heaplet[address]
+
+        # lazy load the symbols' characters
+        chars = (heaplet[i] for i in range(1, length + 1))
+
+        # convert to a string for printing
+        string = ''.join(chars)
+
+        self._print('r{i}:{a}=>{v}'.format(i=reg, a=address, v=repr(string)))
 
     ##########################################################################
     # Math
@@ -417,21 +460,34 @@ class Machine(object):
     # Allocation
     ##########################################################################
 
-    def new_sym(self, dst, value):
+    def new_sym(self, dst, sym):
         '''
         Allocate a new symbol and store the pointer in reg dst.
         '''
-        self._set(dst, self._allocate(value))
+        length = len(sym)
+
+        # allocate space for the symbol +1 from the length
+        chunk = self._allocate(length + 1)
+
+        # store the symbol length
+        self._heaplet[chunk] = length
+
+        # store the symbol characters (+1 for the length)
+        for i, char in enumerate(sym):
+            self._heaplet[chunk + i + 1] = char
+
+        # store the pointer
+        self._set(dst, chunk)
 
     def new_chunk(self, dst, size):
         '''
         Allocate a new chunk of memory and return the pointer in reg dst.
         '''
-        chunk = [None] * size
-        self._set(dst, self._allocate(chunk))
+        chunk = self._allocate(size)
+        self._set(dst, chunk)
 
     ##########################################################################
-    # Loading
+    # Load & Store
     ##########################################################################
 
     def load_const(self, reg, value):
@@ -452,6 +508,46 @@ class Machine(object):
 
         # load the value into a register
         self._set(dst, self._stack_buffer[self._frame_ptr - offset])
+
+    def load_d(self, dst, ptr):
+        '''
+        Directly load memory referenced by reg ptr into reg dst.
+        '''
+        address = self._get(ptr)
+        value = self._heaplet[address]
+        self._set(dst, value)
+
+    def load_i(self, dst, ptr, offset):
+        '''
+        Indirectly load memory referenced by reg ptr plus constant offset into reg dst.
+        '''
+        address = self._get(ptr) + offset
+        value = self._heaplet[address]
+        self._set(dst, value)
+
+    def store_d(self, src, ptr):
+        '''
+        Directly store the value in reg src into the memory addressed by reg ptr.
+        '''
+        address = self._get(ptr)
+        value = self._get(src)
+        self._heaplet[address] = value
+
+    def store_i(self, src, ptr, offset):
+        '''
+        Indirectly store the value in reg src into the memory addressed by reg ptr
+        plus constant offset.
+        '''
+        address = self._get(ptr) + offset
+        value = self._get(src)
+        self._heaplet[address] = value
+
+    def store_c(self, ptr, value):
+        '''
+        Directly store a constant value in the memory addressed by reg ptr.
+        '''
+        address = self._get(ptr)
+        self._heaplet[address] = value
 
     def on_error(self, *args):
         print('error: ' + repr(args))
