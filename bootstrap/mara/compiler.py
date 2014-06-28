@@ -10,6 +10,12 @@ from util.dispatch import method_store, multimethod
 from util.reflection import deriving
 
 
+class CompileError(Exception, deriving('eq', 'show')):
+    def __init__(self, msg, *largs, **kwargs):
+        self.message = msg.format(*largs, **kwargs)
+        super(CompileError, self).__init__(self.message)
+
+
 class Registry(deriving('show', 'eq')):
     def __init__(self):
         self.counter = -1
@@ -113,7 +119,11 @@ class Compiler(object):
         left_expr = n.args[0]
         right_expr = n.args[1]
 
-        op = self._builtins[func]
+        op = self._builtins.get(func, None)
+
+        if op is None:
+            raise CompileError('BinOp {func} is not supported.', func=func)
+
         left = self.visit(left_expr)
         right = self.visit(right_expr)
 

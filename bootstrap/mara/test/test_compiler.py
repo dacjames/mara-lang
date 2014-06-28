@@ -9,7 +9,7 @@ Test the Mara Bytecode Compiler
 
 import pytest
 
-from ..compiler import Compiler
+from ..compiler import Compiler, CompileError
 
 from test_lexer import lex_simple
 from test_parser import parser, maramodule
@@ -21,7 +21,7 @@ def compiler():
     return Compiler()
 
 
-def test_addition(parser, compiler, machine):
+def test_math(parser, compiler, machine):
 
     given = maramodule('test', '''
         5 + 2 * 8 / 4 - 5
@@ -37,3 +37,14 @@ def test_addition(parser, compiler, machine):
     machine._loop()
 
     assert machine._regs[result] == 4
+
+
+def test_bad(parser, compiler):
+
+    given = maramodule('test', '''
+        3 ^ 4
+    ''')
+    ast = parser.parse(given)
+
+    with pytest.raises(CompileError):
+        compiler.compile(ast)
