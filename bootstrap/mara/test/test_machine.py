@@ -52,6 +52,36 @@ def test_simple_machine(machine):
     ]
 
 
+def test_jumps(machine):
+    machine._load([
+        ['jump_r', 8],          # jump to a
+        ['load_c', r(0), 0],    # label x
+        ['jump_r', 7],          # jump to b
+        ['load_c', r(1), 1],    # label y
+        ['jump_r', 7],          # jump to c
+        ['load_c', r(2), 2],    # label z
+        ['jump_r', 7],          # jump to end
+        ['jump_r', 0],          # better never get here!
+        ['jump_a', 1],          # label a, jump to x
+        ['load_c', r(3), 3],    # label b
+        ['jump_ra', r(3)],      # jump to y
+        ['load_c', r(4), -7],   # label c
+        ['jump_rr', r(4)],      # jump to z
+        ['print_reg', r(0)],    # label end
+        ['print_reg', r(1)],
+        ['print_reg', r(2)],
+        ['halt'],
+    ])
+
+    machine._loop()
+
+    assert machine._print_buffer == [
+        'r0:0',
+        'r1:1',
+        'r2:2',
+    ]
+
+
 def test_stack_manipulation(machine):
     machine._load([
         ['load_c', r(0), 0],

@@ -6,6 +6,7 @@ from collections import defaultdict
 
 
 HALT = object()
+NULL = object()
 
 
 class Machine(object):
@@ -332,6 +333,42 @@ class Machine(object):
         and store the result in dst.
         '''
         self._set(dst, self._get(left) % self._get(right))
+
+    ##########################################################################
+    # Jumping
+    ##########################################################################
+
+    def jump_r(self, offset):
+        '''
+        Relative jump a constant offset from the current pc.
+        '''
+        # -1 to cancel out loop iteration
+        self._pc += (offset - 1)
+
+    def jump_a(self, address):
+        '''
+        Absolute jump to a constant address.
+        '''
+        # -1 to cancel out loop iteration
+        self._pc = (address - 1)
+
+    def jump_rr(self, offset):
+        '''
+        Jump relatively through a reg offset.
+        '''
+        offset = self._get(offset)
+
+        # -1 to cancel out loop iteration
+        self._pc += (offset - 1)
+
+    def jump_ra(self, address):
+        '''
+        Jump absolutely to an address store in reg address.
+        '''
+        address = self._get(address)
+
+        # -1 to cancel out loop iteration
+        self._pc = (address - 1)
 
     ##########################################################################
     # Branching
