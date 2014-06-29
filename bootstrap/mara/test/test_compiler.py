@@ -10,6 +10,7 @@ Test the Mara Bytecode Compiler
 import pytest
 
 from ..compiler import Compiler, CompileError
+from ..machine import NULL
 
 from test_lexer import lex_simple
 from test_parser import parser, maramodule
@@ -48,3 +49,39 @@ def test_bad(parser, compiler):
 
     with pytest.raises(CompileError):
         compiler.compile(ast)
+
+
+def test_if_true(parser, compiler, machine):
+
+    given = maramodule('test', '''
+        if 1 {
+            3 + 5
+        }
+    ''')
+
+    ast = parser.parse(given)
+    bytecode = compiler.compile(ast)
+    result = compiler.result()
+
+    machine._load(bytecode)
+    machine._loop()
+
+    assert machine._regs[result] == 8
+
+
+def test_if_false(parser, compiler, machine):
+
+    given = maramodule('test', '''
+        if 0 {
+            3 + 5
+        }
+    ''')
+
+    ast = parser.parse(given)
+    bytecode = compiler.compile(ast)
+    result = compiler.result()
+
+    machine._load(bytecode)
+    machine._loop()
+
+    assert machine._regs[result] is NULL

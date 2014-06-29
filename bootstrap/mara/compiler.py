@@ -6,6 +6,7 @@ Translate AST to Mara Bytecode.
 
 import node
 import scope
+from machine import NULL
 from util.dispatch import method_store, multimethod
 from util.reflection import deriving
 
@@ -133,6 +134,32 @@ class Compiler(object):
 
         return self.result(r(0))
 
+    @visit.d(node.If)
+    def _(self, n):
+        r = self.registry.frame()
+
+        pred_expr = n.pred
+        body_expr = n.body
+
+        pred = self.visit(pred_expr)
+        branch_label = len(self.block)
+        self.block += [
+            ('patch_with_branch'),
+            ('patch_with_else'),
+            ('patch_with_skip'),
+        ]
+        body_label = len(self.block)
+        body_result = self.visit(body_expr)
+
+        end_label = len(self.block)
+
+        true_offset = body_label - branch_label
+        self.block[branch_label] = ('branch_one', pred, true_offset)
+        self.block[branch_label + 1] = ('load_c', body_result, NULL)
+        self.block[branch_label + 2] = ('jump_a', end_label)
+
+        return self.result(body_result)
+
     @visit.d(node.Module)
     def _(self, n):
         exprs = n.exprs
@@ -141,3 +168,15 @@ class Compiler(object):
             self.visit(expr)
 
         return self.block
+
+    @visit.d(node.Block)
+    def _(self, n):
+        exprs = n.exprs
+
+        if len(exprs) == 0:
+            raise CompileError('Empty Blocks not yet supported.')
+
+        for expr in exprs:
+            result = self.visit(expr)
+
+        return self.result(result)
