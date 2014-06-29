@@ -17,7 +17,7 @@ class CompileError(Exception, deriving('eq', 'show')):
         super(CompileError, self).__init__(self.message)
 
 
-class Registry(deriving('show', 'eq')):
+class Registry(deriving('show')):
     def __init__(self):
         self.counter = -1
         self.regs = {}
@@ -39,7 +39,7 @@ class Registry(deriving('show', 'eq')):
         return RegistryFrame(parent=self)
 
 
-class RegistryFrame(deriving('show')):
+class RegistryFrame(deriving('show', 'eq')):
     def __init__(self, parent):
         self.regs = {}
         self.parent = parent
@@ -136,8 +136,6 @@ class Compiler(object):
 
     @visit.d(node.If)
     def _(self, n):
-        r = self.registry.frame()
-
         pred_expr = n.pred
         body_expr = n.body
 

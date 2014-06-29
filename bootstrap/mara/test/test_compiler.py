@@ -55,6 +55,7 @@ def test_if_true(parser, compiler, machine):
 
     given = maramodule('test', '''
         if 1 {
+            2 * 10
             3 + 5
         }
     ''')
@@ -73,6 +74,7 @@ def test_if_false(parser, compiler, machine):
 
     given = maramodule('test', '''
         if 0 {
+            2 * 10
             3 + 5
         }
     ''')
