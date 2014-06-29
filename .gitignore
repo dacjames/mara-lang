@@ -1,6 +1,6 @@
 *.pyc
-__pycache__/**
-__plycache__/**
+**/__pycache__/**
+**/__plycache__/**
 **/parser.out
 **/parsetab.py
 
