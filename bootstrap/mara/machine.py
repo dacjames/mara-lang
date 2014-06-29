@@ -379,28 +379,35 @@ class Machine(object):
         Branch relative if the value in reg pred is zero.
         '''
         if self._get(pred) == 0:
-            self._pc += jmp_offset
+            self._pc += (jmp_offset - 1)  # -1 to cancel loop iteration
 
-    def branch_nonzero(self, pred, jmp_offset):
+    def branch_one(self, pred, jmp_offset):
         '''
         Branch relative if the value in reg pred is not zero.
         '''
-        if self._get(pred) != 0:
-            self._pc += jmp_offset
+        if self._get(pred) == 1:
+            self._pc += (jmp_offset - 1)  # -1 to cancel loop iteration
+
+    def branch_eq(self, left, right, jmp_offset):
+        '''
+        Branch relative if the value in reft left is equal to the value in reg ri ght.
+        '''
+        if self._get(left) == self._get(right):
+            self._pc += (jmp_offset - 1)  # -1 to cancel loop iteration
 
     def branch_gt(self, left, right, jmp_offset):
         '''
         Branch relative if the value in reg left is greater than the value in reg right.
         '''
         if self._get(left) > self._get(right):
-            self._pc += jmp_offset
+            self._pc += (jmp_offset - 1)  # -1 to cancel loop iteration
 
     def branch_lt(self, left, right, jmp_offset):
         '''
         Branch relative if the value in reg pred is less than the value in reg right.
         '''
         if self._get(left) < self._get(right):
-            self._pc += jmp_offset
+            self._pc += (jmp_offset - 1)  # -1 to cancel loop iteration
 
     def branch_gte(self, left, right, jmp_offset):
         '''
@@ -408,7 +415,7 @@ class Machine(object):
         greater than or equal to the value in reg right.
         '''
         if self._get(left) >= self._get(right):
-            self._pc += jmp_offset
+            self._pc += (jmp_offset - 1)  # -1 to cancel loop iteration
 
     def branch_lte(self, left, right, jmp_offset):
         '''
@@ -416,7 +423,7 @@ class Machine(object):
         less than or equal to the value in reg right.
         '''
         if self._get(left) <= self._get(right):
-            self._pc += jmp_offset
+            self._pc += (jmp_offset - 1)  # -1 to cancel loop iteration
 
     ##########################################################################
     # Function Call and Return

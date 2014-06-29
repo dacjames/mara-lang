@@ -34,7 +34,7 @@ def test_simple_machine(machine):
         ['add_rc', r(1), r(1), -10],
         ['print_reg', r(1)],
         ['load_c', r(3), 0],
-        ['branch_gte', r(1), r(3), -4],
+        ['branch_gte', r(1), r(3), -3],
         ['halt'],
     ])
 
@@ -79,6 +79,46 @@ def test_jumps(machine):
         'r0:0',
         'r1:1',
         'r2:2',
+    ]
+
+
+def test_branches(machine):
+    machine._load([
+        ['load_c', r(0), 0],
+        ['load_c', r(1), 1],
+        ['load_c', r(2), 0],
+        ['branch_lt', r(1), r(0), 22],    # branch to error
+        ['branch_lt', r(2), r(0), 21],    # branch to error
+        ['branch_lt', r(0), r(1), 22],    # branch to good
+        ['branch_lte', r(1), r(0), 19],   # branch to error
+        ['branch_lte', r(0), r(2), 1],
+        ['branch_lte', r(0), r(1), 19],   # branch to good
+        ['branch_gt', r(0), r(1), 16],    # branch to error
+        ['branch_gt', r(0), r(2), 15],    # branch to error
+        ['branch_gt', r(1), r(0), 16],    # branch to good
+        ['branch_gte', r(0), r(1), 13],   # branch to error
+        ['branch_gte', r(0), r(2), 1],
+        ['branch_gte', r(1), r(0), 13],   # branch to good
+        ['branch_zero', r(1), 10],
+        ['branch_zero', r(0), 11],
+        ['branch_one', r(0), 8],
+        ['branch_one', r(1), 9],
+        ['jump_r', 6],                    # jump to success
+        ['jump_a', 6],                    # jump to lte test
+        ['jump_a', 9],                    # jump to gt test
+        ['jump_a', 12],                   # jump to gte test
+        ['jump_a', 15],                   # jump to zero test
+        ['jump_a', 17],                   # jump to one test
+        ['load_c', r(99), 0],             # failure
+        ['jump_r', 2],
+        ['load_c', r(99), 1],             # success
+        ['print_reg', r(99)],
+    ])
+
+    machine._loop()
+
+    assert machine._print_buffer == [
+        'r99:1'
     ]
 
 
