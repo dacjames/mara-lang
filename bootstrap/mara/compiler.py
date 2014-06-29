@@ -142,9 +142,9 @@ class Compiler(object):
         pred = self.visit(pred_expr)
         branch_label = len(self.block)
         self.block += [
-            ('patch_with_branch'),
-            ('patch_with_else'),
-            ('patch_with_skip'),
+            None,  # patch with branch
+            None,  # patch with else
+            None,  # patch with skip
         ]
         body_label = len(self.block)
         body_result = self.visit(body_expr)
