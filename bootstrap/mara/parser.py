@@ -292,64 +292,95 @@ p_expr_list_comma = _seperated_expr_list('expr_list_comma', 'COMMA')
 
 
 def p_assign(p):
-    '''assign : expr EQ expr
-              | expr TID EQ expr
+    '''assign : VID assign_rhs
     '''
-    if len(p) == 4:
-        p[0] = node.Assign(name=p[1], value=p[3], type_=None)
-        return
+    p[0] = node.Assign(name=node.ValueId(p[1]), value=p[2].value, type_=None)
 
-    if len(p) == 5:
-        p[0] = node.Assign(name=p[1], value=p[4], type_=node.TypeId(p[2]))
-        return
+    return p[0]
 
-    raise ParseError(list(p), len(p))
+
+def p_assign_rhs(p):
+    '''assign_rhs : EQ expr
+    '''
+    p[0] = node.AssignRhs(value=p[2])
+
+    return p[0]
 
 
 def p_declaration(p):
     '''declaration : val
                    | var
-                   | mut
-                   | ref
     '''
     p[0] = p[1]
     return p[0]
 
 
-def _declaration(cls, p):
-
+def _untyped_declaration(cls, p):
     if len(p) == 4:
-        value = p[3]
+        value = p[3].value
     else:
-        value = None
+        value = node.Unit()
 
     return cls(name=node.ValueId(p[2]), value=value, type_=None)
 
 
+def _typed_declaration(cls, p):
+    if len(p) == 5:
+        value = p[4].value
+    else:
+        value = node.Unit()
+
+    return cls(name=node.ValueId(p[2]), value=value, type_=node.TypeId(p[3]))
+
+
 def p_val(p):
-    '''val : VAL VID expr
+    '''val : val_untyped
+           | val_typed
     '''
-    p[0] = _declaration(node.Val, p)
+    p[0] = p[1]
 
     return p[0]
 
 
+def p_val_untyped(p):
+    '''val_untyped : VAL VID
+                   | VAL VID assign_rhs
+    '''
+    p[0] = _untyped_declaration(node.Val, p)
+
+
+def p_val_typed(p):
+    '''val_typed : VAL VID TID
+                 | VAL VID TID assign_rhs
+    '''
+    p[0] = _typed_declaration(node.Val, p)
+
+
 def p_var(p):
-    '''var : VAR VID expr
+    '''var : var_untyped
+           | var_typed
     '''
-    p[0] = _declaration(node.Var, p)
+    p[0] = p[1]
+
+    return p[0]
 
 
-def p_ref(p):
-    '''ref : REF VID expr
+def p_var_untyped(p):
+    '''var_untyped : VAR VID
+                   | VAR VID assign_rhs
     '''
-    p[0] = _declaration(node.Ref, p)
+    p[0] = _untyped_declaration(node.Var, p)
+
+    return p[0]
 
 
-def p_mut(p):
-    '''mut : MUT VID expr
+def p_var_typed(p):
+    '''var_typed : VAR VID TID
+                 | VAR VID TID assign_rhs
     '''
-    p[0] = _declaration(node.Mut, p)
+    p[0] = _typed_declaration(node.Var, p)
+
+    return p[0]
 
 
 def p_error(tok):

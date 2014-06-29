@@ -44,25 +44,25 @@ def test_simple_control_flow(evaluator, lex_simple, parser):
 
 def test_values_and_variables(evaluator, lex_simple, parser):
     given = maramodule('val_and_var', u'''
-        val x 10
-        val y { 20 }
-        val z ()
+        val x = 10
+        val y = { 20 }
+        val z
         z = 30
 
-        val t { x + y + z }
+        val t = { x + y + z }
 
-        var a 1
-        var b { 2 }
-        var c ()
+        var a = 1
+        var b = { 2 }
+        var c
         c = 3
 
-        val u (a + b + c)
+        val u = (a + b + c)
 
         a = 101
         b = 102
         c = 103
 
-        val v ()
+        val v
         v = a + b + c +
             t + u
     ''')
@@ -80,11 +80,11 @@ def test_values_and_variables(evaluator, lex_simple, parser):
 
 def test_nested_variables(evaluator, lex_simple, parser):
     given = maramodule('test_nested_variables', '''
-        val x { 10 }
-        var y 3
+        val x = { 10 }
+        var y = 3
 
         while y > 0 {
-            val x ()
+            val x
             x = 20
             y = y - 1
         }

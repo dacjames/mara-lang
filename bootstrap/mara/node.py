@@ -67,6 +67,10 @@ class TypeId(_Value):
     pass
 
 
+class Unit(Node):
+    pass
+
+
 class Block(Node):
 
     def __init__(self, exprs, params):
@@ -101,6 +105,12 @@ class Assign(Node):
         self.name = name
         self.value = value
         self.type_ = type_
+
+
+class AssignRhs(Node):
+
+    def __init__(self, value):
+        self.value = value
 
 
 class While(Node):
@@ -171,3 +181,10 @@ class DocComment(_Comment):
 
 class BlockComment(_Comment):
     pass
+
+
+class Call(Node):
+
+    def __init__(self, func, arg):
+        self.func = func
+        self.arg = arg

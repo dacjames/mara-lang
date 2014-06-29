@@ -10,7 +10,7 @@ Test the Mara Bytecode Compiler
 import pytest
 
 from ..compiler import Compiler, CompileError
-from ..machine import NULL
+from .. import special
 
 from test_lexer import lex_simple
 from test_parser import parser, maramodule
@@ -86,4 +86,4 @@ def test_if_false(parser, compiler, machine):
     machine._load(bytecode)
     machine._loop()
 
-    assert machine._regs[result] is NULL
+    assert machine._regs[result] is special.NULL

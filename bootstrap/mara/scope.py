@@ -6,6 +6,7 @@ Scope Objects
 
 from util.dispatch import method_store, multimethod
 from util.reflection import deriving
+import special
 
 
 class ScopeBox(deriving('show', 'eq')):
@@ -115,7 +116,7 @@ class _Scope(deriving('show', 'eq')):
     @_assign.d(ValBox)
     def _(self, box):
         def inner(value):
-            if box.value == ():
+            if box.value == special.UNIT:
                 box.value = value
                 return value
             else:

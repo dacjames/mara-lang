@@ -6,8 +6,8 @@ Impliments a simple, tree-based evaulator.
 
 import node
 import scope
+import special
 from util.dispatch import method_store, multimethod
-
 
 class Eval(object):
     '''
@@ -47,6 +47,10 @@ class Eval(object):
     @visit.d(node.Real)
     def _(self, n):
         return float(n.value)
+
+    @visit.d(node.Unit)
+    def _(self, n):
+        return special.UNIT
 
     @visit.d(node.BinOp)
     def _(self, n):

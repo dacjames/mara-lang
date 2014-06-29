@@ -3,10 +3,7 @@
 # pylint: disable=R0902
 
 from collections import defaultdict
-
-
-HALT = object()
-NULL = object()
+import special
 
 
 class Machine(object):
@@ -118,7 +115,7 @@ class Machine(object):
             if self._trace:
                 print(self._describe_result())
 
-            if result is HALT:
+            if result is special.HALT:
                 break
             else:
                 self._pc += 1
@@ -225,7 +222,7 @@ class Machine(object):
         '''
         End execution of the machine.
         '''
-        return HALT
+        return special.HALT
 
     ##########################################################################
     # Printing
@@ -595,4 +592,4 @@ class Machine(object):
 
     def on_error(self, *args):
         print('error: ' + repr(args))
-        return HALT
+        return special.HALT

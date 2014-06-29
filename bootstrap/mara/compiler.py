@@ -6,7 +6,7 @@ Translate AST to Mara Bytecode.
 
 import node
 import scope
-from machine import NULL
+import special
 from util.dispatch import method_store, multimethod
 from util.reflection import deriving
 
@@ -153,7 +153,7 @@ class Compiler(object):
 
         true_offset = body_label - branch_label
         self.block[branch_label] = ('branch_one', pred, true_offset)
-        self.block[branch_label + 1] = ('load_c', body_result, NULL)
+        self.block[branch_label + 1] = ('load_c', body_result, special.NULL)
         self.block[branch_label + 2] = ('jump_a', end_label)
 
         return self.result(body_result)
