@@ -101,6 +101,17 @@ class Eval(object):
         else:
             return None
 
+    @visit.d(node.IfElse)
+    def _(self, n):
+        pred = n.pred
+        if_body = n.if_body
+        else_body = n.else_body
+
+        if self.visit(pred):
+            return self.visit(if_body)
+        else:
+            return self.visit(else_body)
+
     @visit.d(node.While)
     def _(self, n):
         pred = n.pred

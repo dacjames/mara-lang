@@ -67,13 +67,69 @@ def test_parse_simple_expr(parser):
 def test_parse_function_call(parser):
     given = maramodule('test', '''
         foo 10
+        10.foo
+        x.foo
+        x.foo 10
+        x.foo(3,5)
+        foo 10 { 2 + 4}
+        x.foo {2 + 4 }
+        x.foo 10 { 2 + 4 }
+        x.foo(3, 5){2 + 4}
+
     ''')
 
+    block = n.Block(
+        params=[],
+        exprs=[n.BinOp(
+            func=n.SymbolId('+'),
+            args=[n.Int('2'), n.Int('4')],
+        )]
+    )
+
     expected = n.Module('test', [
-        n.Call(func=n.ValueId('foo'), arg=n.Int('10'))
+        n.Call(func=n.ValueId('foo'), arg=n.Int('10')),
+        n.Call(func=n.ValueId('foo'), arg=n.Int('10')),
+        n.Call(func=n.ValueId('foo'), arg=n.ValueId('x')),
+        n.Call(
+            func=n.ValueId('foo'),
+            arg=n.Tuple(values=[
+                n.ValueId('x'),
+                n.Int('10'),
+            ])
+        ),
+        n.Call(
+            func=n.ValueId('foo'),
+            arg=n.Tuple(values=[
+                n.ValueId('x'),
+                n.Int('3'),
+                n.Int('5'),
+            ])
+        ),
+        n.Call(func=n.ValueId('foo'), arg=n.Int('10'), block=block),
+        n.Call(func=n.ValueId('foo'), arg=n.ValueId('x'), block=block),
+        n.Call(
+            func=n.ValueId('foo'),
+            arg=n.Tuple(values=[
+                n.ValueId('x'),
+                n.Int('10'),
+            ]),
+            block=block,
+        ),
+        n.Call(
+            func=n.ValueId('foo'),
+            arg=n.Tuple(values=[
+                n.ValueId('x'),
+                n.Int('3'),
+                n.Int('5'),
+            ]),
+            block=block,
+        ),
     ])
 
     result = parser.parse(given)
+
+    assert expected.exprs[:5] == result.exprs[:5]
+    assert expected.exprs[5] == result.exprs[5]
     assert expected == result
 
 
@@ -156,6 +212,51 @@ def test_parse_wrapped_if(parser):
         ],
     )
     result = parser.parse(given)
+    assert expected == result
+
+
+def test_parse_simple_control_flow(parser):
+    given = maramodule('control_flow', '''
+        if 1 < 2 {
+            10
+        } else {
+            20
+        }
+    ''')
+
+    expected = n.Module(
+        name='control_flow',
+        exprs=[
+            n.IfElse(
+                pred=n.BinOp(
+                    func=n.SymbolId('<'),
+                    args=[
+                        n.Int('1'),
+                        n.Int('2'),
+                    ]
+                ),
+                if_body=n.Block(
+                    params=[],
+                    exprs=[
+                        n.Int('10')
+                    ]
+                ),
+                else_body=n.Block(
+                    params=[],
+                    exprs=[
+                        n.Int('20')
+                    ]
+                ),
+            ),
+        ]
+    )
+
+    result = parser.parse(given)
+
+    print(result.exprs[0])
+
+    assert expected.exprs[0] == result.exprs[0]
+
     assert expected == result
 
 
