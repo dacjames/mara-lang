@@ -14,12 +14,28 @@ class Node(deriving('eq', 'show')):
         if self.__class__ is Node:
             raise TypeError('Node is abstract and should not be instantiated.')
 
+    def walk(self, visitor):
+        visitor.visit(self)
+        self.recurse(visitor)
+
+    def recurse(self, visitor):
+        pass
+
 
 class Module(Node):
 
     def __init__(self, name=None, exprs=None):
         self.name = name
         self.exprs = exprs
+
+    def recurse(self, visitor):
+        for expr in self.exprs:
+            expr.walk(visitor)
+
+
+class NoOp(Node):
+    def __init__(self):
+        pass
 
 
 class _Collection(Node):
@@ -78,12 +94,20 @@ class Block(Node):
         self.exprs = exprs
         self.params = params
 
+    def recurse(self, visitor):
+        for expr in self.exprs:
+            expr.walk(visitor)
+
 
 class BinOp(Node):
 
     def __init__(self, func, args):
         self.func = func
         self.args = args
+
+    def recurse(self, visitor):
+        for arg in self.args:
+            arg.walk(visitor)
 
 
 class If(Node):
@@ -92,12 +116,20 @@ class If(Node):
         self.pred = pred
         self.body = body
 
+    def recurse(self, visitor):
+        self.pred.walk(visitor)
+        self.body.walk(visitor)
+
 
 class Else(Node):
 
     def __init__(self, expr, body):
         self.expr = expr
         self.body = body
+
+    def recurse(self, visitor):
+        self.expr.walk(visitor)
+        self.body.walk(visitor)
 
 
 class IfElse(Node):
@@ -107,6 +139,11 @@ class IfElse(Node):
         self.if_body = if_body
         self.else_body = else_body
 
+    def recurse(self, visitor):
+        self.pred.walk(visitor)
+        self.if_body.walk(visitor)
+        self.else_body.walk(visitor)
+
 
 class Assign(Node):
 
@@ -115,11 +152,17 @@ class Assign(Node):
         self.value = value
         self.type_ = type_
 
+    def recurse(self, visitor):
+        self.value.walk(visitor)
+
 
 class AssignRhs(Node):
 
     def __init__(self, value):
         self.value = value
+
+    def recurse(self, visitor):
+        self.value.walk(visitor)
 
 
 class While(Node):
@@ -128,6 +171,10 @@ class While(Node):
         self.pred = pred
         self.body = body
 
+    def recurse(self, visitor):
+        self.pred.walk(visitor)
+        self.body.walk(visitor)
+
 
 class _Declaration(Node):
 
@@ -135,6 +182,9 @@ class _Declaration(Node):
         self.name = name
         self.value = value
         self.type_ = type_
+
+    def recurse(self, visitor):
+        self.value.walk(visitor)
 
 
 class Val(_Declaration):
@@ -159,6 +209,9 @@ class For(Node):
         self.clauses = clauses
         self.body = body
 
+    def recurse(self, visitor):
+        self.body.walk(visitor)
+
 
 class ForClause(Node):
 
@@ -172,6 +225,9 @@ class KV(Node):
     def __init__(self, key, value):
         self.key = key
         self.value = value
+
+    def recurse(self, visitor):
+        self.value.walk(visitor)
 
 
 class _Comment(Node):
@@ -198,3 +254,7 @@ class Call(Node):
         self.func = func
         self.arg = arg
         self.block = block
+
+    def recurse(self, visitor):
+        self.arg.walk(visitor)
+        self.block.walk(visitor)

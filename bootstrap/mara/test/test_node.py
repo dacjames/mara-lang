@@ -2,6 +2,9 @@ from .. import node
 
 import pytest
 
+from ..util.dispatch import method_store, multimethod
+from ..import special
+
 
 class DummyNode(node.Node):
 
@@ -68,3 +71,82 @@ def test_complex_equality():
     )
 
     assert a == b
+
+
+class SpyVisitor(object):
+    _store = method_store()
+
+    def __init__(self):
+        self.nodes = []
+
+    def validate(self, node_names):
+        global node
+
+        expected_classes = [
+            getattr(node, name)
+            for name in node_names
+        ]
+
+        result_classes = [
+            node.__class__
+            for node in self.nodes
+        ]
+
+        assert result_classes == expected_classes
+
+    @multimethod(_store)
+    def visit(self, n):
+        self.nodes.append(n)
+
+
+@pytest.fixture
+def spy():
+    return SpyVisitor()
+
+
+def test_walk(spy):
+    given = node.Module(name='test', exprs=[
+        node.Int('10'),
+        node.Val(
+            name=node.ValueId('x'),
+            value=node.Block(params=[], exprs=[
+                node.ValueId('x'),
+                node.TypeId('T'),
+            ])
+        ),
+        node.If(
+            pred=node.BinOp(func='<', args=[
+                node.Int('0'),
+                node.Real('1.0'),
+            ]),
+            body=node.Assign(
+                name=node.ValueId('x'),
+                value=node.KV(
+                    key='z',
+                    value=node.Int('10')
+                ),
+                type_=special.UNIT,
+            )
+        ),
+    ])
+
+    expected = [
+        'Module',
+        'Int',
+        'Val',
+        'Block',
+        'ValueId',
+        'TypeId',
+        'If',
+        'BinOp',
+        'Int',
+        'Real',
+        'Assign',
+        'KV',
+        'Int',
+    ]
+
+    given.walk(spy)
+
+    spy.validate(expected)
+
