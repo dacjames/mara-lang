@@ -1,6 +1,7 @@
 from abc import ABCMeta
 
 from util.reflection import deriving
+import special
 
 
 # pylint: disable=W0231
@@ -99,6 +100,14 @@ class Else(Node):
         self.body = body
 
 
+class IfElse(Node):
+
+    def __init__(self, pred, if_body, else_body):
+        self.pred = pred
+        self.if_body = if_body
+        self.else_body = else_body
+
+
 class Assign(Node):
 
     def __init__(self, name, value, type_=None):
@@ -185,6 +194,7 @@ class BlockComment(_Comment):
 
 class Call(Node):
 
-    def __init__(self, func, arg):
+    def __init__(self, func, arg, block=special.UNIT):
         self.func = func
         self.arg = arg
+        self.block = block

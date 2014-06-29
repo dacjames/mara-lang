@@ -227,7 +227,7 @@ def t_code_SCI(tok):
 
 
 def t_code_REAL(tok):
-    r'[-+]?[0-9]+([.][0-9]+|[.])'
+    r'[-+]?[0-9]+([.][0-9]+)'
     return tok
 
 

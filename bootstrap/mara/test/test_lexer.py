@@ -136,7 +136,8 @@ def test_lex_literal_nums(lex_simple):
     assert output == [
         ('MODULE', 'module'),
         ('INTP', '1_000_000'),
-        ('REAL', '1.'),
+        ('INTD', '1'),
+        ('DOT', '.'),
         ('REAL', '0.9'),
         ('REAL', '1231.0'),
         ('INTD', '-1'),

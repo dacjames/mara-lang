@@ -54,35 +54,34 @@ def p_module(p):
 
 
 def p_expr(p):
-    '''expr : nop
-            | comment
+    '''expr : comment
             | literal
             | tuple
             | list
             | name
             | if
             | else
+            | ifelse
             | while
             | binop
             | kv
-            | block
-            | LPAR expr RPAR
+            | wrapped
             | assign
             | declaration
+            | call
     '''
-    if p.slice[1].type == 'LPAR':
-        p[0] = p[2]
-    else:
-        p[0] = p[1]
+
+    p[0] = p[1]
 
     return p[0]
 
 
-def p_nop(p):  # pylint: disable=W0613
-    '''nop : TERM
-           | SLASH
+def p_wrapped(p):
+    '''wrapped : LPAR expr RPAR
     '''
-    pass
+    p[0] = p[2]
+
+    return p[0]
 
 
 def p_comment(p):
@@ -150,7 +149,6 @@ def p_list(p):
 
 def p_name(p):
     '''name : VID
-            | SID
             | TID
     '''
     tok = p.slice[1]
@@ -212,6 +210,14 @@ def p_postfix_else(p):
     '''postfix_else : expr ELSE expr
     '''
     p[0] = node.Else(body=p[3], expr=p[1])
+    return p[0]
+
+
+def p_ifelse(p):
+    '''ifelse : prefix_if prefix_else
+    '''
+    p[0] = node.IfElse(pred=p[1].pred, if_body=p[1].body, else_body=p[2].body)
+
     return p[0]
 
 
@@ -301,6 +307,7 @@ def p_assign(p):
 
 def p_assign_rhs(p):
     '''assign_rhs : EQ expr
+                  | EQ block
     '''
     p[0] = node.AssignRhs(value=p[2])
 
@@ -379,6 +386,66 @@ def p_var_typed(p):
                  | VAR VID TID assign_rhs
     '''
     p[0] = _typed_declaration(node.Var, p)
+
+    return p[0]
+
+
+def p_call(p):
+    '''call : blockless_call
+            | block_call
+    '''
+    p[0] = p[1]
+
+    return p[0]
+
+
+def p_blockless_call(p):
+    '''blockless_call : prefix_call
+                      | postfix_call
+                      | compound_call
+    '''
+    p[0] = p[1]
+    return p[0]
+
+
+def p_prefix_call(p):
+    '''prefix_call : name expr
+                   | wrapped expr
+    '''
+    p[0] = node.Call(func=p[1], arg=p[2])
+
+    return p[0]
+
+
+def p_postfix_call(p):
+    '''postfix_call : expr DOT name
+    '''
+    p[0] = node.Call(func=p[3], arg=p[1])
+
+    return p[0]
+
+
+def p_compound_call(p):
+    '''compound_call : postfix_call expr
+    '''
+    if isinstance(p[2], node.Tuple):
+        arg = node.Tuple(values=[p[1].arg] + p[2].values)
+
+    else:
+        arg = node.Tuple(values=[p[1].arg, p[2]])
+
+    p[0] = node.Call(func=p[1].func, arg=arg)
+
+    return p[0]
+
+
+def p_block_call(p):
+    '''block_call : blockless_call block
+    '''
+
+    call = p[1]
+    call.block = p[2]
+    p[0] = call
 
     return p[0]
 
