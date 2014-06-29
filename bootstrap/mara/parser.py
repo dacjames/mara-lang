@@ -54,8 +54,7 @@ def p_module(p):
 
 
 def p_expr(p):
-    '''expr : nop
-            | comment
+    '''expr : comment
             | literal
             | tuple
             | list
@@ -65,10 +64,10 @@ def p_expr(p):
             | while
             | binop
             | kv
-            | block
             | LPAR expr RPAR
             | assign
             | declaration
+            | call
     '''
     if p.slice[1].type == 'LPAR':
         p[0] = p[2]
@@ -78,11 +77,11 @@ def p_expr(p):
     return p[0]
 
 
-def p_nop(p):  # pylint: disable=W0613
-    '''nop : TERM
-           | SLASH
-    '''
-    pass
+# def p_nop(p):  # pylint: disable=W0613
+#     '''nop : TERM
+#            | SLASH
+#     '''
+#     pass
 
 
 def p_comment(p):
@@ -150,7 +149,6 @@ def p_list(p):
 
 def p_name(p):
     '''name : VID
-            | SID
             | TID
     '''
     tok = p.slice[1]
@@ -301,6 +299,7 @@ def p_assign(p):
 
 def p_assign_rhs(p):
     '''assign_rhs : EQ expr
+                  | EQ block
     '''
     p[0] = node.AssignRhs(value=p[2])
 
@@ -379,6 +378,14 @@ def p_var_typed(p):
                  | VAR VID TID assign_rhs
     '''
     p[0] = _typed_declaration(node.Var, p)
+
+    return p[0]
+
+
+def p_call(p):
+    '''call : expr expr
+    '''
+    p[0] = node.Call(func=p[1], arg=p[2])
 
     return p[0]
 

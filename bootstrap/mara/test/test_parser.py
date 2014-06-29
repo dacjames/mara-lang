@@ -64,6 +64,19 @@ def test_parse_simple_expr(parser):
     assert expected == result
 
 
+def test_parse_function_call(parser):
+    given = maramodule('test', '''
+        foo 10
+    ''')
+
+    expected = n.Module('test', [
+        n.Call(func=n.ValueId('foo'), arg=n.Int('10'))
+    ])
+
+    result = parser.parse(given)
+    assert expected == result
+
+
 def test_exprs_parse_assignment(parser):
     given = maramodule('assignment', '''
         a = 10
@@ -110,6 +123,7 @@ def test_parse_unwrapped_if(parser):
         ],
     )
     result = parser.parse(given)
+    assert expected.exprs[0].pred == result.exprs[0].pred
     assert expected == result
 
 
