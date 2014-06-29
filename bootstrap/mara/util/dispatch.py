@@ -5,12 +5,17 @@ from collections import defaultdict
 def multimethod(store):
 
     def generic_decorator(f):
+        current_store = store[f.__name__]
 
         @wraps(f)
         def generic(*args):
-            return store[f.__name__][
-                tuple(a.__class__ for a in args[1:])
-            ](*args)
+            try:
+                return current_store[
+                    tuple(a.__class__ for a in args[1:])
+                ](*args)
+
+            except KeyError:
+                return generic.default(*args)
 
         def dispatch(*clses):
 
@@ -25,6 +30,7 @@ def multimethod(store):
             return dispatch_decorator
 
         generic.d = generic.dispatch = dispatch
+        generic.default = f
 
         return generic
 

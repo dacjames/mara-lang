@@ -104,7 +104,7 @@ def test_mutlimethods():
 
         @multimethod(store)
         def visit(self, a):
-            pass
+            return 'Default', a
 
         @visit.dispatch(int)
         def _(self, a):
@@ -129,6 +129,7 @@ def test_mutlimethods():
 
     assert eval_.visit.__name__ == 'visit'
 
+    assert eval_.visit([]) == ('Default', [])
     assert eval_.visit(10) == ('Int', 10)
     assert eval_.multi(10, 10.0) == ('Int', 'Real', 10, 10.0)
     assert eval_.multi(10.0, 10.0) == ('Real', 'Real', 10, 10.0)
