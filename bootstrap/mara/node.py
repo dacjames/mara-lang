@@ -258,3 +258,15 @@ class Call(Node):
     def recurse(self, visitor):
         self.arg.walk(visitor)
         self.block.walk(visitor)
+
+
+class Def(Node):
+
+    def __init__(self, name, param, body, return_type=special.UNIT):
+        self.name = name
+        self.param = param
+        self.body = body
+        self.return_type = return_type
+
+    def recurse(self, visitor):
+        self.body.walk(visitor)

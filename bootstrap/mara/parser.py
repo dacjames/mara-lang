@@ -69,6 +69,7 @@ def p_expr(p):
             | assign
             | declaration
             | call
+            | definition
     '''
 
     p[0] = p[1]
@@ -388,6 +389,64 @@ def p_var_typed(p):
     p[0] = _typed_declaration(node.Var, p)
 
     return p[0]
+
+
+def p_definition(p):
+    '''definition : def_typed
+                  | def_untyped
+    '''
+    p[0] = p[1]
+
+    return p[0]
+
+
+def p_def_typed(p):
+    '''def_typed : DEF def_name def_param def_return block
+    '''
+    p[0] = node.Def(
+        name=p[2],
+        param=p[3],
+        body=p[5],
+        return_type=p[4],
+    )
+
+    return p[0]
+
+
+def p_def_untyped(p):
+    '''def_untyped : DEF def_name def_param block
+    '''
+    p[0] = node.Def(
+        name=p[2],
+        param=p[3],
+        body=p[4],
+    )
+
+
+def p_def_name(p):
+    '''def_name : TID
+                | VID
+    '''
+    p[0] = p[1]
+
+
+def p_def_param(p):
+    '''def_param : param_one
+                 | tuple
+    '''
+    p[0] = p[1]
+
+
+def p_param_one(p):
+    '''param_one : wrapped
+    '''
+    p[0] = node.Tuple(values=[p[1]])
+
+
+def p_def_return(p):
+    '''def_return : TID
+    '''
+    p[0] = node.TypeId(p[1])
 
 
 def p_call(p):

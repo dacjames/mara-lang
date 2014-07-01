@@ -425,6 +425,69 @@ def test_declarations(parser):
     assert expected == result
 
 
+def test_definitions(parser):
+    given = maramodule('test', '''
+        def foo(x) { 3 + 5 }
+        def foo(
+            x
+        ) {
+            3 +
+            5
+        }
+        def bar(x) Float { 1000 * 0.9 }
+    ''')
+
+    expected = n.Module(
+        name='test',
+        exprs=[
+            n.Def(
+                name='foo',
+                param=n.Tuple(values=[n.ValueId('x')]),
+                body=n.Block(params=[], exprs=[
+                    n.BinOp(func=n.SymbolId('+'), args=[
+                        n.Int('3'),
+                        n.Int('5'),
+                    ])
+                ])
+            ),
+            n.Def(
+                name='foo',
+                param=n.Tuple(values=[n.ValueId('x')]),
+                body=n.Block(params=[], exprs=[
+                    n.BinOp(func=n.SymbolId('+'), args=[
+                        n.Int('3'),
+                        n.Int('5'),
+                    ])
+                ])
+            ),
+            n.Def(
+                name='bar',
+                param=n.Tuple(values=[n.ValueId('x')]),
+                return_type=n.TypeId('Float'),
+                body=n.Block(params=[], exprs=[
+                    n.BinOp(func=n.SymbolId('*'), args=[
+                        n.Int('1000'),
+                        n.Real('0.9'),
+                    ]),
+                ])
+            )
+        ],
+    )
+
+    result = parser.parse(given)
+
+    assert expected.exprs[0].name == result.exprs[0].name
+    assert expected.exprs[0].param == result.exprs[0].param
+    assert expected.exprs[0] == result.exprs[0]
+
+    assert expected.exprs[1].name == result.exprs[1].name
+    assert expected.exprs[1].param == result.exprs[1].param
+    assert expected.exprs[1].body == result.exprs[1].body
+    assert expected.exprs[1].return_type == result.exprs[1].return_type
+
+    assert expected == result
+
+
 def test_parse_tuples(parser, lex_simple):
     given = maramodule('tuples', '''
         x = ()
