@@ -94,15 +94,13 @@ class Eval(object):
     @visit.d(node.If)
     def _(self, n):
         pred = n.pred
-        body = n.body
+        if_body = n.if_body
         else_body = n.else_body
 
         result = self.visit(pred)
 
         if result:
-            return self.visit(body)
-        elif result.else_body is special.UNIT:
-            return None
+            return self.visit(if_body)
         else:
             return self.visit(else_body)
 

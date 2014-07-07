@@ -119,7 +119,7 @@ def test_walk(spy):
                 node.Int('0'),
                 node.Real('1.0'),
             ]),
-            body=node.Assign(
+            if_body=node.Assign(
                 name=node.ValueId('x'),
                 value=node.KV(
                     key='z',
@@ -144,6 +144,7 @@ def test_walk(spy):
         'Assign',
         'KV',
         'Int',
+        'NoOp',
     ]
 
     given.walk(spy)

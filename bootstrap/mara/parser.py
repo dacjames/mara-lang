@@ -179,7 +179,7 @@ def p_if(p):
 def p_prefix_if(p):
     '''prefix_if : IF expr block
     '''
-    p[0] = node.If(pred=p[2], body=p[3])
+    p[0] = node.If(pred=p[2], if_body=p[3])
 
     return p[0]
 
@@ -187,7 +187,7 @@ def p_prefix_if(p):
 def p_postfix_if(p):
     '''postfix_if : expr IF expr
     '''
-    p[0] = node.If(pred=p[3], body=p[1])
+    p[0] = node.If(pred=p[3], if_body=p[1])
 
     return p[0]
 
@@ -217,7 +217,7 @@ def p_postfix_else(p):
 def p_ifelse(p):
     '''ifelse : prefix_if prefix_else
     '''
-    p[0] = node.If(pred=p[1].pred, body=p[1].body, else_body=p[2].body)
+    p[0] = node.If(pred=p[1].pred, if_body=p[1].if_body, else_body=p[2].body)
 
     return p[0]
 

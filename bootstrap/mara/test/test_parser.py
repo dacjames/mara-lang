@@ -168,7 +168,7 @@ def test_parse_unwrapped_if(parser):
                         n.Int(value='0'),
                     ]
                 ),
-                body=n.BinOp(
+                if_body=n.BinOp(
                     func=n.SymbolId('*'),
                     args=[
                         n.ValueId('x'),
@@ -196,7 +196,7 @@ def test_parse_wrapped_if(parser):
                         n.Int(value='0'),
                     ]
                 ),
-                body=n.Block(
+                if_body=n.Block(
                     params=[],
                     exprs=[
                         n.BinOp(
@@ -235,7 +235,7 @@ def test_parse_simple_control_flow(parser):
                         n.Int('2'),
                     ]
                 ),
-                body=n.Block(
+                if_body=n.Block(
                     params=[],
                     exprs=[
                         n.Int('10')
@@ -278,7 +278,7 @@ def test_parse_else(parser):
                         n.Int(value='0'),
                     ]
                 ),
-                body=n.Block(
+                if_body=n.Block(
                     params=[],
                     exprs=[
                         n.BinOp(

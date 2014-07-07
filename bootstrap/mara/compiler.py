@@ -137,7 +137,7 @@ class Compiler(object):
     @visit.d(node.If)
     def _(self, n):
         pred_expr = n.pred
-        body_expr = n.body
+        if_body_expr = n.if_body
 
         pred = self.visit(pred_expr)
         branch_label = len(self.block)
@@ -147,7 +147,7 @@ class Compiler(object):
             None,  # patch with skip
         ]
         body_label = len(self.block)
-        body_result = self.visit(body_expr)
+        body_result = self.visit(if_body_expr)
 
         end_label = len(self.block)
 
