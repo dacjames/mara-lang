@@ -224,6 +224,26 @@ class Machine(object):
         '''
         return special.HALT
 
+    def phi(self, result, left, right):
+        '''
+        Return the value set by the path taken through the code.
+        In the current iteration of the machine, this means the register
+        that contains a valid value.
+        '''
+
+        left_value = self._get(left)
+        right_value = self._get(right)
+
+        if left_value is not None and right_value is None:
+            self._set(result, left_value)
+            return
+
+        if left_value is None and right_value is not None:
+            self._set(result, right_value)
+            return
+
+        raise TypeError()
+
     ##########################################################################
     # Printing
     ##########################################################################
