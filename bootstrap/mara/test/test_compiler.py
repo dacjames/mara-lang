@@ -87,3 +87,24 @@ def test_if_false(parser, compiler, machine):
     machine._loop()
 
     assert machine._regs[result] is special.NULL
+
+
+def test_if_else(parser, compiler, machine):
+
+    given = maramodule('test', '''
+        if 0 {
+            2 * 10
+            3 + 5
+        } else {
+            5 - 3
+        }
+    ''')
+
+    ast = parser.parse(given)
+    bytecode = compiler.compile(ast)
+    result = compiler.result()
+
+    machine._load(bytecode)
+    machine._loop()
+
+    assert machine._regs[result] == 2

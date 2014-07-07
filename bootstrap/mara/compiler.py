@@ -136,27 +136,49 @@ class Compiler(object):
 
     @visit.d(node.If)
     def _(self, n):
+        r = self.registry.frame()
+
         pred_expr = n.pred
         if_body_expr = n.if_body
+        else_body_expr = n.else_body
 
         pred = self.visit(pred_expr)
         branch_label = len(self.block)
         self.block += [
             None,  # patch with branch
-            None,  # patch with else
+        ]
+
+        body_result = self.visit(if_body_expr)
+
+        skip_label = len(self.block)
+        self.block += [
             None,  # patch with skip
         ]
-        body_label = len(self.block)
-        body_result = self.visit(if_body_expr)
+
+        else_label = len(self.block)
+        else_result = self.visit(else_body_expr)
 
         end_label = len(self.block)
 
-        true_offset = body_label - branch_label
-        self.block[branch_label] = ('branch_one', pred, true_offset)
-        self.block[branch_label + 1] = ('load_c', body_result, special.NULL)
-        self.block[branch_label + 2] = ('jump_a', end_label)
+        else_offset = else_label - branch_label
+        self.block[branch_label] = ('branch_zero', pred, else_offset)
+        self.block[skip_label] = ('jump_a', end_label)
 
-        return self.result(body_result)
+        self.block += [
+            ('phi', r(0), body_result, else_result)
+        ]
+
+        return self.result(r(0))
+
+    @visit.d(node.NoOp)
+    def _(self, n):
+        r = self.registry.frame()
+
+        self.block += [
+            ('load_c', r(0), special.NULL)
+        ]
+
+        return r(0)
 
     @visit.d(node.Module)
     def _(self, n):
