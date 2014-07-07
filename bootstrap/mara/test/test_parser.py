@@ -227,7 +227,7 @@ def test_parse_simple_control_flow(parser):
     expected = n.Module(
         name='control_flow',
         exprs=[
-            n.IfElse(
+            n.If(
                 pred=n.BinOp(
                     func=n.SymbolId('<'),
                     args=[
@@ -235,7 +235,7 @@ def test_parse_simple_control_flow(parser):
                         n.Int('2'),
                     ]
                 ),
-                if_body=n.Block(
+                body=n.Block(
                     params=[],
                     exprs=[
                         n.Int('10')

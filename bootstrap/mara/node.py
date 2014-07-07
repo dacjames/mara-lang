@@ -112,9 +112,10 @@ class BinOp(Node):
 
 class If(Node):
 
-    def __init__(self, pred, body):
+    def __init__(self, pred, body, else_body=special.UNIT):
         self.pred = pred
         self.body = body
+        self.else_body = else_body
 
     def recurse(self, visitor):
         self.pred.walk(visitor)
@@ -132,17 +133,17 @@ class Else(Node):
         self.body.walk(visitor)
 
 
-class IfElse(Node):
+# class IfElse(Node):
 
-    def __init__(self, pred, if_body, else_body):
-        self.pred = pred
-        self.if_body = if_body
-        self.else_body = else_body
+#     def __init__(self, pred, if_body, else_body):
+#         self.pred = pred
+#         self.if_body = if_body
+#         self.else_body = else_body
 
-    def recurse(self, visitor):
-        self.pred.walk(visitor)
-        self.if_body.walk(visitor)
-        self.else_body.walk(visitor)
+#     def recurse(self, visitor):
+#         self.pred.walk(visitor)
+#         self.if_body.walk(visitor)
+#         self.else_body.walk(visitor)
 
 
 class Assign(Node):

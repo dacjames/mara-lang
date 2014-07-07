@@ -30,15 +30,15 @@ def test_join_else(parser, join_else):
     ast.walk(join_else)
 
     expected = node.Module(name='expr', exprs=[
-        node.IfElse(
+        node.If(
             pred=node.BinOp(func=node.SymbolId('>'), args=[node.ValueId('x'), node.Int('0')]),
-            if_body=node.Block([], []),
+            body=node.Block([], []),
             else_body=node.Block([], []),
         ),
 
-        node.IfElse(
+        node.If(
             pred=node.BinOp(func=node.SymbolId('>'), args=[node.ValueId('x'), node.Int('0')]),
-            if_body=node.Block([], []),
+            body=node.Block([], []),
             else_body=special.UNIT,
         ),
     ])

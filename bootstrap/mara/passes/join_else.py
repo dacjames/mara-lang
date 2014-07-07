@@ -38,17 +38,6 @@ class JoinElse(object):
             if isinstance(prev, node.If):
 
                 if isinstance(curr, node.Else):
-                    exprs[i] = node.IfElse(
-                        pred=prev.pred,
-                        if_body=prev.body,
-                        else_body=curr.body,
-                    )
-
+                    prev.else_body = curr.body
+                    # exprs[i] = prev
                     exprs[j] = node.NoOp()
-
-                else:
-                    exprs[i] = node.IfElse(
-                        pred=prev.pred,
-                        if_body=prev.body,
-                        else_body=node.NoOp(),
-                    )

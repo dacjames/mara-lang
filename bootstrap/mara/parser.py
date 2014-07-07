@@ -217,7 +217,7 @@ def p_postfix_else(p):
 def p_ifelse(p):
     '''ifelse : prefix_if prefix_else
     '''
-    p[0] = node.IfElse(pred=p[1].pred, if_body=p[1].body, else_body=p[2].body)
+    p[0] = node.If(pred=p[1].pred, body=p[1].body, else_body=p[2].body)
 
     return p[0]
 
