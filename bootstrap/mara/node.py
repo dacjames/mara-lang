@@ -2,6 +2,7 @@ from abc import ABCMeta
 
 from util.reflection import deriving
 import special
+import attributes
 
 
 # pylint: disable=W0231
@@ -11,8 +12,7 @@ class Node(deriving('eq', 'show')):
     __metaclass__ = ABCMeta
 
     def __init__(self):
-        if self.__class__ is Node:
-            raise TypeError('Node is abstract and should not be instantiated.')
+        self.attrs = attributes.Attributes()
 
     def walk(self, visitor):
         visitor.visit(self)
@@ -25,6 +25,8 @@ class Node(deriving('eq', 'show')):
 class Module(Node):
 
     def __init__(self, name=None, exprs=None):
+        Node.__init__(self)
+
         self.name = name
         self.exprs = exprs
 
@@ -35,12 +37,13 @@ class Module(Node):
 
 class NoOp(Node):
     def __init__(self):
-        pass
+        Node.__init__(self)
 
 
 class _Collection(Node):
 
     def __init__(self, values=None):
+        Node.__init__(self)
         if values is None:
             values = []
         self.values = values
@@ -57,6 +60,7 @@ class List(_Collection):
 class _Value(Node):
 
     def __init__(self, value):
+        Node.__init__(self)
         self.value = value
 
 
@@ -85,12 +89,16 @@ class TypeId(_Value):
 
 
 class Unit(Node):
-    pass
+
+    def __init__(self):
+        Node.__init__(self)
 
 
 class Block(Node):
 
     def __init__(self, exprs, params):
+        Node.__init__(self)
+
         self.exprs = exprs
         self.params = params
 
@@ -102,6 +110,8 @@ class Block(Node):
 class BinOp(Node):
 
     def __init__(self, func, args):
+        Node.__init__(self)
+
         self.func = func
         self.args = args
 
@@ -113,6 +123,8 @@ class BinOp(Node):
 class If(Node):
 
     def __init__(self, pred, if_body, else_body=None):
+        Node.__init__(self)
+
         self.pred = pred
         self.if_body = if_body
 
@@ -130,6 +142,8 @@ class If(Node):
 class Else(Node):
 
     def __init__(self, expr, body):
+        Node.__init__(self)
+
         self.expr = expr
         self.body = body
 
@@ -141,6 +155,8 @@ class Else(Node):
 class Assign(Node):
 
     def __init__(self, name, value, type_=None):
+        Node.__init__(self)
+
         self.name = name
         self.value = value
         self.type_ = type_
@@ -152,6 +168,7 @@ class Assign(Node):
 class AssignRhs(Node):
 
     def __init__(self, value):
+        Node.__init__(self)
         self.value = value
 
     def recurse(self, visitor):
@@ -161,6 +178,7 @@ class AssignRhs(Node):
 class While(Node):
 
     def __init__(self, pred, body):
+        Node.__init__(self)
         self.pred = pred
         self.body = body
 
@@ -172,6 +190,7 @@ class While(Node):
 class _Declaration(Node):
 
     def __init__(self, name, value, type_=None):
+        Node.__init__(self)
         self.name = name
         self.value = value
         self.type_ = type_
@@ -199,6 +218,8 @@ class Ref(_Declaration):
 class For(Node):
 
     def __init__(self, clauses, body):
+        Node.__init__(self)
+
         self.clauses = clauses
         self.body = body
 
@@ -209,6 +230,8 @@ class For(Node):
 class ForClause(Node):
 
     def __init__(self, bind, in_):
+        Node.__init__(self)
+
         self.bind = bind
         self.in_ = in_
 
@@ -216,6 +239,8 @@ class ForClause(Node):
 class KV(Node):
 
     def __init__(self, key, value):
+        Node.__init__(self)
+
         self.key = key
         self.value = value
 
@@ -226,6 +251,8 @@ class KV(Node):
 class _Comment(Node):
 
     def __init__(self, content):
+        Node.__init__(self)
+
         self.content = content
 
 
@@ -244,6 +271,8 @@ class BlockComment(_Comment):
 class Call(Node):
 
     def __init__(self, func, arg, block=special.UNIT):
+        Node.__init__(self)
+
         self.func = func
         self.arg = arg
         self.block = block
@@ -256,6 +285,8 @@ class Call(Node):
 class Def(Node):
 
     def __init__(self, name, param, body, return_type=special.UNIT):
+        Node.__init__(self)
+
         self.name = name
         self.param = param
         self.body = body

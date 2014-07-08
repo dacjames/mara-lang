@@ -23,9 +23,8 @@ class JoinElse(object):
 
     def scan(self, exprs):
         '''
-        Scan a list of exprs, joining neighboring If and Else nodes into a single IfElse node.
+        Scan a list of exprs, joining neighboring If and Else nodes into a single If node.
         The 'hole' left by the Else is replaced with a NoOp.
-        To simplify generation, If nodes are transformed into IfElse nodes with a NoOp else_body.
         '''
 
         prev = None
