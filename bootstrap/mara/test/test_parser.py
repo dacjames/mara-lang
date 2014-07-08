@@ -441,7 +441,7 @@ def test_definitions(parser):
         name='test',
         exprs=[
             n.Def(
-                name='foo',
+                name=n.ValueId('foo'),
                 param=n.Tuple(values=[n.ValueId('x')]),
                 body=n.Block(params=[], exprs=[
                     n.BinOp(func=n.SymbolId('+'), args=[
@@ -451,7 +451,7 @@ def test_definitions(parser):
                 ])
             ),
             n.Def(
-                name='foo',
+                name=n.ValueId('foo'),
                 param=n.Tuple(values=[n.ValueId('x')]),
                 body=n.Block(params=[], exprs=[
                     n.BinOp(func=n.SymbolId('+'), args=[
@@ -461,7 +461,7 @@ def test_definitions(parser):
                 ])
             ),
             n.Def(
-                name='bar',
+                name=n.ValueId('bar'),
                 param=n.Tuple(values=[n.ValueId('x')]),
                 return_type=n.TypeId('Float'),
                 body=n.Block(params=[], exprs=[

@@ -148,20 +148,38 @@ def p_list(p):
         p[0] = node.List(p[2])
 
 
-def p_name(p):
-    '''name : VID
-            | TID
+def p_vid(p):
+    '''vid : VID
     '''
-    tok = p.slice[1]
 
-    if tok.type == 'VID':
-        p[0] = node.ValueId(tok.value)
+    p[0] = node.ValueId(p[1])
 
-    if tok.type == 'SID':
-        p[0] = node.SymbolId(tok.value)
+    return p[0]
 
-    if tok.type == 'TID':
-        p[0] = node.TypeId(tok.value)
+
+def p_tid(p):
+    '''tid : TID
+    '''
+
+    p[0] = node.TypeId(p[1])
+
+    return p[0]
+
+
+def p_sid(p):
+    '''sid : SID
+    '''
+
+    p[0] = node.SymbolId(p[1])
+
+    return p[0]
+
+
+def p_name(p):
+    '''name : vid
+            | tid
+    '''
+    p[0] = p[1]
 
     return p[0]
 
@@ -299,9 +317,9 @@ p_expr_list_comma = _seperated_expr_list('expr_list_comma', 'COMMA')
 
 
 def p_assign(p):
-    '''assign : VID assign_rhs
+    '''assign : vid assign_rhs
     '''
-    p[0] = node.Assign(name=node.ValueId(p[1]), value=p[2].value, type_=None)
+    p[0] = node.Assign(name=p[1], value=p[2].value, type_=None)
 
     return p[0]
 
@@ -329,7 +347,7 @@ def _untyped_declaration(cls, p):
     else:
         value = node.Unit()
 
-    return cls(name=node.ValueId(p[2]), value=value, type_=None)
+    return cls(name=p[2], value=value, type_=None)
 
 
 def _typed_declaration(cls, p):
@@ -338,7 +356,7 @@ def _typed_declaration(cls, p):
     else:
         value = node.Unit()
 
-    return cls(name=node.ValueId(p[2]), value=value, type_=node.TypeId(p[3]))
+    return cls(name=p[2], value=value, type_=p[3])
 
 
 def p_val(p):
@@ -351,15 +369,15 @@ def p_val(p):
 
 
 def p_val_untyped(p):
-    '''val_untyped : VAL VID
-                   | VAL VID assign_rhs
+    '''val_untyped : VAL vid
+                   | VAL vid assign_rhs
     '''
     p[0] = _untyped_declaration(node.Val, p)
 
 
 def p_val_typed(p):
-    '''val_typed : VAL VID TID
-                 | VAL VID TID assign_rhs
+    '''val_typed : VAL vid tid
+                 | VAL vid tid assign_rhs
     '''
     p[0] = _typed_declaration(node.Val, p)
 
@@ -374,8 +392,8 @@ def p_var(p):
 
 
 def p_var_untyped(p):
-    '''var_untyped : VAR VID
-                   | VAR VID assign_rhs
+    '''var_untyped : VAR vid
+                   | VAR vid assign_rhs
     '''
     p[0] = _untyped_declaration(node.Var, p)
 
@@ -383,8 +401,8 @@ def p_var_untyped(p):
 
 
 def p_var_typed(p):
-    '''var_typed : VAR VID TID
-                 | VAR VID TID assign_rhs
+    '''var_typed : VAR vid tid
+                 | VAR vid tid assign_rhs
     '''
     p[0] = _typed_declaration(node.Var, p)
 
@@ -424,8 +442,8 @@ def p_def_untyped(p):
 
 
 def p_def_name(p):
-    '''def_name : TID
-                | VID
+    '''def_name : tid
+                | vid
     '''
     p[0] = p[1]
 
@@ -444,9 +462,9 @@ def p_param_one(p):
 
 
 def p_def_return(p):
-    '''def_return : TID
+    '''def_return : tid
     '''
-    p[0] = node.TypeId(p[1])
+    p[0] = p[1]
 
 
 def p_call(p):
