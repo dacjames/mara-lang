@@ -270,12 +270,16 @@ class BlockComment(_Comment):
 
 class Call(Node):
 
-    def __init__(self, func, arg, block=special.UNIT):
+    def __init__(self, func, arg, block=None):
         Node.__init__(self)
 
         self.func = func
         self.arg = arg
-        self.block = block
+
+        if block is not None:
+            self.block = block
+        else:
+            self.block = Unit()
 
     def recurse(self, visitor):
         self.arg.walk(visitor)
@@ -284,13 +288,17 @@ class Call(Node):
 
 class Def(Node):
 
-    def __init__(self, name, param, body, return_type=special.UNIT):
+    def __init__(self, name, param, body, return_type=None):
         Node.__init__(self)
 
         self.name = name
         self.param = param
         self.body = body
-        self.return_type = return_type
+
+        if return_type is not None:
+            self.return_type = return_type
+        else:
+            self.return_type = Unit()
 
     def recurse(self, visitor):
         self.body.walk(visitor)
