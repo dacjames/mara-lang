@@ -7,15 +7,20 @@ where the new value must be equal to the old, or "hard", which alway sets the at
 Hard overrides should be avoided except for testing or depreciation purposes.
 '''
 
+import collections
 from util.reflection import deriving
 
 
-class Attributes(deriving('show', 'eq')):
-    def __init__(self):
+class Attributes(object):
+    def __init__(self, members=None):
         self.members = {}
 
-    def __getitem__(self, key):
-        return self.members.__getitem__(key)
+        try:
+            for key, value in members.iteritems():
+                self[key] = value
+
+        except AttributeError:
+            pass
 
     def __delitem__(self, key):
         return self.members.__delitem__(key)
@@ -59,15 +64,53 @@ class Attributes(deriving('show', 'eq')):
 
     ##########################################################################
 
+    def __eq__(self, other):
+        try:
+            return sorted(self.iteritems()) == sorted(other.iteritems())
+        except AttributeError:
+            return False
+
+    def __repr__(self):
+        items = sorted(self.members.items())
+        field_str = ', '.join([
+            '{k}: {v}'.format(k=key, v=value)
+            for key, value in items
+        ])
+
+        return "Attributes({{{f}}})".format(f=field_str)
+
+    def __str__(self):
+        return self.__repr__()
+
     def __setitem__(self, key, value):
         try:
             self.members.__getitem__(key)
 
         except KeyError:
+
+            if self._ispath(key):
+                self._setpath(key, value)
+                return
+
+            if isinstance(value, collections.Mapping):
+                value = Attributes(value)
+
             self.members.__setitem__(key, value)
             return
 
         raise KeyError(key)
+
+    def __getitem__(self, key):
+        if self._ispath(key):
+            return self._getpath(key)
+        else:
+            return self.members.__getitem__(key)
+
+    def get(self, key, default):
+        try:
+            return self.__getitem__(key)
+        except AttributeError:
+            return default
 
     def set_soft(self, key, value):
         '''
@@ -93,3 +136,32 @@ class Attributes(deriving('show', 'eq')):
         Set and always override an attribute
         '''
         self.members.__setitem__(key, value)
+
+    def _ispath(self, value):
+        ispath = '/' in value
+        return ispath
+
+    def _setpath(self, key, value):
+        steps = list(reversed(key.split('/')))
+
+        step = steps.pop()
+        while len(steps) > 0:
+            try:
+                current = self[step]
+            except KeyError:
+                current = Attributes()
+                self[step] = current
+
+            step = steps.pop()
+
+        current[step] = value
+
+    def _getpath(self, key):
+
+        steps = key.split('/')
+
+        current = self
+        for step in steps:
+            current = current[step]
+
+        return current

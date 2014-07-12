@@ -20,7 +20,7 @@ def test_node_shared_methods():
     dummy = DummyNode('qua', None, 0)
     other = DummyNode('qua', None, 0)
 
-    assert repr(dummy) == "DummyNode(a='qua', attrs=Attributes(members={}), b=None, c=0)"
+    assert repr(dummy) == "DummyNode(a='qua', attrs=Attributes({}), b=None, c=0)"
     assert dummy == other
     assert dummy.attrs
 
@@ -78,6 +78,11 @@ def test_node_attributes():
 
     with pytest.raises(KeyError):
         given.attrs['foo'] = 0
+
+    given.attrs['qua/bar'] = 0
+    assert given.attrs['qua/bar'] == 0
+    assert given.attrs['qua']['bar'] == 0
+
 
     given.attrs.set_soft('foo', 0)
 
