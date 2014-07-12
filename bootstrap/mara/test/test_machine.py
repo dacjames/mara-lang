@@ -290,3 +290,19 @@ def test_heap(machine):
         'r10:10',
         'r11:11',
     ]
+
+
+def test_copy(machine):
+    machine._load([
+        ['load_v', r(1), 10],
+        ['copy', r(2), r(1)],
+        ['print_reg', r(1)],
+        ['print_reg', r(2)],
+    ])
+
+    machine._loop()
+
+    assert machine._print_buffer == [
+        'r1:10',
+        'r2:10',
+    ]

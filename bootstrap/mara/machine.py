@@ -446,6 +446,16 @@ class Machine(object):
             self._pc += (jmp_offset - 1)  # -1 to cancel loop iteration
 
     ##########################################################################
+    # Register Manipulation
+    ##########################################################################
+
+    def copy(self, dst, src):
+        '''
+        Copy the value from register src into register dst.
+        '''
+        self._set(dst, self._get(src))
+
+    ##########################################################################
     # Function Call and Return
     ##########################################################################
 
