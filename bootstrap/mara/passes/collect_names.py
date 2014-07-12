@@ -5,10 +5,14 @@ and attribute them to the containing Block or Module node.
 
 from ..util.dispatch import method_store, multimethod
 from .. import node
+from .. import scope
 
 
 class CollectNames(object):
     _store = method_store()
+
+    def __init__(self):
+        self.namespace = scope.Root()
 
     @multimethod(_store)
     def visit(self, n):
@@ -16,20 +20,28 @@ class CollectNames(object):
 
     @visit.d(node.Block)
     def _(self, n):
-        self.scan(n)
+        self.namespace = self.namespace.child()
+        n.attrs['namespace'] = self.namespace
 
     @visit.d(node.Module)
     def _(self, n):
-        self.scan(n)
+        self.namespace = self.namespace.child()
+        n.attrs['namespace'] = self.namespace
 
-    def scan(self, n):
-        namespace = {}
+    @visit.d(node.Val)
+    def _(self, n):
+        ident = n.name.value
 
-        for expr in n.exprs:
-            try:
-                name = expr.name
-                namespace[name.value] = expr
-            except AttributeError:
-                continue
+        self.namespace.declare(ident, scope.ValBox(n))
 
-        n.attrs['namespace'] = namespace
+    @visit.d(node.Var)
+    def _(self, n):
+        ident = n.name.value
+
+        self.namespace.declare(ident, scope.VarBox(n))
+
+    @visit.d(node.Def)
+    def _(self, n):
+        ident = n.name.value
+
+        self.namespace.declare(ident, scope.DefBox(n))

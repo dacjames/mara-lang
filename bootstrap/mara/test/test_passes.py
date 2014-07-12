@@ -8,6 +8,7 @@ import pytest
 from .. import node
 from .. import special
 from .. import passes
+from .. import scope
 
 from test_lexer import lex_simple
 from test_parser import parser, maramodule
@@ -60,22 +61,18 @@ def test_collect_names(parser, collect_names):
     ''')
 
     expected = {
-        'x': node.Val(
+        'x': scope.ValBox(node.Val(
             name=node.ValueId('x'),
             value=node.Int('10'),
-        ),
-        'y': node.Val(
+        )),
+        'y': scope.ValBox(node.Val(
             name=node.ValueId('y'),
             value=node.Unit(),
-        ),
-        'z': node.Assign(
-            name=node.ValueId('z'),
-            value=node.Int('30'),
-        )
+        )),
     }
 
     ast = parser.parse(given)
 
     ast.walk(collect_names)
 
-    assert expected == ast.attrs['namespace']
+    assert ast.attrs['namespace'] == expected
