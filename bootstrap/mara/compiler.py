@@ -72,6 +72,7 @@ class Compiler(object):
 
         self.block = []
         self.registry = Registry()
+        self.pool = ConstantPool()
 
         self._result = None
 
@@ -83,20 +84,21 @@ class Compiler(object):
         return reg
 
     def compile(self, ast):
+        ast.walk(self.pool)
         bytecodes = self.visit(ast)
         bytecodes.append(('halt',))
         return bytecodes
 
     @multimethod(_store)
     def visit(self, n):
-        pass
+        raise TypeError('Node type {n} not yet supported for compilation'.format(n=n.__class__))
 
     @visit.d(node.Int)
     def _(self, n):
         r = self.registry.frame()
 
         self.block += [
-            ('load_c', r(0), int(n.value)),
+            ('load_c', r(0), n['constant']),
         ]
 
         return r(0)
@@ -106,7 +108,7 @@ class Compiler(object):
         r = self.registry.frame()
 
         self.block += [
-            ('load_c', r(0), float(n.value)),
+            ('load_v', r(0), float(n.value)),
         ]
 
         return r(0)
@@ -175,7 +177,7 @@ class Compiler(object):
         r = self.registry.frame()
 
         self.block += [
-            ('load_c', r(0), special.NULL)
+            ('load_v', r(0), special.NULL)
         ]
 
         return r(0)
@@ -200,3 +202,36 @@ class Compiler(object):
             result = self.visit(expr)
 
         return self.result(result)
+
+
+class ConstantPool(object):
+    '''
+    A pool for holding compile time constants.
+    '''
+
+    _store = method_store()
+
+    def __init__(self):
+        self._pool = []
+
+    def __getitem__(self, key):
+        return self._pool.__getitem__(key)
+
+    @multimethod(_store)
+    def visit(self, n):
+        pass
+
+    @visit.d(node.Int)
+    def _(self, n):
+        self._add(n, lambda n: int(n.value))
+
+    @visit.d(node.Real)
+    def _(self, n):
+        self._add(n, lambda n: float(n.value))
+
+    def _add(self, n, accessor):
+        index = len(self._pool)
+        value = accessor(n)
+
+        self._pool.append(value)
+        n['constant'] = index

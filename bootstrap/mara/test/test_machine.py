@@ -22,7 +22,7 @@ def test_simple_machine(machine):
     machine._load([
         ['print_const', 0],
         ['print_const', 1],
-        ['load_c', r(0), 1],
+        ['load_v', r(0), 1],
         ['print_reg', r(0)],
         ['add_rc', r(0), r(0), 1],
         ['add_rr', r(1), r(0), r(0)],
@@ -33,7 +33,7 @@ def test_simple_machine(machine):
         ['add_rc', r(1), r(1), 10],
         ['add_rc', r(1), r(1), -10],
         ['print_reg', r(1)],
-        ['load_c', r(3), 0],
+        ['load_v', r(3), 0],
         ['branch_gte', r(1), r(3), -3],
         ['halt'],
     ])
@@ -55,17 +55,17 @@ def test_simple_machine(machine):
 def test_jumps(machine):
     machine._load([
         ['jump_r', 8],          # jump to a
-        ['load_c', r(0), 0],    # label x
+        ['load_v', r(0), 0],    # label x
         ['jump_r', 7],          # jump to b
-        ['load_c', r(1), 1],    # label y
+        ['load_v', r(1), 1],    # label y
         ['jump_r', 7],          # jump to c
-        ['load_c', r(2), 2],    # label z
+        ['load_v', r(2), 2],    # label z
         ['jump_r', 7],          # jump to end
         ['jump_r', 0],          # better never get here!
         ['jump_a', 1],          # label a, jump to x
-        ['load_c', r(3), 3],    # label b
+        ['load_v', r(3), 3],    # label b
         ['jump_ra', r(3)],      # jump to y
-        ['load_c', r(4), -7],   # label c
+        ['load_v', r(4), -7],   # label c
         ['jump_rr', r(4)],      # jump to z
         ['print_reg', r(0)],    # label end
         ['print_reg', r(1)],
@@ -84,9 +84,9 @@ def test_jumps(machine):
 
 def test_branches(machine):
     machine._load([
-        ['load_c', r(0), 0],
-        ['load_c', r(1), 1],
-        ['load_c', r(2), 0],
+        ['load_v', r(0), 0],
+        ['load_v', r(1), 1],
+        ['load_v', r(2), 0],
         ['branch_lt', r(1), r(0), 22],    # branch to error
         ['branch_lt', r(2), r(0), 21],    # branch to error
         ['branch_lt', r(0), r(1), 22],    # branch to good
@@ -109,9 +109,9 @@ def test_branches(machine):
         ['jump_a', 12],                   # jump to gte test
         ['jump_a', 15],                   # jump to zero test
         ['jump_a', 17],                   # jump to one test
-        ['load_c', r(99), 0],             # failure
+        ['load_v', r(99), 0],             # failure
         ['jump_r', 2],
-        ['load_c', r(99), 1],             # success
+        ['load_v', r(99), 1],             # success
         ['print_reg', r(99)],
     ])
 
@@ -124,9 +124,9 @@ def test_branches(machine):
 
 def test_stack_manipulation(machine):
     machine._load([
-        ['load_c', r(0), 0],
+        ['load_v', r(0), 0],
         ['push', r(0)],
-        ['load_c', r(0), 1],
+        ['load_v', r(0), 1],
         ['print_reg', r(0)],
         ['peak', r(0)],
         ['print_reg', r(0)],
@@ -158,9 +158,9 @@ def test_stack_manipulation(machine):
 
 def test_int_math(machine):
     machine._load([
-        ['load_c', r(0), 10],
-        ['load_c', r(1), 20],
-        ['load_c', r(2), 33],
+        ['load_v', r(0), 10],
+        ['load_v', r(1), 20],
+        ['load_v', r(2), 33],
         ['add_rc', r(4), r(0), 2],
         ['print_reg', r(4)],
         ['add_rr', r(4), r(0), r(1)],
@@ -209,8 +209,8 @@ def test_int_math(machine):
 def test_function_calls(machine):
     machine._load([
         # main { print f(6) }
-        ['load_c', r(0), 6],
-        ['load_c', r(1), 99],
+        ['load_v', r(0), 6],
+        ['load_v', r(1), 99],
         ['call', 10, r(0)],
         ['print_reg', r(0)],
         ['print_reg', r(1)],
@@ -222,7 +222,7 @@ def test_function_calls(machine):
         ['ret'],
         # f(x) { a = g(x, 10); g(a, a) }
         ['load_p', r(1), 0],        # r1 = load x
-        ['load_c', r(2), 10],       # r2 = load 10
+        ['load_v', r(2), 10],       # r2 = load 10
         ['call', 6, r(1), r(2)],        # r0 = g(r1, r2)
         ['add_rc', r(1), r(0), 0],      # r1 = r0 + 0
         ['call', 6, r(1), r(1)],        # r0 = call(r1, r1)
@@ -246,18 +246,18 @@ def test_heap(machine):
         ['store_c', r(0), 4],
         ['store_c', r(1), 5],
 
-        ['load_c', r(20), 6],
+        ['load_v', r(20), 6],
         ['store_d', r(20), r(2)],
-        ['load_c', r(20), 7],
+        ['load_v', r(20), 7],
         ['store_d', r(20), r(3)],
 
-        ['load_c', r(20), 8],
+        ['load_v', r(20), 8],
         ['store_i', r(20), r(0), 4],
-        ['load_c', r(20), 9],
+        ['load_v', r(20), 9],
         ['store_i', r(20), r(0), 5],
-        ['load_c', r(20), 10],
+        ['load_v', r(20), 10],
         ['store_i', r(20), r(0), 6],
-        ['load_c', r(20), 11],
+        ['load_v', r(20), 11],
         ['store_i', r(20), r(0), 7],
 
         ['load_d', r(4), r(0)],

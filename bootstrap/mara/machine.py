@@ -23,6 +23,8 @@ class Machine(object):
         self._free_ptr = 0
         self._end_ptr = 7
 
+        self._pool = None  # Constant Pool
+
         self._print_buffer = []
 
         self._trace = traced
@@ -67,8 +69,9 @@ class Machine(object):
     # Internal Functions
     ##########################################################################
 
-    def _load(self, code):
+    def _load(self, code, constant_pool=None):
         self._code = code
+        self._pool = constant_pool
 
     def _describe(self):
         '''
@@ -551,11 +554,17 @@ class Machine(object):
     # Load & Store
     ##########################################################################
 
-    def load_c(self, reg, value):
+    def load_v(self, reg, value):
         '''
-        Load a constant number into a register.
+        Load an embedded value into a register.
         '''
         self._set(reg, value)
+
+    def load_c(self, reg, index):
+        '''
+        Load a constant at index in the constant pool into register reg.
+        '''
+        self._set(reg, self._pool[index])
 
     def load_p(self, dst, index):
         '''

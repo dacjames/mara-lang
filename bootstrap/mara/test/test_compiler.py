@@ -34,7 +34,7 @@ def test_math(parser, compiler, machine):
 
     assert isinstance(bytecode, list)
 
-    machine._load(bytecode)
+    machine._load(bytecode, compiler.pool)
     machine._loop()
 
     assert machine._regs[result] == 4
@@ -64,7 +64,7 @@ def test_if_true(parser, compiler, machine):
     bytecode = compiler.compile(ast)
     result = compiler.result()
 
-    machine._load(bytecode)
+    machine._load(bytecode, compiler.pool)
     machine._loop()
 
     assert machine._regs[result] == 8
@@ -83,7 +83,7 @@ def test_if_false(parser, compiler, machine):
     bytecode = compiler.compile(ast)
     result = compiler.result()
 
-    machine._load(bytecode)
+    machine._load(bytecode, compiler.pool)
     machine._loop()
 
     assert machine._regs[result] is special.NULL
@@ -104,7 +104,7 @@ def test_if_else(parser, compiler, machine):
     bytecode = compiler.compile(ast)
     result = compiler.result()
 
-    machine._load(bytecode)
+    machine._load(bytecode, compiler.pool)
     machine._loop()
 
     assert machine._regs[result] == 2
