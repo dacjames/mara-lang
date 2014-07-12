@@ -16,32 +16,35 @@ class CollectNames(object):
 
     @multimethod(_store)
     def visit(self, n):
-        pass
+        n['namespace'] = self.namespace
 
     @visit.d(node.Block)
     def _(self, n):
         self.namespace = self.namespace.child()
-        n.attrs['namespace'] = self.namespace
+        n['namespace'] = self.namespace
 
     @visit.d(node.Module)
     def _(self, n):
         self.namespace = self.namespace.child()
-        n.attrs['namespace'] = self.namespace
+        n['namespace'] = self.namespace
 
     @visit.d(node.Val)
     def _(self, n):
         ident = n.name.value
 
         self.namespace.declare(ident, scope.ValBox(n))
+        n['namespace'] = self.namespace
 
     @visit.d(node.Var)
     def _(self, n):
         ident = n.name.value
 
         self.namespace.declare(ident, scope.VarBox(n))
+        n['namespace'] = self.namespace
 
     @visit.d(node.Def)
     def _(self, n):
         ident = n.name.value
 
         self.namespace.declare(ident, scope.DefBox(n))
+        n['namespace'] = self.namespace

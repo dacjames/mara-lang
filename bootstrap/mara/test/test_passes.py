@@ -24,6 +24,11 @@ def collect_names():
     return passes.CollectNames()
 
 
+@pytest.fixture
+def resolve_names():
+    return passes.ResolveNames()
+
+
 def test_join_else(parser, join_else):
     given = maramodule('test', '''
         if x > 0 {}
@@ -75,4 +80,19 @@ def test_collect_names(parser, collect_names):
 
     ast.walk(collect_names)
 
-    assert ast.attrs['namespace'] == expected
+    assert ast['namespace'] == expected
+
+
+def test_collect_bad_names(parser, collect_names):
+    given = maramodule('test', '''
+        val x = 10
+        val x
+
+        var y
+        var y = 5
+    ''')
+
+    ast = parser.parse(given)
+
+    with pytest.raises(TypeError):
+        ast.walk(collect_names)
