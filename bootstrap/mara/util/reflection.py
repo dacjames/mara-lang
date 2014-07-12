@@ -72,6 +72,33 @@ def _derived__str__(self):
     )
 
 
+def _derived__dictstr__(self):
+    items = sorted(self.members.items())
+    field_str = ', '.join([
+        '{k}: {v}'.format(k=key, v=value)
+        for key, value in items
+    ])
+
+    return "Attributes({{{f}}})".format(f=field_str)
+
+
+def _derived__dictrepr__(self):
+    items = sorted(self.members.items())
+    field_str = ', '.join([
+        '{k}: {v}'.format(k=repr(key), v=repr(value))
+        for key, value in items
+    ])
+
+    return "Attributes({{{f}}})".format(f=field_str)
+
+
+def _derived__dicteq__(self, other):
+    try:
+        return sorted(self.iteritems()) == sorted(other.iteritems())
+    except AttributeError:
+        return False
+
+
 def _deriving(*method_ids):
     '''Generates a deriving class containing the given method identifiers.
     '''
@@ -82,7 +109,8 @@ def _deriving(*method_ids):
         method = g.get('_derived' + method_id)
 
         if method is not None:
-            methods[method_id] = method
+            method_name = _derivable_names.get(method_id, method_id)
+            methods[method_name] = method
         else:
             raise TypeError('derivable base method "{m}" not found'.format(
                 m=method_id
@@ -98,9 +126,16 @@ def _deriving(*method_ids):
 _derivable_ids = {'__repr__', '__eq__'}
 
 
+_derivable_names = {
+    '__dictstr__': '__str__',
+    '__dictrepr__': '__repr__',
+    '__dicteq__': '__eq__',
+}
+
 _derivable_mapping = {
     'show': ['__repr__', '__str__'],
     'eq': ['__eq__'],
+    'members_dict': ['__dicteq__', '__dictrepr__', '__dictstr__'],
 }
 
 

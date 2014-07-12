@@ -11,7 +11,7 @@ import collections
 from util.reflection import deriving
 
 
-class Attributes(object):
+class Attributes(deriving('members_dict')):
     def __init__(self, members=None):
         self.members = {}
 
@@ -63,24 +63,6 @@ class Attributes(object):
         return self.members.get(key, default)
 
     ##########################################################################
-
-    def __eq__(self, other):
-        try:
-            return sorted(self.iteritems()) == sorted(other.iteritems())
-        except AttributeError:
-            return False
-
-    def __repr__(self):
-        items = sorted(self.members.items())
-        field_str = ', '.join([
-            '{k}: {v}'.format(k=key, v=value)
-            for key, value in items
-        ])
-
-        return "Attributes({{{f}}})".format(f=field_str)
-
-    def __str__(self):
-        return self.__repr__()
 
     def __setitem__(self, key, value):
         try:

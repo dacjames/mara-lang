@@ -9,7 +9,7 @@ from util.reflection import deriving
 import special
 
 
-class ScopeBox(deriving('show', 'eq')):
+class ScopeBox(deriving('eq', 'show')):
     def __init__(self, value):
         self.value = value
 
@@ -22,7 +22,11 @@ class VarBox(ScopeBox):
     pass
 
 
-class _Scope(deriving('show', 'eq')):
+class DefBox(ScopeBox):
+    pass
+
+
+class _Scope(deriving('members_dict')):
     _store = method_store()
 
     def __init__(self):
