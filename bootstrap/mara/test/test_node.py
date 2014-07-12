@@ -20,9 +20,9 @@ def test_node_shared_methods():
     dummy = DummyNode('qua', None, 0)
     other = DummyNode('qua', None, 0)
 
-    assert repr(dummy) == "DummyNode(a='qua', attrs=Attributes({}), b=None, c=0)"
+    assert repr(dummy) == "DummyNode(a='qua', b=None, c=0)"
     assert dummy == other
-    assert dummy.attrs
+    assert dummy._attrs
 
 
 def test_compoment_equality():
@@ -68,30 +68,32 @@ def test_complex_equality():
 
 
 def test_node_attributes():
+    # pylint: disable=W0212
+    # pylint: disable=W0104
+
     given = node.Module(name='test', exprs=[])
 
     with pytest.raises(KeyError):
-        given.attrs['foo']
+        given['foo']
 
-    given.attrs['foo'] = 0
-    assert given.attrs['foo'] == 0
-
-    with pytest.raises(KeyError):
-        given.attrs['foo'] = 0
-
-    given.attrs['qua/bar'] = 0
-    assert given.attrs['qua/bar'] == 0
-    assert given.attrs['qua']['bar'] == 0
-
-
-    given.attrs.set_soft('foo', 0)
+    given['foo'] = 0
+    assert given['foo'] == 0
 
     with pytest.raises(KeyError):
-        given.attrs.set_soft('foo', 1)
+        given['foo'] = 0
 
-    given.attrs.set_hard('foo', 1)
+    given['qua/bar'] = 0
+    assert given['qua/bar'] == 0
+    assert given['qua']['bar'] == 0
 
-    assert given.attrs['foo'] == 1
+    given._attrs.set_soft('foo', 0)
+
+    with pytest.raises(KeyError):
+        given._attrs.set_soft('foo', 1)
+
+    given._attrs.set_hard('foo', 1)
+
+    assert given._attrs['foo'] == 1
 
 
 class SpyVisitor(object):
@@ -171,6 +173,3 @@ def test_walk(spy):
     given.walk(spy)
 
     spy.validate(expected)
-
-
-

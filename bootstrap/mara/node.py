@@ -12,7 +12,7 @@ class Node(deriving('eq', 'show')):
     __metaclass__ = ABCMeta
 
     def __init__(self):
-        self.attrs = attributes.Attributes()
+        self._attrs = attributes.Attributes()
 
     def walk(self, visitor):
         visitor.visit(self)
@@ -20,6 +20,12 @@ class Node(deriving('eq', 'show')):
 
     def recurse(self, visitor):
         pass
+
+    def __getitem__(self, key):
+        return self._attrs.__getitem__(key)
+
+    def __setitem__(self, key, value):
+        self._attrs.__setitem__(key, value)
 
 
 class Module(Node):
