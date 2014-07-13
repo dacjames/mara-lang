@@ -10,12 +10,14 @@ def multimethod(store):
         @wraps(f)
         def generic(*args):
             try:
-                return current_store[
+                function = current_store[
                     tuple(a.__class__ for a in args[1:])
-                ](*args)
+                ]
 
             except KeyError:
-                return generic.default(*args)
+                function = generic.default
+
+            return function(*args)
 
         def dispatch(*clses):
 
