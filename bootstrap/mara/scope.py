@@ -7,30 +7,31 @@ Scope Objects
 from util.dispatch import method_store, multimethod
 from util.reflection import deriving
 import special
+import node
 
 
-class ScopeBox(deriving('eq', 'show')):
-    def __init__(self, value):
-        self.value = value
+# class ScopeBox(deriving('eq', 'show')):
+#     def __init__(self, value):
+#         self.value = value
 
-    def unbox(self):
-        return self.value
-
-
-class ValBox(ScopeBox):
-    pass
+#     def unbox(self):
+#         return self.value
 
 
-class VarBox(ScopeBox):
-    pass
+# # class ValBox(ScopeBox):
+# #     pass
 
 
-class DefBox(ScopeBox):
-    pass
+# # class VarBox(ScopeBox):
+# #     pass
 
 
-class ParamBox(ScopeBox):
-    pass
+# # class DefBox(ScopeBox):
+# #     pass
+
+
+# # class ParamBox(ScopeBox):
+# #     pass
 
 
 class _Scope(deriving('members_dict')):
@@ -97,41 +98,40 @@ class _Scope(deriving('members_dict')):
         self.members = dict(self.members.items() + other.members.items())
         return self
 
-    def declare(self, ident, boxed):
-        assert isinstance(boxed, ScopeBox), 'method Scope::declare expected a boxed value.'
+    def declare(self, ident, value):
 
         if ident in self.members:
             raise TypeError('Cannot re-declare variable: ' + ident)
         else:
-            self.members[ident] = boxed
+            self.members[ident] = value
 
-        return boxed
+        return value
 
-    def assign(self, ident, unboxed):
+    def assign(self, ident, new_value):
         if ident in self:
-            box = self[ident]
-            return self._assign(box)(unboxed)
+            old_value = self[ident]
+            return self._assign(old_value)(new_value)
         else:
-            self.declare(ident, ValBox(unboxed))
+            self.declare(ident, new_value)
 
     @multimethod(_store)
-    def _assign(self, box):
+    def _assign(self, old_value):
         pass
 
-    @_assign.d(ValBox)
-    def _(self, box):
+    @_assign.d(node.Val)
+    def _(self, old_value):
         def inner(value):
-            if box.value == special.UNIT:
-                box.value = value
+            if old_value.value == special.UNIT:
+                old_value.value = value
                 return value
             else:
                 raise TypeError('Cannot reassign initialized val')
         return inner
 
-    @_assign.d(VarBox)
-    def _(self, box):
+    @_assign.d(node.Var)
+    def _(self, old_value):
         def inner(value):
-            box.value = value
+            old_value.value = value
             return value
         return inner
 

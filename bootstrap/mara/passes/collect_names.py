@@ -32,26 +32,26 @@ class CollectNames(object):
     def _(self, n):
         ident = n.name.value
 
-        self.namespace.declare(ident, scope.ValBox(n))
+        self.namespace.declare(ident, n)
         n['namespace'] = self.namespace
 
     @visit.d(node.Var)
     def _(self, n):
         ident = n.name.value
 
-        self.namespace.declare(ident, scope.VarBox(n))
+        self.namespace.declare(ident, n)
         n['namespace'] = self.namespace
 
     @visit.d(node.Def)
     def _(self, n):
         ident = n.name.value
 
-        self.namespace.declare(ident, scope.DefBox(n))
+        self.namespace.declare(ident, n)
         n['namespace'] = self.namespace
 
     @visit.d(node.Param)
     def _(self, n):
         ident = n.name.value
 
-        self.namespace.declare(ident, scope.ParamBox(n))
+        self.namespace.declare(ident, n)
         n['namespace'] = self.namespace

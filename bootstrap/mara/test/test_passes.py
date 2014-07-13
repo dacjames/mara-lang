@@ -67,23 +67,23 @@ def test_collect_names(parser, collect_names):
     ''')
 
     expected = {
-        'x': scope.ValBox(node.Val(
+        'x': node.Val(
             name=node.ValueId('x'),
             value=node.Int('10'),
-        )),
-        'y': scope.ValBox(node.Val(
+        ),
+        'y': node.Val(
             name=node.ValueId('y'),
             value=node.Unit(),
-        )),
-        'foo': scope.DefBox(node.Def(
+        ),
+        'foo': node.Def(
             name=node.ValueId('foo'),
             param=node.Tuple([node.Param(node.ValueId('x'), 0)]),
             body=node.Block([]),
-        )),
+        ),
     }
 
     inner = {
-        'x': scope.ParamBox(node.Param(name=node.ValueId('x'), index=0)),
+        'x': node.Param(name=node.ValueId('x'), index=0),
     }
 
     ast = parser.parse(given)
@@ -94,7 +94,7 @@ def test_collect_names(parser, collect_names):
     assert ast['namespace']['y'] == expected['y']
     assert ast['namespace']['foo'] == expected['foo']
 
-    foo = ast['namespace']['foo'].unbox()
+    foo = ast['namespace']['foo']
     inner_result = foo.body['namespace']
     assert inner_result['x'] == inner['x']
     assert inner_result['y'] == expected['y']
