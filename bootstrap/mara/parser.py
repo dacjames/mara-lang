@@ -449,22 +449,52 @@ def p_def_name(p):
 
 
 def p_def_param(p):
-    '''def_param : param_one
-                 | tuple
+    '''def_param : LPAR param_list RPAR
     '''
-    p[0] = p[1]
+    p[0] = p[2]
 
 
-def p_param_one(p):
-    '''param_one : wrapped
+def p_param_list(p):
+    '''param_list : param COMMA def_param
+                 | param COMMA
+                 | param
     '''
-    p[0] = node.Tuple(values=[p[1]])
+
+    if len(p) == 2:
+        p[0] = node.Tuple(values=[p[1]])
+
+    elif len(p) == 3:
+        p[0] = node.Tuple(values=[p[1]])
+
+    else:
+        p[0] = node.Tuple(values=[p[1]] + p[3])
+
+    return p[0]
 
 
 def p_def_return(p):
     '''def_return : tid
     '''
     p[0] = p[1]
+
+
+def p_param(p):
+    '''param : untyped_param
+             | typed_param
+    '''
+    p[0] = p[1]
+
+
+def p_typed_param(p):
+    '''typed_param : vid tid
+    '''
+    p[0] = node.Param(name=p[1], type_=p[2])
+
+
+def p_untyped_param(p):
+    '''untyped_param : vid
+    '''
+    p[0] = node.Param(name=p[1])
 
 
 def p_call(p):

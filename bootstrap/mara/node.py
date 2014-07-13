@@ -102,13 +102,20 @@ class Unit(Node):
 
 class Block(Node):
 
-    def __init__(self, exprs, params):
+    def __init__(self, exprs, params=None):
         Node.__init__(self)
 
         self.exprs = exprs
-        self.params = params
+
+        if params is None:
+            self.params = []
+        else:
+            self.params = params
 
     def recurse(self, visitor):
+        for param in self.params:
+            param.walk(visitor)
+
         for expr in self.exprs:
             expr.walk(visitor)
 
@@ -292,10 +299,19 @@ class Call(Node):
         self.block.walk(visitor)
 
 
+class Param(Node):
+    def __init__(self, name, type_=None):
+        Node.__init__(self)
+        self.name = name
+        self.type_ = type_
+
+
 class Def(Node):
 
     def __init__(self, name, param, body, return_type=None):
         Node.__init__(self)
+
+        body.params = param.values
 
         self.name = name
         self.param = param

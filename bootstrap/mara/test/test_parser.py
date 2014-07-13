@@ -427,7 +427,7 @@ def test_declarations(parser):
 
 def test_definitions(parser):
     given = maramodule('test', '''
-        def foo(x) { 3 + 5 }
+        def foo(x Int) { 3 + 5 }
         def foo(
             x
         ) {
@@ -442,8 +442,8 @@ def test_definitions(parser):
         exprs=[
             n.Def(
                 name=n.ValueId('foo'),
-                param=n.Tuple(values=[n.ValueId('x')]),
-                body=n.Block(params=[], exprs=[
+                param=n.Tuple(values=[n.Param(name=n.ValueId('x'), type_=n.TypeId('Int'))]),
+                body=n.Block(exprs=[
                     n.BinOp(func=n.SymbolId('+'), args=[
                         n.Int('3'),
                         n.Int('5'),
@@ -452,8 +452,8 @@ def test_definitions(parser):
             ),
             n.Def(
                 name=n.ValueId('foo'),
-                param=n.Tuple(values=[n.ValueId('x')]),
-                body=n.Block(params=[], exprs=[
+                param=n.Tuple(values=[n.Param(name=n.ValueId('x'))]),
+                body=n.Block(exprs=[
                     n.BinOp(func=n.SymbolId('+'), args=[
                         n.Int('3'),
                         n.Int('5'),
@@ -462,9 +462,9 @@ def test_definitions(parser):
             ),
             n.Def(
                 name=n.ValueId('bar'),
-                param=n.Tuple(values=[n.ValueId('x')]),
+                param=n.Tuple(values=[n.Param(name=n.ValueId('x'))]),
                 return_type=n.TypeId('Float'),
-                body=n.Block(params=[], exprs=[
+                body=n.Block(exprs=[
                     n.BinOp(func=n.SymbolId('*'), args=[
                         n.Int('1000'),
                         n.Real('0.9'),

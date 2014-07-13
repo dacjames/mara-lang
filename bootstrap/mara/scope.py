@@ -29,6 +29,10 @@ class DefBox(ScopeBox):
     pass
 
 
+class ParamBox(ScopeBox):
+    pass
+
+
 class _Scope(deriving('members_dict')):
     _store = method_store()
 
