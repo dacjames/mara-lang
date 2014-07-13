@@ -11,6 +11,7 @@ import pytest
 
 from ..compiler import Compiler, CompileError
 from .. import special
+from .. import passes
 
 from test_lexer import lex_simple
 from test_parser import parser, maramodule
@@ -108,3 +109,23 @@ def test_if_else(parser, compiler, machine):
     machine._loop()
 
     assert machine._regs[result] == 2
+
+
+def test_variable_resolution_with_constants(parser, compiler, machine):
+    given = maramodule('test', '''
+        val x = 10
+        x * 2
+    ''')
+
+    ast = parser.parse(given)
+
+    ast.walk(passes.CollectNames())
+
+    bytecode = compiler.compile(ast)
+    result = compiler.result()
+    pool = compiler.pool
+
+    machine._load(bytecode, pool)
+    machine._loop()
+
+    assert machine._regs[result] == 20

@@ -108,10 +108,29 @@ class Compiler(object):
         r = self.registry.frame()
 
         self.block += [
-            ('load_v', r(0), float(n.value)),
+            ('load_c', r(0), n['constant']),
         ]
 
         return r(0)
+
+    @visit.d(node.Val)
+    def _(self, n):
+        result = self.visit(n.value)
+        n['result'] = result
+
+        return result
+
+    @visit.d(node.ValueId)
+    def _(self, n):
+        r = self.registry.frame()
+
+        identifier = n.value
+
+        declaration = n['namespace'][identifier].unbox()
+
+        source = declaration['result']
+
+        return source
 
     @visit.d(node.BinOp)
     def _(self, n):
