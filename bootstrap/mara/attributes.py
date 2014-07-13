@@ -74,9 +74,6 @@ class Attributes(deriving('members_dict')):
                 self._setpath(key, value)
                 return
 
-            if isinstance(value, collections.Mapping):
-                value = Attributes(value)
-
             self.members.__setitem__(key, value)
             return
 
