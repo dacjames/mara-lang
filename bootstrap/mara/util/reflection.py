@@ -79,7 +79,7 @@ def _derived__dictstr__(self):
         for key, value in items
     ])
 
-    return "Attributes({{{f}}})".format(f=field_str)
+    return "{cls}({{{f}}})".format(cls=self.__class__.__name__, f=field_str)
 
 
 def _derived__dictrepr__(self):
@@ -89,7 +89,7 @@ def _derived__dictrepr__(self):
         for key, value in items
     ])
 
-    return "Attributes({{{f}}})".format(f=field_str)
+    return "{cls}({{{f}}})".format(cls=self.__class__.__name__, f=field_str)
 
 
 def _derived__dicteq__(self, other):
