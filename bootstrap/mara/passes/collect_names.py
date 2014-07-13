@@ -48,3 +48,10 @@ class CollectNames(object):
 
         self.namespace.declare(ident, scope.DefBox(n))
         n['namespace'] = self.namespace
+
+    @visit.d(node.Param)
+    def _(self, n):
+        ident = n.name.value
+
+        self.namespace.declare(ident, scope.ParamBox(n))
+        n['namespace'] = self.namespace
