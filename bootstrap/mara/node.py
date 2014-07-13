@@ -300,10 +300,15 @@ class Call(Node):
 
 
 class Param(Node):
-    def __init__(self, name, type_=None):
+    def __init__(self, name, index=None, type_=None):
         Node.__init__(self)
         self.name = name
-        self.type_ = type_
+        self.index = index
+
+        if type_ is None:
+            self.type_ = Unit()
+        else:
+            self.type_ = type_
 
 
 class Def(Node):

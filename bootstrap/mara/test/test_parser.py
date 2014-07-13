@@ -429,12 +429,13 @@ def test_definitions(parser):
     given = maramodule('test', '''
         def foo(x Int) { 3 + 5 }
         def foo(
-            x
+            x,
+            y
         ) {
             3 +
             5
         }
-        def bar(x) Float { 1000 * 0.9 }
+        def bar(x, y Real) Float { 1000 * 0.9 }
     ''')
 
     expected = n.Module(
@@ -442,7 +443,9 @@ def test_definitions(parser):
         exprs=[
             n.Def(
                 name=n.ValueId('foo'),
-                param=n.Tuple(values=[n.Param(name=n.ValueId('x'), type_=n.TypeId('Int'))]),
+                param=n.Tuple(values=[
+                    n.Param(name=n.ValueId('x'), index=0, type_=n.TypeId('Int'))
+                ]),
                 body=n.Block(exprs=[
                     n.BinOp(func=n.SymbolId('+'), args=[
                         n.Int('3'),
@@ -452,7 +455,10 @@ def test_definitions(parser):
             ),
             n.Def(
                 name=n.ValueId('foo'),
-                param=n.Tuple(values=[n.Param(name=n.ValueId('x'))]),
+                param=n.Tuple(values=[
+                    n.Param(name=n.ValueId('x'), index=0),
+                    n.Param(name=n.ValueId('y'), index=1),
+                ]),
                 body=n.Block(exprs=[
                     n.BinOp(func=n.SymbolId('+'), args=[
                         n.Int('3'),
@@ -462,7 +468,10 @@ def test_definitions(parser):
             ),
             n.Def(
                 name=n.ValueId('bar'),
-                param=n.Tuple(values=[n.Param(name=n.ValueId('x'))]),
+                param=n.Tuple(values=[
+                    n.Param(name=n.ValueId('x'), index=0),
+                    n.Param(name=n.ValueId('y'), index=1, type_=n.TypeId('Real')),
+                ]),
                 return_type=n.TypeId('Float'),
                 body=n.Block(exprs=[
                     n.BinOp(func=n.SymbolId('*'), args=[

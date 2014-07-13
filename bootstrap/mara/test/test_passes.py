@@ -77,15 +77,13 @@ def test_collect_names(parser, collect_names):
         )),
         'foo': scope.DefBox(node.Def(
             name=node.ValueId('foo'),
-            param=node.Tuple([node.Param(node.ValueId('x'))]),
+            param=node.Tuple([node.Param(node.ValueId('x'), 0)]),
             body=node.Block([]),
         )),
     }
 
     inner = {
-        'x': scope.ParamBox(node.Param(
-            name=node.ValueId('x'),
-        )),
+        'x': scope.ParamBox(node.Param(name=node.ValueId('x'), index=0)),
     }
 
     ast = parser.parse(given)

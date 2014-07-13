@@ -451,23 +451,27 @@ def p_def_name(p):
 def p_def_param(p):
     '''def_param : LPAR param_list RPAR
     '''
-    p[0] = p[2]
+    param_list = p[2]
+    for i, param in enumerate(param_list):
+        param.index = i
+
+    p[0] = node.Tuple(values=param_list)
 
 
 def p_param_list(p):
-    '''param_list : param COMMA def_param
+    '''param_list : param COMMA param_list
                  | param COMMA
                  | param
     '''
 
     if len(p) == 2:
-        p[0] = node.Tuple(values=[p[1]])
+        p[0] = [p[1]]
 
     elif len(p) == 3:
-        p[0] = node.Tuple(values=[p[1]])
+        p[0] = [p[1]]
 
     else:
-        p[0] = node.Tuple(values=[p[1]] + p[3])
+        p[0] = [p[1]] + p[3]
 
     return p[0]
 
