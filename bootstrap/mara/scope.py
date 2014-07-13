@@ -13,6 +13,9 @@ class ScopeBox(deriving('eq', 'show')):
     def __init__(self, value):
         self.value = value
 
+    def unbox(self):
+        return self.value
+
 
 class ValBox(ScopeBox):
     pass
@@ -34,12 +37,6 @@ class _Scope(deriving('members_dict')):
 
     def __getitem__(self, key):
         return self.members.__getitem__(key)
-
-    def __setitem__(self, key, value):
-        return self.members.__setitem__(key, value)
-
-    def __delitem__(self, key):
-        return self.members.__delitem__(key)
 
     def __contains__(self, key):
         return self.has_key(key)  # noqa
@@ -155,6 +152,6 @@ class Scope(_Scope):
 
     def __getitem__(self, key):
         try:
-            return self.members.__getitem__(key)
+            return _Scope.__getitem__(self, key)
         except KeyError:
             return self.parent.__getitem__(key)
