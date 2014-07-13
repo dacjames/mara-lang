@@ -113,8 +113,9 @@ def test_if_else(parser, compiler, machine):
 
 def test_variable_resolution_with_constants(parser, compiler, machine):
     given = maramodule('test', '''
-        val x = 10
-        x * 2
+        val x = (5 + 5)
+        var y = 2
+        x * y
     ''')
 
     ast = parser.parse(given)

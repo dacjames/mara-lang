@@ -73,6 +73,7 @@ class Compiler(object):
         self.block = []
         self.registry = Registry()
         self.pool = ConstantPool()
+        self.functions = {}
 
         self._result = None
 
@@ -120,17 +121,45 @@ class Compiler(object):
 
         return result
 
+    @visit.d(node.Var)
+    def _(self, n):
+        result = self.visit(n.value)
+        n['result'] = result
+
+        return result
+
     @visit.d(node.ValueId)
     def _(self, n):
-        r = self.registry.frame()
-
         identifier = n.value
 
-        declaration = n['namespace'][identifier].unbox()
+        declaration = n['namespace'][identifier]
 
         source = declaration['result']
 
         return source
+
+    @visit.d(node.Def)
+    def _(self, n):
+        r = self.registry.frame()
+
+    @visit.d(node.Call)
+    def _(self, n):
+        r = self.registry.frame()
+
+        identifier = n.func.value
+
+        declaration = n['namespace'][identifier]
+
+        function_id = declaration['function_id']
+
+        arg_tuple = declaration.arg
+        arg_registers = [self.visit(value) for value in arg_tuple]
+
+        self.block += [
+            tuple(['call', function_id] + arg_registers),
+            ('copy', r(0), 0),
+        ]
+
 
     @visit.d(node.BinOp)
     def _(self, n):
@@ -254,3 +283,4 @@ class ConstantPool(object):
 
         self._pool.append(value)
         n['constant'] = index
+
