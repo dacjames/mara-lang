@@ -86,7 +86,12 @@ class Compiler(object):
 
     def compile(self, ast):
         ast.walk(self.pool)
-        bytecodes = self.visit(ast)
+        try:
+            bytecodes = self.visit(ast)
+        except Exception:
+            for code in self.block:
+                print code
+            raise
         bytecodes.append(('halt',))
         return bytecodes
 
@@ -138,9 +143,55 @@ class Compiler(object):
 
         return source
 
+    @visit.d(node.Param)
+    def _(self, n):
+        r = self.registry.frame()
+        offset = n.index
+
+        self.block += [
+            ('load_p', r(0), offset),
+        ]
+
+        n['result'] = r(0)
+
+        return r(0)
+
     @visit.d(node.Def)
     def _(self, n):
         r = self.registry.frame()
+
+        #  +1 for address load, +1 for hole
+        address = len(self.block) + 2
+
+        # store the address of the function as the result.
+        self.block += [
+            ('load_v', r(0), address),
+            None,  # patch with skip
+        ]
+        skip_label = len(self.block) - 1
+
+        # set attributes
+        n['address'] = address
+        n['result'] = r(0)
+
+        # generate loads for all the function params
+        for param in n.param.values:
+            self.visit(param)
+
+        # generate the function body
+        ret = self.visit(n.body)
+
+        # generate the return of the result
+        self.block += [
+            ('copy', 0, ret),
+            ('ret',),
+        ]
+        end_label = len(self.block)
+
+        # skip past the declaration
+        self.block[skip_label] = ('jump_a', end_label)
+
+        return r(0)
 
     @visit.d(node.Call)
     def _(self, n):
@@ -148,17 +199,25 @@ class Compiler(object):
 
         identifier = n.func.value
 
+        # lookup the function's declaration
         declaration = n['namespace'][identifier]
 
-        function_id = declaration['function_id']
+        # lookup the address of the function body
+        address = declaration['address']
 
-        arg_tuple = declaration.arg
-        arg_registers = [self.visit(value) for value in arg_tuple]
+        # generate evaluations of all the arguments
+        arg_registers = [
+            self.visit(value)
+            for value in n.arg.values
+        ]
 
+        # generate the call
         self.block += [
-            tuple(['call', function_id] + arg_registers),
+            tuple(['call', address] + arg_registers),
             ('copy', r(0), 0),
         ]
+
+        return r(0)
 
 
     @visit.d(node.BinOp)
@@ -276,6 +335,11 @@ class ConstantPool(object):
     @visit.d(node.Real)
     def _(self, n):
         self._add(n, lambda n: float(n.value))
+
+    @visit.d(node.Call)
+    def _(self, n):
+        for arg in n.arg.values:
+            self.visit(arg)
 
     def _add(self, n, accessor):
         index = len(self._pool)

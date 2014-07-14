@@ -130,3 +130,36 @@ def test_variable_resolution_with_constants(parser, compiler, machine):
     machine._loop()
 
     assert machine._regs[result] == 20
+
+
+def test_define_and_call(parser, compiler, machine):
+    given = maramodule('test', '''
+        def add(x, y) {
+            x + y
+        }
+
+        def add_ten(x) {
+            val y = 10
+            x + y
+        }
+
+        val a = add(1, 2)
+        val b = add(3, 4)
+
+        a + b
+    ''')
+
+    ast = parser.parse(given)
+
+    ast.walk(passes.CollectNames())
+
+    bytecode = compiler.compile(ast)
+    result = compiler.result()
+    pool = compiler.pool
+
+    machine._load(bytecode, pool)
+    machine._loop()
+
+    print(result)
+
+    assert machine._regs[result] == 10
