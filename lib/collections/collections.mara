@@ -12,25 +12,15 @@ datum T.Node {
 
 def LinkedList = nil
 
-def Node::get index =
+def Node::get (index) {
     match   index
     as 0    this.head
     else    self(index - 1)
+}
 
-def Nil::get index = fail IndexError
+def Nil::get index { fail IndexError }
 
 end impl
-
-
-
-module example
-
-depend random/seed
-
-a = random.matrix
-
-
-end example
 
 
 module

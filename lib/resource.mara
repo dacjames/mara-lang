@@ -5,9 +5,13 @@ The `Resource` trait is used to manage sharable or external resources like files
 
 module
 
+trait Sharable {
+    def acquire () -> This.Maybe { this }
+    def release () -> Maybe
+}
+
 trait Resource {
-    def acquire -> This.Maybe { this }
-    def release -> Maybe
+    def acquire () -> This.Maybe { this }
 }
 
 end

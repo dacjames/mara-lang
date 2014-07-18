@@ -1,24 +1,24 @@
-module example
+module (example.provider)
 
 provide users = Service('/user/:id', User)
 
 
-end example
+end
 
 
-module example-b
+module (example.dependant)
 depend users
 
 def main {
     dac = users[196]
     jess = users[1]
 
-    jess.tag (
-        tag     = 'boyfriend',
-        user    = dac,
-        tagback = 'girlfriend',
-    ).save
+    jess.tag [
+        tag: 'boyfriend',
+        user: dac,
+        tagback: 'girlfriend',
+    ] .save
 
 }
 
-module example-b
+end

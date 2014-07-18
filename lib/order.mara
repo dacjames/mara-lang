@@ -33,7 +33,7 @@ trait Comparable.Collection::Sort {
 
     def quicksort -> This
     def quicksort {
-        smaller, larger, equal = this.partition compare
+        smaller, larger, equal = this.partition (Comparable.compare)
         smaller.self ++ equal ++ larger.self
     }
 

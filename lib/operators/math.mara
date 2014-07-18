@@ -1,12 +1,10 @@
-module example
-depend main
+module collection
 
+import 'mara.collection' [
+    Collection:
+]
 
-
-
-end
-
-module collections
+use Collection
 
 alias('++', concat)
 alias('--', diff)
