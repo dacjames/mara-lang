@@ -40,7 +40,7 @@ def test_join_else(parser, join_else):
 
     ast.walk(join_else)
 
-    expected = node.Module(name='expr', exprs=[
+    expected = node.Module(name='test', exprs=[
         node.If(
             pred=node.BinOp(func=node.SymbolId('>'), args=[node.ValueId('x'), node.Int('0')]),
             if_body=node.Block([], []),
@@ -48,13 +48,64 @@ def test_join_else(parser, join_else):
         ),
         node.NoOp(),
         node.If(
-            pred=node.BinOp(func=node.SymbolId('>'), args=[node.ValueId('x'), node.Int('0')]),
+            pred=node.BinOp(func=node.SymbolId('>'), args=[node.ValueId('x'), node.Int('1')]),
             if_body=node.Block([], []),
             else_body=node.Unit(),
         ),
     ])
 
-    assert expected
+    assert ast.exprs[0] == expected.exprs[0]
+    assert ast.exprs[1] == expected.exprs[1]
+    assert ast.exprs[2] == expected.exprs[2]
+
+    assert ast == expected
+
+
+def test_join_else_regression(parser, join_else):
+    given = maramodule('test', '''
+        def foo(x) {
+            if x + 1 {
+                5
+            }
+            else {
+                10
+            }
+        }
+    ''')
+
+    ast = parser.parse(given)
+
+    ast.walk(join_else)
+
+    expected = node.Module(name='test', exprs=[
+        node.Def(
+            name=node.ValueId('foo'),
+            param=node.Tuple([
+                node.Param(name=node.ValueId('x'), index=0)
+            ]),
+            body=node.Block(exprs=[
+                node.If(
+                    pred=node.BinOp(
+                        func=node.SymbolId('+'),
+                        args=[node.ValueId('x'), node.Int('1')]
+                    ),
+                    if_body=node.Block([
+                        node.Int('5')
+                    ]),
+                    else_body=node.Block([
+                        node.Int('10')
+                    ]),
+                ),
+                node.NoOp(),
+            ]),
+        ),
+    ])
+
+    assert ast.exprs[0].name == expected.exprs[0].name
+    assert ast.exprs[0].param == expected.exprs[0].param
+    assert ast.exprs[0].body == expected.exprs[0].body
+    assert ast.exprs[0] == expected.exprs[0]
+    assert ast == expected
 
 
 def test_collect_names(parser, collect_names):
@@ -114,3 +165,8 @@ def test_collect_bad_names(parser, collect_names):
 
     with pytest.raises(TypeError):
         ast.walk(collect_names)
+
+
+
+
+
