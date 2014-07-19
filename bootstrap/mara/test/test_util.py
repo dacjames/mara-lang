@@ -72,7 +72,9 @@ class AttrTest(object):
 def test_public_attrs_field_methods():
     test = AttrTest()
 
-    instance_fields = ['instance_field0', 'instance_field1', 'property0', 'property1']
+    instance_fields = ['instance_field0', 'instance_field1']
+    instance_properties = ['property0', 'property1']
+    instance_members = ['instance_field0', 'instance_field1', 'property0', 'property1']
     instance_methods = ['instance_method0', 'instance_method1']
     instance_attrs = [
         'instance_field0', 'instance_field1',
@@ -81,6 +83,8 @@ def test_public_attrs_field_methods():
     ]
 
     assert util.instance_fields(test) == instance_fields
+    assert util.instance_properties(test) == instance_properties
+    assert util.instance_members(test) == instance_members
     assert util.instance_methods(test) == instance_methods
     assert util.instance_attrs(test) == instance_attrs
 

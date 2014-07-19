@@ -192,7 +192,15 @@ def _is_instance_field(obj, attr):
     return (
         not isinstance(attribute, types.MethodType) and
         getattr(obj.__class__, attr, None) is None
-    ) or isinstance(getattr(obj.__class__, attr, None), property)
+    )
+
+
+def _is_instance_property(obj, attr):
+    attribute = getattr(obj, attr, None)
+
+    return (
+        isinstance(getattr(obj.__class__, attr, None), property)
+    )
 
 
 def class_attrs(obj):
@@ -231,10 +239,26 @@ def class_methods(obj):
 
 
 def instance_attrs(obj):
-    '''Public attributes(fields and methods) of an object.
+    '''Public attributes(fields, properties, and methods) of an object.
     '''
     def pred(attr):
-        return _is_instance_field(obj, attr) or _is_instance_method(obj, attr)
+        return (
+            _is_instance_field(obj, attr) or
+            _is_instance_method(obj, attr) or
+            _is_instance_property(obj, attr)
+        )
+
+    return _public_attrs(obj, pred)
+
+
+def instance_members(obj):
+    '''Public members (fields and properties) of an object.
+    '''
+    def pred(attr):
+        return (
+            _is_instance_field(obj, attr) or
+            _is_instance_property(obj, attr)
+        )
 
     return _public_attrs(obj, pred)
 
@@ -249,6 +273,12 @@ def instance_methods(obj):
     '''Public methods on an object.
     '''
     return _public_attrs(obj, lambda attr: _is_instance_method(obj, attr))
+
+
+def instance_properties(obj):
+    '''Public properties of an object.
+    '''
+    return _public_attrs(obj, lambda attr: _is_instance_property(obj, attr))
 
 ##############################################################################
 ##############################################################################
