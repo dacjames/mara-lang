@@ -46,11 +46,11 @@ def test_join_else(parser, join_else):
             if_body=node.Block([], []),
             else_body=node.Block([], []),
         ),
-
+        node.NoOp(),
         node.If(
             pred=node.BinOp(func=node.SymbolId('>'), args=[node.ValueId('x'), node.Int('0')]),
             if_body=node.Block([], []),
-            else_body=special.UNIT,
+            else_body=node.Unit(),
         ),
     ])
 

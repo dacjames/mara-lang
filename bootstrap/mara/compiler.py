@@ -100,6 +100,10 @@ class Compiler(object):
     def visit(self, n):
         raise TypeError('Node type {n} not yet supported for compilation'.format(n=n.__class__))
 
+    @visit.d(node.NoOp)
+    def _(self, n):
+        pass
+
     @visit.d(node.Int)
     def _(self, n):
         r = self.registry.frame()
@@ -280,7 +284,7 @@ class Compiler(object):
 
         return self.result(r(0))
 
-    @visit.d(node.NoOp)
+    @visit.d(node.Unit)
     def _(self, n):
         r = self.registry.frame()
 

@@ -148,7 +148,6 @@ def test_walk(spy):
                     key='z',
                     value=node.Int('10')
                 ),
-                type_=special.UNIT,
             )
         ),
     ])
@@ -167,7 +166,7 @@ def test_walk(spy):
         'Assign',
         'KV',
         'Int',
-        'NoOp',
+        'Unit',
     ]
 
     given.walk(spy)

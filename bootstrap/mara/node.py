@@ -144,7 +144,7 @@ class If(Node):
         if else_body is not None:
             self.else_body = else_body
         else:
-            self.else_body = NoOp()
+            self.else_body = Unit()
 
     def recurse(self, visitor):
         self.pred.walk(visitor)
