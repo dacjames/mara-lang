@@ -275,8 +275,7 @@ def t_code_SID(tok):
 
 
 def _newline_terminates(tok):
-    '''
-    Determines if a newline token is preceded, excluding whitespace, by a terminating character.
+    '''Determines if a newline token is preceded, excluding whitespace, by a terminating character.
     '''
     # walk backward to find first non-whitespace char
     # -1 because the current position is known to be whitespace

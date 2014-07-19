@@ -7,6 +7,7 @@ import ply.yacc as yacc
 
 from lexer import tokens  # pylint: disable=W0611
 from lexer import KEYWORDS
+from lexer import build_lexer, lex_tokens, lex_simple
 import node
 import util
 
@@ -563,7 +564,6 @@ def p_compound_call(p):
     return p[0]
 
 
-
 def p_block_call(p):
     '''block_call : blockless_call block
     '''
@@ -579,5 +579,18 @@ def p_error(tok):
     raise ParseError(tok, tok.lexer)
 
 
-def build_parser():
-    return yacc.yacc(tabmodule='__plycache__/parser.out', outputdir='./__plycache__')
+class Parser(object):
+    def __init__(self):
+        self._parser = yacc.yacc(tabmodule='__plycache__/parser.out', outputdir='./__plycache__')
+        self._lexer = build_lexer()
+
+    def parse(self, document):
+        return self._parser.parse(document, lexer=self._lexer)
+
+    def simple_stream(self, document):
+        for tok in lex_simple(self._lexer, document):
+            yield tok
+
+    def token_stream(self, document):
+        for tok in lex_tokens(self._lexer, document):
+            yield tok

@@ -7,19 +7,14 @@ import pytest
 
 xfail = pytest.mark.xfail
 
-from test_lexer import lex_simple  # pylint: disable=W0611
-
 
 def maramodule(name, code):
     return 'module {n} {c} end'.format(n=name, c=code)
 
 
 @pytest.fixture
-def parser(lex_simple):
-    # pylint:disable=W0612
-    # this is dirty hack because we need to trigger a lexer import.
-    lex_simple = lex_simple
-    return parser_module.build_parser()
+def parser():
+    return parser_module.Parser()
 
 
 def test_parse_literals(parser):
@@ -526,7 +521,7 @@ def test_definitions(parser):
     assert expected == result
 
 
-def test_parse_tuples(parser, lex_simple):
+def test_parse_tuples(parser):
     given = maramodule('tuples', '''
         x = ()
         x = (1,)
@@ -557,13 +552,13 @@ def test_parse_tuples(parser, lex_simple):
         ]
     )
 
-    stream = list(lex_simple(given))  # pylint:disable=W0612
+    stream = parser.simple_stream(given)
     result = parser.parse(given)
 
     assert expected == result
 
 
-def test_parse_lists(parser, lex_simple):
+def test_parse_lists(parser):
 
     given = maramodule('lists', '''
         x = []
@@ -605,13 +600,13 @@ def test_parse_lists(parser, lex_simple):
         ]
     )
 
-    stream = list(lex_simple(given))  # pylint:disable=W0612
+    stream = parser.simple_stream(given)  # pylint:disable=W0612
     result = parser.parse(given)
 
     assert expected == result
 
 
-def test_parse_kvs(parser, lex_simple):
+def test_parse_kvs(parser):
     given = maramodule('kvs', '''
         x : 10
         y :
@@ -639,7 +634,7 @@ def test_parse_kvs(parser, lex_simple):
         ]
     )
 
-    stream = list(lex_simple(given))  # pylint:disable=W0612
+    stream = parser.simple_stream(given)  # pylint:disable=W0612
     result = parser.parse(given)
     assert expected == result
 

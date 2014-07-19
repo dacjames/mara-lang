@@ -7,6 +7,7 @@ Translate AST to Mara Bytecode.
 import node
 import scope
 import special
+import constant
 from util.dispatch import method_store, multimethod
 from util.reflection import deriving
 
@@ -72,8 +73,8 @@ class Compiler(object):
 
         self.block = []
         self.registry = Registry()
-        self.pool = ConstantPool()
         self.functions = {}
+        self.pool = None
 
         self._result = None
 
@@ -84,8 +85,8 @@ class Compiler(object):
         self._result = reg
         return reg
 
-    def compile(self, ast):
-        ast.walk(self.pool)
+    def compile(self, ast, pool):
+        self.pool = pool
         try:
             bytecodes = self.visit(ast)
         except Exception:
@@ -309,42 +310,3 @@ class Compiler(object):
             result = self.visit(expr)
 
         return self.result(result)
-
-
-class ConstantPool(object):
-    '''
-    A pool for holding compile time constants.
-    '''
-
-    _store = method_store()
-
-    def __init__(self):
-        self._pool = []
-
-    def __getitem__(self, key):
-        return self._pool.__getitem__(key)
-
-    @multimethod(_store)
-    def visit(self, n):
-        pass
-
-    @visit.d(node.Int)
-    def _(self, n):
-        self._add(n, lambda n: int(n.value))
-
-    @visit.d(node.Real)
-    def _(self, n):
-        self._add(n, lambda n: float(n.value))
-
-    @visit.d(node.Call)
-    def _(self, n):
-        for arg in n.arg.values:
-            self.visit(arg)
-
-    def _add(self, n, accessor):
-        index = len(self._pool)
-        value = accessor(n)
-
-        self._pool.append(value)
-        n['constant'] = index
-
