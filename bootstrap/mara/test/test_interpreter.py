@@ -18,7 +18,7 @@ from test_parser import maramodule
 
 @pytest.fixture
 def interpreter():
-    return Interpreter()
+    return Interpreter(traced=True)
 
 
 def test_math(interpreter):
@@ -118,3 +118,24 @@ def test_define_and_call(interpreter):
     result = interpreter.evaluate(given)
 
     assert result == 10
+
+
+def test_nested_if_inside_function(interpreter):
+    given = maramodule('test', '''
+        def foo(x) {
+            if x + 1 {
+                5
+            }
+            else {
+
+                if 0 { 10 }
+                else { 20 }
+            }
+        }
+
+        foo(-1)
+    ''')
+
+    result = interpreter.evaluate(given)
+
+    assert result == 20

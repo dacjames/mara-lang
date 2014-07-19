@@ -18,7 +18,7 @@ class Interpreter(object):
     def __init__(self, buffered=False, traced=False):
         self.compiler = Compiler()
         self.parser = Parser()
-        self.machine = Machine()
+        self.machine = Machine(buffered=buffered, traced=traced)
 
         self.isbuffered = buffered
         self.istraced = traced

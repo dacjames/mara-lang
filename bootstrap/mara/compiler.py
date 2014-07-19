@@ -89,7 +89,7 @@ class Compiler(object):
         self.pool = pool
         try:
             bytecodes = self.visit(ast)
-        except Exception:
+        except CompileError:
             for code in self.block:
                 print code
             raise
@@ -159,7 +159,7 @@ class Compiler(object):
 
         n['result'] = r(0)
 
-        return r(0)
+        return self.result(r(0))
 
     @visit.d(node.Def)
     def _(self, n):
@@ -196,7 +196,7 @@ class Compiler(object):
         # skip past the declaration
         self.block[skip_label] = ('jump_a', end_label)
 
-        return r(0)
+        return self.result(r(0))
 
     @visit.d(node.Call)
     def _(self, n):
@@ -222,7 +222,7 @@ class Compiler(object):
             ('copy', r(0), 0),
         ]
 
-        return r(0)
+        return self.result(r(0))
 
 
     @visit.d(node.BinOp)
@@ -292,7 +292,7 @@ class Compiler(object):
             ('load_v', r(0), special.NULL)
         ]
 
-        return r(0)
+        return self.result(r(0))
 
     @visit.d(node.Module)
     def _(self, n):
