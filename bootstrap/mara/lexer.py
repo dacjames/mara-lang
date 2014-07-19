@@ -266,6 +266,7 @@ SYMA = r'[~!?<>]'
 SYMB = r'[&|%=+\-^*/:]'
 SYMC = r'(\{|\[|\(|\\)'
 SYM_REGEX = re.compile(r'{A}|{B}|{C}'.format(A=SYMA, B=SYMB, C=SYMC))
+WHITESPACE = re.compile(r'[ \t\r\n]')
 
 
 @TOKEN(r'{A}+|{B}({A}|{B})+'.format(A=SYMA, B=SYMB))
@@ -274,7 +275,19 @@ def t_code_SID(tok):
 
 
 def _newline_terminates(tok):
-    after_symbol = SYM_REGEX.match(tok.lexer.lexdata[tok.lexer.lexpos - 2])
+    '''
+    Determines if a newline token is preceded, excluding whitespace, by a terminating character.
+    '''
+    # walk backward to find first non-whitespace char
+    # -1 because the current position is known to be whitespace
+    pos = tok.lexer.lexpos - 1
+    lexdata = tok.lexer.lexdata
+
+    while WHITESPACE.match(lexdata[pos]):
+        pos -= 1
+
+    # check if the character causes a termination
+    after_symbol = SYM_REGEX.match(tok.lexer.lexdata[pos])
 
     return (
         not after_symbol
@@ -287,7 +300,6 @@ def t_code_NL(tok):
 
     if _newline_terminates(tok):
         tok.type = 'TERM'
-        tok.value = '\n'
         return tok
 
 

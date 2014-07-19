@@ -172,7 +172,7 @@ end'''
         ('VID', 'x'),
         ('EQ', '='),
         ('INTD', '10'),
-        ('TERM', '\n'),
+        ('TERM', '\n\n\n\n'),
         ('VID', 'y'),
         ('PLUS', '+'),
         ('INTD', '5'),
@@ -259,6 +259,34 @@ def test_lex_comments(lex_simple):
         ('DCOMMENT', ' asdf'),
         ('TERM', '\n'),
         ('BCOMMENT', '\n    asdf\n    qwerty\n    '),
+        ('TERM', '\n'),
+    ]
+
+    result = list(lex_simple(given))
+
+    assert result == expected
+
+
+def test_control_with_empty(lex_simple):
+    given = '''module test
+    if x {
+
+        10
+
+
+    }
+    '''
+
+    expected = [
+        ('MODULE', 'module'),
+        ('VID', 'test'),
+        ('TERM', '\n'),
+        ('IF', 'if'),
+        ('VID', 'x'),
+        ('LBRC', '{'),
+        ('INTD', '10'),
+        ('TERM', '\n\n\n'),
+        ('RBRC', '}'),
         ('TERM', '\n'),
     ]
 

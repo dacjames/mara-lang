@@ -245,7 +245,9 @@ def test_parse_wrapped_if(parser):
 def test_parse_simple_control_flow(parser):
     given = maramodule('control_flow', '''
         if 1 < 2 {
+
             10
+
         } else {
             20
         }
