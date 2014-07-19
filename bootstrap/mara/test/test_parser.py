@@ -66,6 +66,7 @@ def test_parse_simple_expr(parser):
 
 def test_parse_function_call(parser):
     given = maramodule('test', '''
+        foo(10)
         foo 10
         10.foo
         x.foo
@@ -87,9 +88,30 @@ def test_parse_function_call(parser):
     )
 
     expected = n.Module('test', [
-        n.Call(func=n.ValueId('foo'), arg=n.Int('10')),
-        n.Call(func=n.ValueId('foo'), arg=n.Int('10')),
-        n.Call(func=n.ValueId('foo'), arg=n.ValueId('x')),
+        n.Call(
+            func=n.ValueId('foo'),
+            arg=n.Tuple([
+                n.Int('10'),
+            ]),
+        ),
+        n.Call(
+            func=n.ValueId('foo'),
+            arg=n.Tuple([
+                n.Int('10'),
+            ]),
+        ),
+        n.Call(
+            func=n.ValueId('foo'),
+            arg=n.Tuple([
+                n.Int('10'),
+            ]),
+        ),
+        n.Call(
+            func=n.ValueId('foo'),
+            arg=n.Tuple([
+                n.ValueId('x')
+            ]),
+        ),
         n.Call(
             func=n.ValueId('foo'),
             arg=n.Tuple(values=[
@@ -105,8 +127,8 @@ def test_parse_function_call(parser):
                 n.Int('5'),
             ])
         ),
-        n.Call(func=n.ValueId('foo'), arg=n.Int('10'), block=block),
-        n.Call(func=n.ValueId('foo'), arg=n.ValueId('x'), block=block),
+        n.Call(func=n.ValueId('foo'), arg=n.Tuple(values=[n.Int('10')]), block=block),
+        n.Call(func=n.ValueId('foo'), arg=n.Tuple(values=[n.ValueId('x')]), block=block),
         n.Call(
             func=n.ValueId('foo'),
             arg=n.Tuple(values=[
@@ -128,8 +150,13 @@ def test_parse_function_call(parser):
 
     result = parser.parse(given)
 
-    assert expected.exprs[:5] == result.exprs[:5]
+    assert expected.exprs[0] == result.exprs[0]
+    assert expected.exprs[1] == result.exprs[1]
+    assert expected.exprs[2] == result.exprs[2]
+    assert expected.exprs[3] == result.exprs[3]
+    assert expected.exprs[4] == result.exprs[4]
     assert expected.exprs[5] == result.exprs[5]
+    assert expected.exprs[6] == result.exprs[6]
     assert expected == result
 
 

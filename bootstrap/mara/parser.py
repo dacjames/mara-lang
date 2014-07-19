@@ -523,7 +523,12 @@ def p_prefix_call(p):
     '''prefix_call : name expr
                    | wrapped expr
     '''
-    p[0] = node.Call(func=p[1], arg=p[2])
+    if isinstance(p[2], node.Tuple):
+        values = p[2].values
+    else:
+        values = [p[2]]
+
+    p[0] = node.Call(func=p[1], arg=node.Tuple(values=values))
 
     return p[0]
 
@@ -531,7 +536,13 @@ def p_prefix_call(p):
 def p_postfix_call(p):
     '''postfix_call : expr DOT name
     '''
-    p[0] = node.Call(func=p[3], arg=p[1])
+
+    if isinstance(p[1], node.Tuple):
+        values = p[1].values
+    else:
+        values = [p[1]]
+
+    p[0] = node.Call(func=p[3], arg=node.Tuple(values=values))
 
     return p[0]
 
@@ -539,15 +550,18 @@ def p_postfix_call(p):
 def p_compound_call(p):
     '''compound_call : postfix_call expr
     '''
-    if isinstance(p[2], node.Tuple):
-        arg = node.Tuple(values=[p[1].arg] + p[2].values)
+    a = p[1]
+    b = p[2]
 
+    if isinstance(p[2], node.Tuple):
+        arg = node.Tuple(values=p[1].arg.values + p[2].values)
     else:
-        arg = node.Tuple(values=[p[1].arg, p[2]])
+        arg = node.Tuple(values=p[1].arg.values + [p[2]])
 
     p[0] = node.Call(func=p[1].func, arg=arg)
 
     return p[0]
+
 
 
 def p_block_call(p):

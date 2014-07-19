@@ -73,6 +73,7 @@ class Compiler(object):
         self.block = []
         self.registry = Registry()
         self.pool = ConstantPool()
+        self.functions = {}
 
         self._result = None
 
@@ -85,7 +86,12 @@ class Compiler(object):
 
     def compile(self, ast):
         ast.walk(self.pool)
-        bytecodes = self.visit(ast)
+        try:
+            bytecodes = self.visit(ast)
+        except Exception:
+            for code in self.block:
+                print code
+            raise
         bytecodes.append(('halt',))
         return bytecodes
 
@@ -120,17 +126,99 @@ class Compiler(object):
 
         return result
 
+    @visit.d(node.Var)
+    def _(self, n):
+        result = self.visit(n.value)
+        n['result'] = result
+
+        return result
+
     @visit.d(node.ValueId)
     def _(self, n):
-        r = self.registry.frame()
-
         identifier = n.value
 
-        declaration = n['namespace'][identifier].unbox()
+        declaration = n['namespace'][identifier]
 
         source = declaration['result']
 
         return source
+
+    @visit.d(node.Param)
+    def _(self, n):
+        r = self.registry.frame()
+        offset = n.index
+
+        self.block += [
+            ('load_p', r(0), offset),
+        ]
+
+        n['result'] = r(0)
+
+        return r(0)
+
+    @visit.d(node.Def)
+    def _(self, n):
+        r = self.registry.frame()
+
+        #  +1 for address load, +1 for hole
+        address = len(self.block) + 2
+
+        # store the address of the function as the result.
+        self.block += [
+            ('load_v', r(0), address),
+            None,  # patch with skip
+        ]
+        skip_label = len(self.block) - 1
+
+        # set attributes
+        n['address'] = address
+        n['result'] = r(0)
+
+        # generate loads for all the function params
+        for param in n.param.values:
+            self.visit(param)
+
+        # generate the function body
+        ret = self.visit(n.body)
+
+        # generate the return of the result
+        self.block += [
+            ('copy', 0, ret),
+            ('ret',),
+        ]
+        end_label = len(self.block)
+
+        # skip past the declaration
+        self.block[skip_label] = ('jump_a', end_label)
+
+        return r(0)
+
+    @visit.d(node.Call)
+    def _(self, n):
+        r = self.registry.frame()
+
+        identifier = n.func.value
+
+        # lookup the function's declaration
+        declaration = n['namespace'][identifier]
+
+        # lookup the address of the function body
+        address = declaration['address']
+
+        # generate evaluations of all the arguments
+        arg_registers = [
+            self.visit(value)
+            for value in n.arg.values
+        ]
+
+        # generate the call
+        self.block += [
+            tuple(['call', address] + arg_registers),
+            ('copy', r(0), 0),
+        ]
+
+        return r(0)
+
 
     @visit.d(node.BinOp)
     def _(self, n):
@@ -248,9 +336,15 @@ class ConstantPool(object):
     def _(self, n):
         self._add(n, lambda n: float(n.value))
 
+    @visit.d(node.Call)
+    def _(self, n):
+        for arg in n.arg.values:
+            self.visit(arg)
+
     def _add(self, n, accessor):
         index = len(self._pool)
         value = accessor(n)
 
         self._pool.append(value)
         n['constant'] = index
+
