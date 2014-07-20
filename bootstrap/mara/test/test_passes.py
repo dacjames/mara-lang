@@ -29,6 +29,11 @@ def resolve_names():
     return passes.ResolveNames()
 
 
+@pytest.fixture
+def type_check():
+    return passes.TypeCheck()
+
+
 def test_join_else(parser, join_else):
     given = maramodule('test', '''
         if x > 0 {}
@@ -165,3 +170,21 @@ def test_collect_bad_names(parser, collect_names):
 
     with pytest.raises(TypeError):
         ast.walk_down(collect_names)
+
+
+def test_type_check_simple(type_check):
+    given = node.Def(
+        name=node.ValueId('foo'),
+        param=node.Tuple([node.Param(node.ValueId('x'))]),
+        body=node.Block([
+            node.Real('3.5'),
+            node.Int('10'),
+        ]),
+    )
+
+    given.walk_up(type_check)
+
+    assert given['type'] == node.FunctionType(
+        param_type=node.Tuple([node.AnyType()]),
+        return_type=node.IntType(),
+    )

@@ -344,3 +344,38 @@ class Def(Node):
     def recurse(self, visitor, walk):
         walk(self.param, visitor)
         walk(self.body, visitor)
+
+
+##############################################################################
+# Types
+##############################################################################
+
+
+class IntType(Node):
+    pass
+
+
+class BooleanType(Node):
+    pass
+
+
+class RealType(Node):
+    pass
+
+
+class UnitType(Node):
+    pass
+
+
+class AnyType(Node):
+    pass
+
+
+class FunctionType(Node):
+    def __init__(self, param_type, return_type):
+        self.param_type = param_type
+        self.return_type = return_type
+
+    def recurse(self, visitor, walk):
+        walk(self.param_type, visitor)
+        walk(self.return_type, visitor)
