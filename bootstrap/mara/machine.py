@@ -57,11 +57,10 @@ class Machine(object):
         A dictionary copy of the registers for the frame.
         '''
         fp = self._frame_ptr
+        frame = self._regs_buffer[fp]
 
-        if self._frame_ptr == 0:
-            frame = self._regs_buffer[fp]
-        else:
-            frame = [self._regs_buffer[0][0]] + self._regs_buffer[fp]
+        if self._frame_ptr != 0:
+            frame[0] = self._regs_buffer[0][0]
 
         return {i: r for i, r in enumerate(frame) if r is not None}
 
@@ -86,10 +85,16 @@ class Machine(object):
         '''
         State of the machine after executing an instruction.
         '''
-        return '{pc}= {{{regs}}} {stack}'.format(
+        stack_view = []
+        for i, elem in enumerate(self._stack):
+            fp = 'fp:' if i == self._frame_ptr else ''
+            sp = 'sp:' if i == self._stack_ptr else ''
+            stack_view.append(fp + sp + str(elem))
+
+        return '{pc}= {{{regs}}} [{stack}]'.format(
             pc=self._pc,
             regs=', '.join('r{0}:{1}'.format(r, v) for r, v in self._regs.items()),
-            stack=list(reversed(self._stack)),
+            stack=', '.join(stack_view),
         )
 
     def _loop(self):
@@ -129,7 +134,6 @@ class Machine(object):
         '''
         Set the value in a register for the current frame.
         '''
-
         # r0 is sharded by all frames
         if reg == 0:
             fp = 0
@@ -463,22 +467,22 @@ class Machine(object):
         '''
         Call a function at absolute address func with a variable number of params.
         '''
-        # push arguments
-        for param in params:
-            self._push(self._get(param))
-
-        # store the number of params
-        # this is a stopgap until we have function type information
-        self._push(len(params))
-
         # save the return address
         self._push(self._pc)
 
         # save the frame pointer
         self._push(self._frame_ptr)
 
+        # remember new frame_ptr, but don't set it yet to ensure
+        # that params are loaded from the correct register frame.
+        new_frame_ptr = self._stack_ptr
+
+        # push the arguments
+        for param in params:
+            self._push(self._get(param))
+
         # set the new frame pointer
-        self._frame_ptr = self._stack_ptr
+        self._frame_ptr = new_frame_ptr
 
         # jump to the function
         self._pc = func
@@ -496,11 +500,8 @@ class Machine(object):
         # get the return address
         ret_addr = self._stack_buffer[self._frame_ptr - 1]
 
-        # number of parameters
-        param_offset = self._stack_buffer[self._frame_ptr - fixed_offset]
-
-        # resest the stack_ptr, -1 for the param count
-        self._stack_ptr = self._frame_ptr - fixed_offset - 1 - param_offset
+        # reset the stack_ptr
+        self._stack_ptr = self._frame_ptr - fixed_offset
 
         # restore the old frame_ptr
         self._frame_ptr = self._stack_buffer[self._frame_ptr]
@@ -580,14 +581,14 @@ class Machine(object):
         '''
         Load a function parameter in a register.
         '''
-        # saved frame_ptr, return address, num_params
-        fixed_offset = 3
+        # index start at zero, but frame_ptr points to saved frame_ptr
+        offset = index + 1
 
-        # compute the negative offset
-        offset = fixed_offset + index
+        # get the value
+        value = self._stack_buffer[self._frame_ptr + offset]
 
         # load the value into a register
-        self._set(dst, self._stack_buffer[self._frame_ptr - offset])
+        self._set(dst, value)
 
     def load_d(self, dst, ptr):
         '''
