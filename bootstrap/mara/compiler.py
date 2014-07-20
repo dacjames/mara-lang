@@ -114,8 +114,12 @@ class Compiler(object):
     def _(self, n):
         r = self.registry.frame()
 
+        # self.block += [
+        #     ('load_c', r(0), n['constant']),
+        # ]
+
         self.block += [
-            ('load_c', r(0), n['constant']),
+            ('load_v', r(0), int(n.value)),
         ]
 
         return r(0)
@@ -226,10 +230,6 @@ class Compiler(object):
         # track what registers we use in the function,
         # +1 because register numbers start at 1 (0 is special)
         reg_begin_index = self.registry.counter + 1
-
-        # generate loads for all the function params
-        for param in n.param.values:
-            self.visit(param)
 
         # generate the function body
         ret = self.visit(n.body)

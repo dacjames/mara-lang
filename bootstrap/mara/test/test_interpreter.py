@@ -175,3 +175,22 @@ def test_fib(interpreter):
     result = interpreter.evaluate(given)
 
     assert result == 5
+
+
+@pytest.mark.xfail
+def test_benchmark(interpreter):
+    given = maramodule('test', '''
+        def slow_double (x, y) {
+            if x == 0 {
+                y
+            } else {
+                slow_double(x - 1, y + 2)
+            }
+        }
+
+        slow_double(100, 0)
+    ''')
+
+    result = interpreter.evaluate(given)
+
+    assert result == 200
