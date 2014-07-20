@@ -140,6 +140,15 @@ class Machine(object):
         '''
         return self._regs_buffer[reg]
 
+    def _get_nullable(self, reg):
+        '''
+        Get the value in a register, if it exists, else return None.
+        '''
+        if reg < len(self._regs_buffer):
+            return self._regs_buffer[reg]
+        else:
+            return None
+
     def _allocate(self, size):
         '''
         Allocate a new object in the heap.
@@ -230,8 +239,8 @@ class Machine(object):
         that contains a valid value.
         '''
 
-        left_value = self._get(left)
-        right_value = self._get(right)
+        left_value = self._get_nullable(left)
+        right_value = self._get_nullable(right)
 
         if left_value is not None and right_value is None:
             self._set(result, left_value)

@@ -12,17 +12,10 @@ class CollectLocals(object):
 
     def __init__(self):
         self.definition = None
-        self.module = None
 
     @multimethod(_store)
     def visit(self, n):
         pass
-
-    @visit.d(node.Module)
-    def _(self, n):
-        self.module = n
-
-        n['locals'] = {}
 
     @visit.d(node.Def)
     def _(self, n):
@@ -48,10 +41,8 @@ class CollectLocals(object):
         namespace = n['namespace']
         qualified = namespace.qualify(ident)
 
-        if self.definition is not None:
-            locals_ = self.definition['locals']
-        else:
-            locals_ = self.module['locals']
+        locals_ = self.definition['locals']
 
         n['index'] = len(locals_)
+
         locals_[qualified] = n

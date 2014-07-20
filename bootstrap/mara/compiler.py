@@ -260,7 +260,6 @@ class Compiler(object):
 
         return self.result(r(0))
 
-
     @visit.d(node.BinOp)
     def _(self, n):
 
@@ -333,12 +332,6 @@ class Compiler(object):
     @visit.d(node.Module)
     def _(self, n):
         exprs = n.exprs
-
-        local_variables = n['locals']
-
-        self.block += [
-            ('reserve', len(local_variables))
-        ]
 
         for expr in exprs:
             self.visit(expr)
