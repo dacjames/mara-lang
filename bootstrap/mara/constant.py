@@ -27,11 +27,6 @@ class ConstantPool(object):
     def _(self, n):
         self._add(n, lambda n: float(n.value))
 
-    @visit.d(node.Call)
-    def _(self, n):
-        for arg in n.arg.values:
-            self.visit(arg)
-
     def _add(self, n, accessor):
         index = len(self._pool)
         value = accessor(n)

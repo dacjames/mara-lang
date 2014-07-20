@@ -67,6 +67,10 @@ class _Collection(Node):
             values = []
         self.values = values
 
+    def recurse(self, visitor):
+        for value in self.values:
+            value.walk(visitor)
+
 
 class Tuple(_Collection):
     pass

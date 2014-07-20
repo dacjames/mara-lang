@@ -154,3 +154,25 @@ def test_variable_assignment(interpreter):
     result = interpreter.evaluate(given)
 
     assert result == 3
+
+
+def test_fib(interpreter):
+    given = maramodule('test', '''
+        def fib (x) {
+            1 if x == 0
+            else {
+                1 if x == 1
+                else {
+                    val a = fib(x - 2)
+                    val b = fib(x - 1)
+                    a + b
+                }
+            }
+        }
+
+        fib(4)
+    ''')
+
+    result = interpreter.evaluate(given)
+
+    assert result == 5

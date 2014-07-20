@@ -47,6 +47,8 @@ class Machine(object):
         self._free_ptr = 0
         self._end_ptr = 7
 
+        self._phi_trace_stack = [set()]
+
         self._pool = None  # Constant Pool
 
         self._print_buffer = []
@@ -126,7 +128,7 @@ class Machine(object):
         # iterations = 0
 
         while self._pc < end:
-            # if iterations > 100:
+            # if iterations > 1000:
             #     print('max iterations')
             #     break
 
@@ -156,6 +158,7 @@ class Machine(object):
         if reg >= len(self._regs_buffer):
             self._regs_buffer += [None] * max(len(self._regs_buffer), reg)
 
+        self._phi_trace(reg)
         self._regs_buffer[reg] = value
 
     def _get(self, reg):
@@ -172,6 +175,28 @@ class Machine(object):
             return self._regs_buffer[reg]
         else:
             return None
+
+    def _phi_start(self):
+        self._phi_trace_stack.append(set())
+
+    def _phi_end(self):
+        self._phi_trace_stack.pop()
+
+    def _phi_trace(self, reg):
+        seen = self._phi_trace_stack[-1]
+        seen.add(reg)
+
+    def _phi_get(self, left, right):
+        seen = self._phi_trace_stack[-1]
+
+        if left in seen and right not in seen:
+            return self._get(left)
+
+        if right in seen and left not in seen:
+            return self._get(right)
+
+        else:
+            raise TypeError(left, right)
 
     def _allocate(self, size):
         '''
@@ -259,22 +284,8 @@ class Machine(object):
     def phi(self, result, left, right):
         '''
         Return the value set by the path taken through the code.
-        In the current iteration of the machine, this means the register
-        that contains a valid value.
         '''
-
-        left_value = self._get_nullable(left)
-        right_value = self._get_nullable(right)
-
-        if left_value is not None and right_value is None:
-            self._set(result, left_value)
-            return
-
-        if left_value is None and right_value is not None:
-            self._set(result, right_value)
-            return
-
-        raise TypeError()
+        self._set(result, self._phi_get(left, right))
 
     ##########################################################################
     # Printing
@@ -492,6 +503,9 @@ class Machine(object):
         # jump to the function
         self._pc = func
 
+        # start phi trace
+        self._phi_start()
+
         # cancel out loop increment
         self._pc -= 1
 
@@ -513,6 +527,9 @@ class Machine(object):
 
         # jump to the return address
         self._pc = ret_addr
+
+        # end the phi trace
+        self._phi_end()
 
     ##########################################################################
     # Stack Manipulation

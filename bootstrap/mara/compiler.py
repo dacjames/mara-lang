@@ -61,10 +61,16 @@ class Compiler(object):
 
     _store = method_store()
     _builtins = {
-        '+': 'add_rr',
-        '-': 'sub_rr',
-        '*': 'mul_rr',
-        '/': 'div_rr',
+        '+': 'add',
+        '-': 'sub',
+        '*': 'mul',
+        '/': 'div',
+        '<': 'lt',
+        '<=': 'lte',
+        '>': 'gt',
+        '>=': 'gte',
+        '==': 'eq',
+        '!=': 'neq',
     }
 
     def __init__(self):
@@ -269,12 +275,15 @@ class Compiler(object):
         left_expr = n.args[0]
         right_expr = n.args[1]
 
+        print 'binop', n
+
         op = self._builtins.get(func, None)
 
         if op is None:
             raise CompileError('BinOp {func} is not supported.', func=func)
 
         left = self.visit(left_expr)
+
         right = self.visit(right_expr)
 
         self.block += [
