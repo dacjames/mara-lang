@@ -130,13 +130,22 @@ def p_literal(p):
 
 
 def p_tuple(p):
-    '''tuple : LPAR RPAR
-             | LPAR expr_list_comma RPAR
+    '''tuple : full_tuple
+             | empty_tuple
     '''
-    if len(p) == 3:
-        p[0] = node.Tuple([])
-    else:
-        p[0] = node.Tuple(p[2])
+    p[0] = p[1]
+
+
+def p_empty_tuple(p):
+    '''empty_tuple : LPAR RPAR
+    '''
+    p[0] = node.Tuple([])
+
+
+def p_full_tuple(p):
+    '''full_tuple : LPAR expr_list_comma RPAR
+    '''
+    p[0] = node.Tuple(p[2])
 
 
 def p_list(p):
@@ -450,13 +459,16 @@ def p_def_name(p):
 
 
 def p_def_param(p):
-    '''def_param : LPAR param_list RPAR
+    '''def_param : empty_tuple
+                 | full_param
     '''
-    param_list = p[2]
-    for i, param in enumerate(param_list):
-        param.index = i
+    p[0] = p[1]
 
-    p[0] = node.Tuple(values=param_list)
+
+def p_full_param(p):
+    '''full_param : LPAR param_list RPAR
+    '''
+    p[0] = node.Tuple(values=p[2])
 
 
 def p_param_list(p):

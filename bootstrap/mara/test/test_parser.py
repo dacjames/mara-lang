@@ -451,6 +451,7 @@ def test_declarations(parser):
 
 def test_definitions(parser):
     given = maramodule('test', '''
+        def foo() {}
         def foo(x Int) { 3 + 5 }
         def foo(
             x,
@@ -467,8 +468,13 @@ def test_definitions(parser):
         exprs=[
             n.Def(
                 name=n.ValueId('foo'),
+                param=n.Tuple([]),
+                body=n.Block([]),
+            ),
+            n.Def(
+                name=n.ValueId('foo'),
                 param=n.Tuple(values=[
-                    n.Param(name=n.ValueId('x'), index=0, type_=n.TypeId('Int'))
+                    n.Param(name=n.ValueId('x'), type_=n.TypeId('Int'))
                 ]),
                 body=n.Block(exprs=[
                     n.BinOp(func=n.SymbolId('+'), args=[

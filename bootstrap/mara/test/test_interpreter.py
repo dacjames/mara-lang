@@ -143,12 +143,12 @@ def test_nested_if_inside_function(interpreter):
 
 def test_variable_assignment(interpreter):
     given = maramodule('test', '''
-        def foo(x) {
+        def foo() {
             var z = 4
             z = 3
         }
 
-        foo(1)
+        foo()
     ''')
 
     result = interpreter.evaluate(given)
