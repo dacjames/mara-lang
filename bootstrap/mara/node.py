@@ -322,7 +322,7 @@ class Param(Node):
         self.name = name
 
         if type_ is None:
-            self.type_ = Unit()
+            self.type_ = InferType()
         else:
             self.type_ = type_
 
@@ -339,7 +339,7 @@ class Def(Node):
         if return_type is not None:
             self.return_type = return_type
         else:
-            self.return_type = Unit()
+            self.return_type = InferType()
 
     def recurse(self, visitor, walk):
         walk(self.param, visitor)
@@ -351,11 +351,15 @@ class Def(Node):
 ##############################################################################
 
 
+class InferType(Node):
+    pass
+
+
 class IntType(Node):
     pass
 
 
-class BooleanType(Node):
+class BoolType(Node):
     pass
 
 

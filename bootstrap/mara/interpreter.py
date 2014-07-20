@@ -23,13 +23,16 @@ class Interpreter(object):
         self.isbuffered = buffered
         self.istraced = traced
 
-    def evaluate(self, module):
+    def evaluate(self, module, type_check=False):
         ast = self.parser.parse(module)
 
         ast.walk_down(passes.JoinElse())
         ast.walk_down(passes.ModuleFunction(), short_circuit=True)
         ast.walk_down(passes.CollectNames())
         ast.walk_down(passes.CollectLocals())
+
+        if type_check:
+            ast.walk_up(passes.TypeCheck())
 
         pool = constant.ConstantPool()
         ast.walk_down(pool)

@@ -180,6 +180,7 @@ def test_type_check_simple(type_check):
             node.Real('3.5'),
             node.Int('10'),
         ]),
+        return_type=node.TypeId('Int'),
     )
 
     given.walk_up(type_check)
@@ -188,3 +189,36 @@ def test_type_check_simple(type_check):
         param_type=node.Tuple([node.AnyType()]),
         return_type=node.IntType(),
     )
+
+
+def test_type_check_infer(type_check):
+    given = node.Def(
+        name=node.ValueId('foo'),
+        param=node.Tuple([node.Param(node.ValueId('x'))]),
+        body=node.Block([
+            node.Real('3.5'),
+            node.Int('10'),
+        ]),
+    )
+
+    given.walk_up(type_check)
+
+    assert given['type'] == node.FunctionType(
+        param_type=node.Tuple([node.AnyType()]),
+        return_type=node.IntType(),
+    )
+
+
+def test_type_check_return_fail(type_check):
+    given = node.Def(
+        name=node.ValueId('foo'),
+        param=node.Tuple([node.Param(node.ValueId('x'))]),
+        body=node.Block([
+            node.Real('3.5'),
+            node.Int('10'),
+        ]),
+        return_type=node.TypeId('Real'),
+    )
+
+    with pytest.raises(TypeError):
+        given.walk_up(type_check)

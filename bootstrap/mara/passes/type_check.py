@@ -9,6 +9,13 @@ from .. import node
 class TypeCheck(object):
     _store = method_store()
 
+    def __init__(self):
+        self._builtin_types = {
+            'Int': node.IntType(),
+            'Real': node.RealType(),
+            'Bool': node.BoolType(),
+        }
+
     @multimethod(_store)
     def visit(self, n):
         pass
@@ -38,7 +45,7 @@ class TypeCheck(object):
 
     @visit.d(node.Param)
     def _(self, n):
-        if n.type_ == node.Unit():
+        if n.type_ == node.InferType():
             n['type'] = node.AnyType()
         else:
             raise NotImplementedError(n)
@@ -50,9 +57,33 @@ class TypeCheck(object):
     @visit.d(node.Def)
     def _(self, n):
         param_type = n.param['type']
-        return_type = n.body['type']
+        body_type = n.body['type']
+
+        return_type = self.resolve_type(n.return_type)
+
+        if return_type == node.InferType():
+            return_type = body_type
+
+        elif body_type != return_type:
+            raise TypeError('Type Mismatch: {0} != {1}'.format(body_type, return_type))
 
         n['type'] = node.FunctionType(
             param_type=param_type,
             return_type=return_type,
         )
+
+    @multimethod(_store)
+    def resolve_type(self, n):
+        raise TypeError(n)
+
+    @resolve_type.d(node.InferType)
+    def _(self, n):
+        return n
+
+    @resolve_type.d(node.TypeId)
+    def _(self, n):
+        name = n.value
+        if name in self._builtin_types:
+            return self._builtin_types[name]
+        else:
+            raise TypeError(name)
