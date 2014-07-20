@@ -2,8 +2,32 @@
 # pylint: disable=R0904
 # pylint: disable=R0902
 
+import functools
+
 from collections import defaultdict
 import special
+
+
+def builtin_comparison(pred):
+
+    @functools.wraps(pred)
+    def func(self, left, right):
+        return 1 if pred(self, left, right) else 0
+
+    return builtin_binop(func)
+
+
+def builtin_binop(func):
+
+    @functools.wraps(func)
+    def inner(self, dst, left, right):
+        lhs = self._get(left)
+        rhs = self._get(right)
+
+        value = func(self, lhs, rhs)
+        self._set(dst, value)
+
+    return inner
 
 
 class Machine(object):
@@ -292,72 +316,56 @@ class Machine(object):
         self._print('r{i}:{a}=>{v}'.format(i=reg, a=address, v=repr(string)))
 
     ##########################################################################
+    # Comparisons
+    ##########################################################################
+
+    @builtin_comparison
+    def lt(self, left, right):
+        return left < right
+
+    @builtin_comparison
+    def lte(self, left, right):
+        return left <= right
+
+    @builtin_comparison
+    def gt(self, left, right):
+        return left > right
+
+    @builtin_comparison
+    def gte(self, left, right):
+        return left >= right
+
+    @builtin_comparison
+    def eq(self, left, right):
+        return left == right
+
+    @builtin_comparison
+    def neq(self, left, right):
+        return left != right
+
+    ##########################################################################
     # Math
     ##########################################################################
 
-    def add_rc(self, dst, left, right):
-        '''
-        Add the value in reg left to the constant right and store the result in dst.
-        '''
-        self._set(dst, self._get(left) + right)
+    @builtin_binop
+    def add(self, left, right):
+        return left + right
 
-    def add_rr(self, dst, left, right):
-        '''
-        Add the value in reg left to the value in reg right and store the result in dst.
-        '''
-        self._set(dst, self._get(left) + self._get(right))
+    @builtin_binop
+    def sub(self, left, right):
+        return left - right
 
-    def sub_rc(self, dst, left, right):
-        '''
-        Subtract the constant right from the value in reg left and store the result in dst.
-        '''
-        self._set(dst, self._get(left) - right)
+    @builtin_binop
+    def mul(self, left, right):
+        return left * right
 
-    def sub_rr(self, dst, left, right):
-        '''
-        Subtract the the value in reg right from the value in reg left and store the result in dst.
-        '''
-        self._set(dst, self._get(left) - self._get(right))
+    @builtin_binop
+    def div(self, left, right):
+        return left // right
 
-    def mul_rc(self, dst, left, right):
-        '''
-        Multiply the the value in reg left by the constant right and store the result in dst.
-        '''
-        self._set(dst, self._get(left) * right)
-
-    def mul_rr(self, dst, left, right):
-        '''
-        Multiply the the value in reg left by the value in reg right and store the result in dst.
-        '''
-        self._set(dst, self._get(left) * self._get(right))
-
-    def div_rc(self, dst, left, right):
-        '''
-        Divide the the value in reg left by the constant left and store the result in dst.
-        Truncates to an integer result.
-        '''
-        self._set(dst, self._get(left) // right)
-
-    def div_rr(self, dst, left, right):
-        '''
-        Divide the the value in reg left from the value in reg right and store the result in dst.
-        Truncates to an integer result.
-        '''
-        self._set(dst, self._get(left) // self._get(right))
-
-    def rem_rc(self, dst, left, right):
-        '''
-        Compute the remainder of the the value in reg left divided bv the constant left
-        and store the result in dst.
-        '''
-        self._set(dst, self._get(left) % right)
-
-    def rem_rr(self, dst, left, right):
-        '''
-        Compute the remainder of value in reg left divided by the value in reg right
-        and store the result in dst.
-        '''
-        self._set(dst, self._get(left) % self._get(right))
+    @builtin_binop
+    def rem(self, left, right):
+        return left % right
 
     ##########################################################################
     # Jumping
@@ -644,3 +652,6 @@ class Machine(object):
     def on_error(self, *args):
         print('error: ' + repr(args))
         return special.HALT
+
+
+

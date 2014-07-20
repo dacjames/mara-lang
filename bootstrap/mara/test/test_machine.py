@@ -24,14 +24,17 @@ def test_simple_machine(machine):
         ['print_const', 1],
         ['load_v', r(0), 1],
         ['print_reg', r(0)],
-        ['add_rc', r(0), r(0), 1],
-        ['add_rr', r(1), r(0), r(0)],
+        ['load_v', r(42), 1],
+        ['add', r(0), r(0), r(42)],
+        ['add', r(1), r(0), r(0)],
         ['print_reg', r(0)],
         ['print_reg', r(1)],
         ['new_sym', r(2), 'hello, world'],
         ['print_sym', r(2)],
-        ['add_rc', r(1), r(1), 10],
-        ['add_rc', r(1), r(1), -10],
+        ['load_v', r(42), 10],
+        ['add', r(1), r(1), r(42)],
+        ['load_v', r(42), -10],
+        ['add', r(1), r(1), r(42)],
         ['print_reg', r(1)],
         ['load_v', r(3), 0],
         ['branch_gte', r(1), r(3), -3],
@@ -130,11 +133,14 @@ def test_stack_manipulation(machine):
         ['print_reg', r(0)],
         ['peak', r(0)],
         ['print_reg', r(0)],
-        ['add_rc', r(0), r(0), 1],
+        ['load_v', r(42), 1],
+        ['add', r(0), r(0), r(42)],
         ['push', r(0)],
-        ['add_rc', r(0), r(0), 1],
+        ['load_v', r(42), 1],
+        ['add', r(0), r(0), r(42)],
         ['push', r(0)],
-        ['add_rc', r(0), r(0), 1],
+        ['load_v', r(42), 1],
+        ['add', r(0), r(0), r(42)],
         ['push', r(0)],
         ['pop', r(0)],
         ['peak', r(1)],
@@ -161,29 +167,35 @@ def test_int_math(machine):
         ['load_v', r(0), 10],
         ['load_v', r(1), 20],
         ['load_v', r(2), 33],
-        ['add_rc', r(4), r(0), 2],
+        ['load_v', r(42), 2],
+        ['add', r(4), r(0), r(42)],
         ['print_reg', r(4)],
-        ['add_rr', r(4), r(0), r(1)],
+        ['add', r(4), r(0), r(1)],
         ['print_reg', r(4)],
-        ['sub_rc', r(4), r(0), 20],
+        ['load_v', r(42), 20],
+        ['sub', r(4), r(0), r(42)],
         ['print_reg', r(4)],
-        ['sub_rr', r(4), r(2), r(1)],
+        ['sub', r(4), r(2), r(1)],
         ['print_reg', r(4)],
-        ['mul_rc', r(4), r(0), 2],
+        ['load_v', r(42), 2],
+        ['mul', r(4), r(0), r(42)],
         ['print_reg', r(4)],
-        ['mul_rr', r(4), r(0), r(2)],
+        ['mul', r(4), r(0), r(2)],
         ['print_reg', r(4)],
-        ['div_rc', r(4), r(0), 2],
+        ['load_v', r(42), 2],
+        ['div', r(4), r(0), r(42)],
         ['print_reg', r(4)],
-        ['div_rc', r(4), r(0), 20],
+        ['load_v', r(42), 20],
+        ['div', r(4), r(0), r(42)],
         ['print_reg', r(4)],
-        ['div_rr', r(4), r(2), r(0)],
+        ['div', r(4), r(2), r(0)],
         ['print_reg', r(4)],
-        ['div_rr', r(4), r(1), r(0)],
+        ['div', r(4), r(1), r(0)],
         ['print_reg', r(4)],
-        ['rem_rc', r(4), r(0), 3],
+        ['load_v', r(42), 3],
+        ['rem', r(4), r(0), r(42)],
         ['print_reg', r(4)],
-        ['rem_rr', r(4), r(2), r(0)],
+        ['rem', r(4), r(2), r(0)],
         ['print_reg', r(4)],
         ['halt'],
     ])
@@ -205,6 +217,64 @@ def test_int_math(machine):
         'r4:3',
     ]
 
+def test_comparisons(machine):
+
+    machine._load([
+        ['load_v', r(0), 0],
+        ['load_v', r(1), 1],
+        ['lt', r(3), r(0), r(1)],
+        ['lt', r(13), r(1), r(1)],
+        ['lt', r(23), r(1), r(0)],
+        ['lte', r(4), r(0), r(1)],
+        ['lte', r(14), r(1), r(1)],
+        ['lte', r(24), r(1), r(0)],
+        ['gt', r(5), r(0), r(1)],
+        ['gt', r(15), r(1), r(1)],
+        ['gt', r(25), r(1), r(0)],
+        ['gte', r(6), r(0), r(1)],
+        ['gte', r(16), r(1), r(1)],
+        ['gte', r(26), r(1), r(0)],
+        ['eq', r(7), r(0), r(1)],
+        ['eq', r(17), r(1), r(1)],
+        ['eq', r(27), r(1), r(0)],
+        ['neq', r(8), r(0), r(1)],
+        ['neq', r(18), r(1), r(1)],
+        ['neq', r(28), r(1), r(0)],
+        ['print_reg', r(3)],
+        ['print_reg', r(13)],
+        ['print_reg', r(23)],
+        ['print_reg', r(4)],
+        ['print_reg', r(14)],
+        ['print_reg', r(24)],
+        ['print_reg', r(5)],
+        ['print_reg', r(15)],
+        ['print_reg', r(25)],
+        ['print_reg', r(6)],
+        ['print_reg', r(16)],
+        ['print_reg', r(26)],
+        ['print_reg', r(7)],
+        ['print_reg', r(17)],
+        ['print_reg', r(27)],
+        ['print_reg', r(8)],
+        ['print_reg', r(18)],
+        ['print_reg', r(28)],
+
+        ['halt'],
+    ])
+
+    machine._loop()
+
+    assert machine._print_buffer == [
+        'r3:1', 'r13:0', 'r23:0',
+        'r4:1', 'r14:1', 'r24:0',
+        'r5:0', 'r15:0', 'r25:1',
+        'r6:0', 'r16:1', 'r26:1',
+        'r7:0', 'r17:1', 'r27:0',
+        'r8:1', 'r18:0', 'r28:1',
+    ]
+
+
+
 
 def test_function_calls(machine):
     machine._load([
@@ -218,7 +288,7 @@ def test_function_calls(machine):
         # g(x, y) { x + y }
         ['load_p', r(11), 0],               # r11 = load x
         ['load_p', r(12), 1],               # r12 = load y
-        ['add_rr', r(0), r(11), r(12)],     # r0 = x + y
+        ['add', r(0), r(11), r(12)],     # r0 = x + y
         ['ret'],
         # f(x) { a = g(x, 10); g(a, a) }
         ['load_p', r(21), 0],               # r1 = load x
@@ -240,9 +310,12 @@ def test_function_calls(machine):
 def test_heap(machine):
     machine._load([
         ['new_chunk', r(0), 8],
-        ['add_rc', r(1), r(0), 1],
-        ['add_rc', r(2), r(0), 2],
-        ['add_rc', r(3), r(0), 3],
+        ['load_v', r(42), 1],
+        ['add', r(1), r(0), r(42)],
+        ['load_v', r(42), 2],
+        ['add', r(2), r(0), r(42)],
+        ['load_v', r(42), 3],
+        ['add', r(3), r(0), r(42)],
         ['store_c', r(0), 4],
         ['store_c', r(1), 5],
 
