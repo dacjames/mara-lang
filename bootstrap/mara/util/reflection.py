@@ -31,6 +31,12 @@ def _derived__eq__(self, other):
     return self.__class__ == other.__class__
 
 
+def _derived__ne__(self, other):
+    '''Universal not equal method implimented as not(self == other).
+    '''
+    return not(self == other)
+
+
 def _derived__repr__(self):
     '''Universal repr method
 
@@ -134,7 +140,7 @@ _derivable_names = {
 
 _derivable_mapping = {
     'show': ['__repr__', '__str__'],
-    'eq': ['__eq__'],
+    'eq': ['__eq__', '__ne__'],
     'members_dict': ['__dicteq__', '__dictrepr__', '__dictstr__'],
 }
 
