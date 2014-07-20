@@ -122,13 +122,13 @@ def test_collect_names(parser, collect_names):
             name=node.ValueId('x'),
             value=node.Int('10'),
         ),
-        'y': node.Val(
+        'y': node.Var(
             name=node.ValueId('y'),
             value=node.Unit(),
         ),
         'foo': node.Def(
             name=node.ValueId('foo'),
-            param=node.Tuple([node.Param(node.ValueId('x'), 0)]),
+            param=node.Tuple([node.Param(node.ValueId('x'))]),
             body=node.Block([]),
         ),
     }

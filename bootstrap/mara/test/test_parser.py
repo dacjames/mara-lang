@@ -169,7 +169,7 @@ def test_exprs_parse_assignment(parser):
     given = 'module assignment; val a Real = 1.0 end'
 
     expected = n.Module('assignment', [
-        n.Assign(name=n.ValueId('a'), value=n.Int('1.0'), type_=n.TypeId('Real'))
+        n.Val(name=n.ValueId('a'), value=n.Real('1.0'), type_=n.TypeId('Real'))
     ])
 
     result = parser.parse(given)
@@ -347,7 +347,7 @@ def test_parse_postfix_while(parser):
                             func=n.SymbolId('*'),
                             args=[
                                 n.ValueId('x'),
-                                n.Real(value='2')
+                                n.Int(value='2')
                             ]
                         ),
                     ]

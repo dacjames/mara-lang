@@ -28,7 +28,7 @@ def _derived__eq__(self, other):
 
         if not equal:
             return False
-    return True
+    return self.__class__ == other.__class__
 
 
 def _derived__repr__(self):
