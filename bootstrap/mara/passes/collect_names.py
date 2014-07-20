@@ -20,7 +20,9 @@ class CollectNames(object):
 
     @visit.d(node.Block)
     def _(self, n):
-        self.namespace = self.namespace.child(n.unique_name)
+        if 'def_context' not in n:
+            self.namespace = self.namespace.child(n.unique_name)
+
         n['namespace'] = self.namespace
 
     @visit.d(node.Module)
@@ -47,7 +49,11 @@ class CollectNames(object):
         ident = n.name.value
 
         self.namespace.declare(ident, n)
+
+        n.body['def_context'] = n
+
         n['namespace'] = self.namespace
+        self.namespace = self.namespace.child(n.unique_name)
 
     @visit.d(node.Param)
     def _(self, n):

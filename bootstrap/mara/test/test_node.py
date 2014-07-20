@@ -134,7 +134,7 @@ def test_walk_down(spy):
         node.Int('10'),
         node.Val(
             name=node.ValueId('x'),
-            value=node.Block(params=[], exprs=[
+            value=node.Block(exprs=[
                 node.ValueId('x'),
                 node.TypeId('T'),
             ])
@@ -182,7 +182,7 @@ def test_walk_up(spy):
         node.Int('10'),
         node.Val(
             name=node.ValueId('x'),
-            value=node.Block(params=[], exprs=[
+            value=node.Block(exprs=[
                 node.ValueId('x'),
                 node.TypeId('T'),
             ])

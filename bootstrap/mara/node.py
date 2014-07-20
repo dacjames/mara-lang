@@ -39,6 +39,9 @@ class Node(deriving('eq', 'show')):
     def recurse(self, visitor, walk):
         pass
 
+    def __contains__(self, key):
+        return self._attrs.__contains__(key)
+
     def __getitem__(self, key):
         return self._attrs.__getitem__(key)
 
@@ -124,20 +127,12 @@ class Unit(Node):
 
 class Block(Node):
 
-    def __init__(self, exprs, params=None):
+    def __init__(self, exprs):
         Node.__init__(self)
 
         self.exprs = exprs
 
-        if params is None:
-            self.params = []
-        else:
-            self.params = params
-
     def recurse(self, visitor, walk):
-        for param in self.params:
-            walk(param, visitor)
-
         for expr in self.exprs:
             walk(expr, visitor)
 
@@ -337,8 +332,6 @@ class Def(Node):
     def __init__(self, name, param, body, return_type=None):
         Node.__init__(self)
 
-        body.params = param.values
-
         self.name = name
         self.param = param
         self.body = body
@@ -349,4 +342,5 @@ class Def(Node):
             self.return_type = Unit()
 
     def recurse(self, visitor, walk):
+        walk(self.param, visitor)
         walk(self.body, visitor)

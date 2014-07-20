@@ -75,7 +75,6 @@ def test_parse_function_call(parser):
     ''')
 
     block = n.Block(
-        params=[],
         exprs=[n.BinOp(
             func=n.SymbolId('+'),
             args=[n.Int('2'), n.Int('4')],
@@ -219,7 +218,6 @@ def test_parse_wrapped_if(parser):
                     ]
                 ),
                 if_body=n.Block(
-                    params=[],
                     exprs=[
                         n.BinOp(
                             func=n.SymbolId('*'),
@@ -260,13 +258,11 @@ def test_parse_simple_control_flow(parser):
                     ]
                 ),
                 if_body=n.Block(
-                    params=[],
                     exprs=[
                         n.Int('10')
                     ]
                 ),
                 else_body=n.Block(
-                    params=[],
                     exprs=[
                         n.Int('20')
                     ]
@@ -303,7 +299,6 @@ def test_parse_else(parser):
                     ]
                 ),
                 if_body=n.Block(
-                    params=[],
                     exprs=[
                         n.BinOp(
                             func=n.SymbolId('*'),
@@ -317,7 +312,7 @@ def test_parse_else(parser):
             ),
             n.Else(
                 expr=None,
-                body=n.Block(params=[], exprs=[
+                body=n.Block(exprs=[
                     n.Real('10.0')
                 ])
             ),
@@ -347,7 +342,6 @@ def test_parse_postfix_while(parser):
                     ]
                 ),
                 body=n.Block(
-                    params=[],
                     exprs=[
                         n.BinOp(
                             func=n.SymbolId('*'),
@@ -386,7 +380,6 @@ def test_exprs_and_blocks(parser):
             n.Assign(
                 name=n.ValueId('block'),
                 value=n.Block(
-                    params=[],
                     exprs=[
                         n.Assign(name=n.ValueId('x'), value=n.Int('10'), type_=None),
                         n.Assign(name=n.ValueId('y'), value=n.ValueId('x'), type_=None),
@@ -411,7 +404,6 @@ def test_exprs_and_blocks(parser):
             n.Assign(
                 name=n.ValueId('empty'),
                 value=n.Block(
-                    params=[],
                     exprs=[],
                 ),
             ),

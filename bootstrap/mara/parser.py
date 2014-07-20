@@ -289,10 +289,10 @@ def p_block(p):
     '''
 
     if len(p) == 4:
-        p[0] = node.Block(exprs=p[2], params=[])
+        p[0] = node.Block(exprs=p[2])
 
     elif len(p) == 3:
-        p[0] = node.Block(exprs=[], params=[])
+        p[0] = node.Block(exprs=[])
 
     else:
         raise Exception(len(p))
