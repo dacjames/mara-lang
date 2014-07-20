@@ -26,15 +26,13 @@ class Interpreter(object):
     def evaluate(self, module):
         ast = self.parser.parse(module)
 
-        print ast
-
-        ast.walk(passes.JoinElse())
-        ast.walk_subtree(passes.ModuleFunction())
-        ast.walk(passes.CollectNames())
-        ast.walk(passes.CollectLocals())
+        ast.walk_down(passes.JoinElse())
+        ast.walk_down(passes.ModuleFunction(), short_circuit=True)
+        ast.walk_down(passes.CollectNames())
+        ast.walk_down(passes.CollectLocals())
 
         pool = constant.ConstantPool()
-        ast.walk(pool)
+        ast.walk_down(pool)
 
         bytecode = self.compiler.compile(ast, pool)
         result = self.compiler.result()

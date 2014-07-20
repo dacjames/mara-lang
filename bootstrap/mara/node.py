@@ -22,16 +22,21 @@ class Node(deriving('eq', 'show')):
             self._unique_name = unique_id(self.__class__.__name__)
         return self._unique_name
 
-    def walk(self, visitor):
+    def walk_down(self, visitor, short_circuit=False):
         visitor.visit(self)
-        self.recurse(visitor)
+        if short_circuit and visitor.recurse_on(self):
+            self.recurse(visitor, Node.walk_down)
+        else:
+            self.recurse(visitor, Node.walk_down)
 
-    def walk_subtree(self, visitor):
+    def walk_up(self, visitor, short_circuit=False):
+        if short_circuit and visitor.recurse_on(self):
+            self.recurse(visitor, Node.walk_up)
+        else:
+            self.recurse(visitor, Node.walk_up)
         visitor.visit(self)
-        if visitor.recurse_on(self):
-            self.recurse(visitor)
 
-    def recurse(self, visitor):
+    def recurse(self, visitor, walk):
         pass
 
     def __getitem__(self, key):
@@ -49,9 +54,9 @@ class Module(Node):
         self.name = name
         self.exprs = exprs
 
-    def recurse(self, visitor):
+    def recurse(self, visitor, walk):
         for expr in self.exprs:
-            expr.walk(visitor)
+            walk(expr, visitor)
 
 
 class NoOp(Node):
@@ -67,9 +72,9 @@ class _Collection(Node):
             values = []
         self.values = values
 
-    def recurse(self, visitor):
+    def recurse(self, visitor, walk):
         for value in self.values:
-            value.walk(visitor)
+            walk(value, visitor)
 
 
 class Tuple(_Collection):
@@ -129,12 +134,12 @@ class Block(Node):
         else:
             self.params = params
 
-    def recurse(self, visitor):
+    def recurse(self, visitor, walk):
         for param in self.params:
-            param.walk(visitor)
+            walk(param, visitor)
 
         for expr in self.exprs:
-            expr.walk(visitor)
+            walk(expr, visitor)
 
 
 class BinOp(Node):
@@ -145,9 +150,9 @@ class BinOp(Node):
         self.func = func
         self.args = args
 
-    def recurse(self, visitor):
+    def recurse(self, visitor, walk):
         for arg in self.args:
-            arg.walk(visitor)
+            walk(arg, visitor)
 
 
 class If(Node):
@@ -163,10 +168,10 @@ class If(Node):
         else:
             self.else_body = Unit()
 
-    def recurse(self, visitor):
-        self.pred.walk(visitor)
-        self.if_body.walk(visitor)
-        self.else_body.walk(visitor)
+    def recurse(self, visitor, walk):
+        walk(self.pred, visitor)
+        walk(self.if_body, visitor)
+        walk(self.else_body, visitor)
 
 
 class Else(Node):
@@ -177,9 +182,9 @@ class Else(Node):
         self.expr = expr
         self.body = body
 
-    def recurse(self, visitor):
-        self.expr.walk(visitor)
-        self.body.walk(visitor)
+    def recurse(self, visitor, walk):
+        walk(self.expr, visitor)
+        walk(self.body, visitor)
 
 
 class Assign(Node):
@@ -191,8 +196,8 @@ class Assign(Node):
         self.value = value
         self.type_ = type_
 
-    def recurse(self, visitor):
-        self.value.walk(visitor)
+    def recurse(self, visitor, walk):
+        walk(self.value, visitor)
 
 
 class AssignRhs(Node):
@@ -201,8 +206,8 @@ class AssignRhs(Node):
         Node.__init__(self)
         self.value = value
 
-    def recurse(self, visitor):
-        self.value.walk(visitor)
+    def recurse(self, visitor, walk):
+        walk(self.value, visitor)
 
 
 class While(Node):
@@ -212,9 +217,9 @@ class While(Node):
         self.pred = pred
         self.body = body
 
-    def recurse(self, visitor):
-        self.pred.walk(visitor)
-        self.body.walk(visitor)
+    def recurse(self, visitor, walk):
+        walk(self.pred, visitor)
+        walk(self.body, visitor)
 
 
 class _Declaration(Node):
@@ -225,8 +230,8 @@ class _Declaration(Node):
         self.value = value
         self.type_ = type_
 
-    def recurse(self, visitor):
-        self.value.walk(visitor)
+    def recurse(self, visitor, walk):
+        walk(self.value, visitor)
 
 
 class Val(_Declaration):
@@ -253,8 +258,8 @@ class For(Node):
         self.clauses = clauses
         self.body = body
 
-    def recurse(self, visitor):
-        self.body.walk(visitor)
+    def recurse(self, visitor, walk):
+        walk(self.body, visitor)
 
 
 class ForClause(Node):
@@ -274,8 +279,8 @@ class KV(Node):
         self.key = key
         self.value = value
 
-    def recurse(self, visitor):
-        self.value.walk(visitor)
+    def recurse(self, visitor, walk):
+        walk(self.value, visitor)
 
 
 class _Comment(Node):
@@ -311,9 +316,9 @@ class Call(Node):
         else:
             self.block = Unit()
 
-    def recurse(self, visitor):
-        self.arg.walk(visitor)
-        self.block.walk(visitor)
+    def recurse(self, visitor, walk):
+        walk(self.arg, visitor)
+        walk(self.block, visitor)
 
 
 class Param(Node):
@@ -343,5 +348,5 @@ class Def(Node):
         else:
             self.return_type = Unit()
 
-    def recurse(self, visitor):
-        self.body.walk(visitor)
+    def recurse(self, visitor, walk):
+        walk(self.body, visitor)

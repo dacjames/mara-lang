@@ -38,7 +38,7 @@ def test_join_else(parser, join_else):
 
     ast = parser.parse(given)
 
-    ast.walk(join_else)
+    ast.walk_down(join_else)
 
     expected = node.Module(name='test', exprs=[
         node.If(
@@ -75,7 +75,7 @@ def test_join_else_regression(parser, join_else):
 
     ast = parser.parse(given)
 
-    ast.walk(join_else)
+    ast.walk_down(join_else)
 
     expected = node.Module(name='test', exprs=[
         node.Def(
@@ -139,7 +139,7 @@ def test_collect_names(parser, collect_names):
 
     ast = parser.parse(given)
 
-    ast.walk(collect_names)
+    ast.walk_down(collect_names)
 
     assert ast['namespace']['x'] == expected['x']
     assert ast['namespace']['y'] == expected['y']
@@ -164,9 +164,4 @@ def test_collect_bad_names(parser, collect_names):
     ast = parser.parse(given)
 
     with pytest.raises(TypeError):
-        ast.walk(collect_names)
-
-
-
-
-
+        ast.walk_down(collect_names)

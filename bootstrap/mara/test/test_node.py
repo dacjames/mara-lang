@@ -103,7 +103,6 @@ class SpyVisitor(object):
         self.nodes = []
 
     def validate(self, node_names):
-        global node
 
         expected_classes = [
             getattr(node, name)
@@ -111,9 +110,12 @@ class SpyVisitor(object):
         ]
 
         result_classes = [
-            node.__class__
-            for node in self.nodes
+            n.__class__
+            for n in self.nodes
         ]
+
+        for cls in result_classes:
+            print cls
 
         assert result_classes == expected_classes
 
@@ -127,7 +129,7 @@ def spy():
     return SpyVisitor()
 
 
-def test_walk(spy):
+def test_walk_down(spy):
     given = node.Module(name='test', exprs=[
         node.Int('10'),
         node.Val(
@@ -148,7 +150,8 @@ def test_walk(spy):
                     key='z',
                     value=node.Int('10')
                 ),
-            )
+            ),
+            else_body=node.Unit(),
         ),
     ])
 
@@ -169,6 +172,54 @@ def test_walk(spy):
         'Unit',
     ]
 
-    given.walk(spy)
+    given.walk_down(spy)
+
+    spy.validate(expected)
+
+
+def test_walk_up(spy):
+    given = node.Module(name='test', exprs=[
+        node.Int('10'),
+        node.Val(
+            name=node.ValueId('x'),
+            value=node.Block(params=[], exprs=[
+                node.ValueId('x'),
+                node.TypeId('T'),
+            ])
+        ),
+        node.If(
+            pred=node.BinOp(func='<', args=[
+                node.Int('0'),
+                node.Real('1.0'),
+            ]),
+            if_body=node.Assign(
+                name=node.ValueId('x'),
+                value=node.KV(
+                    key='z',
+                    value=node.Int('10')
+                ),
+            ),
+            else_body=node.Unit(),
+        ),
+    ])
+
+    expected = [
+        'Int',
+        'ValueId',
+        'TypeId',
+        'Block',
+        'Val',
+        'Int',
+        'Real',
+        'BinOp',
+        'Int',
+        'KV',
+        'Assign',
+        'Unit',
+        'If',
+        'Module',
+    ]
+
+    given.walk_up(spy)
 
     spy.validate(expected)
