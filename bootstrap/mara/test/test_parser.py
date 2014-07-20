@@ -480,8 +480,8 @@ def test_definitions(parser):
             n.Def(
                 name=n.ValueId('foo'),
                 param=n.Tuple(values=[
-                    n.Param(name=n.ValueId('x'), index=0),
-                    n.Param(name=n.ValueId('y'), index=1),
+                    n.Param(name=n.ValueId('x')),
+                    n.Param(name=n.ValueId('y')),
                 ]),
                 body=n.Block(exprs=[
                     n.BinOp(func=n.SymbolId('+'), args=[
@@ -493,8 +493,8 @@ def test_definitions(parser):
             n.Def(
                 name=n.ValueId('bar'),
                 param=n.Tuple(values=[
-                    n.Param(name=n.ValueId('x'), index=0),
-                    n.Param(name=n.ValueId('y'), index=1, type_=n.TypeId('Real')),
+                    n.Param(name=n.ValueId('x')),
+                    n.Param(name=n.ValueId('y'), type_=n.TypeId('Real')),
                 ]),
                 return_type=n.TypeId('Float'),
                 body=n.Block(exprs=[

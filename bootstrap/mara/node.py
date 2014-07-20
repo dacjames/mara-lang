@@ -308,10 +308,9 @@ class Call(Node):
 
 
 class Param(Node):
-    def __init__(self, name, index=None, type_=None):
+    def __init__(self, name, type_=None):
         Node.__init__(self)
         self.name = name
-        self.index = index
 
         if type_ is None:
             self.type_ = Unit()

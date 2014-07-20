@@ -81,7 +81,7 @@ def test_join_else_regression(parser, join_else):
         node.Def(
             name=node.ValueId('foo'),
             param=node.Tuple([
-                node.Param(name=node.ValueId('x'), index=0)
+                node.Param(name=node.ValueId('x'))
             ]),
             body=node.Block(exprs=[
                 node.If(
@@ -134,7 +134,7 @@ def test_collect_names(parser, collect_names):
     }
 
     inner = {
-        'x': node.Param(name=node.ValueId('x'), index=0),
+        'x': node.Param(name=node.ValueId('x')),
     }
 
     ast = parser.parse(given)
