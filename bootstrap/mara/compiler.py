@@ -219,7 +219,13 @@ class Compiler(object):
         # reserve space for local variables
         self.block += [
             ('reserve', len(local_variables)),
+            None,   # patch with save
         ]
+        save_label = len(self.block) - 1
+
+        # track what registers we use in the function,
+        # +1 because register numbers start at 1 (0 is special)
+        reg_begin_index = self.registry.counter + 1
 
         # generate loads for all the function params
         for param in n.param.values:
@@ -228,12 +234,20 @@ class Compiler(object):
         # generate the function body
         ret = self.visit(n.body)
 
+        # record the registers we used
+        reg_end_index = self.registry.counter + 1
+        local_registers = range(reg_begin_index, reg_end_index)
+
         # generate the return of the result
         self.block += [
             ('copy', 0, ret),
+            tuple(['restore'] + local_registers),
             ('ret',),
         ]
         end_label = len(self.block)
+
+        # patch in the save
+        self.block[save_label] = tuple(['save'] + local_registers)
 
         # skip past the declaration
         self.block[skip_label] = ('jump_a', end_label)

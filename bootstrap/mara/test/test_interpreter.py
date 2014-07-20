@@ -163,9 +163,8 @@ def test_fib(interpreter):
             else {
                 1 if x == 1
                 else {
-                    val a = fib(x - 2)
-                    val b = fib(x - 1)
-                    a + b
+                    (fib(x - 2)) +
+                    (fib(x - 1))
                 }
             }
         }

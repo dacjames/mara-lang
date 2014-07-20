@@ -559,6 +559,20 @@ class Machine(object):
         '''
         self._reserve(count)
 
+    def save(self, *regs):
+        '''
+        Save the registers onto the stack.
+        '''
+        for reg in reversed(regs):
+            self._push(self._get_nullable(reg))
+
+    def restore(self, *regs):
+        '''
+        Restore saved registers from the stack.
+        '''
+        for reg in regs:
+            self._set(reg, self._pop())
+
     ##########################################################################
     # Allocation
     ##########################################################################
@@ -669,6 +683,3 @@ class Machine(object):
     def on_error(self, *args):
         print('error: ' + repr(args))
         return special.HALT
-
-
-
