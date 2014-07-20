@@ -20,12 +20,12 @@ class CollectNames(object):
 
     @visit.d(node.Block)
     def _(self, n):
-        self.namespace = self.namespace.child()
+        self.namespace = self.namespace.child(n.unique_name)
         n['namespace'] = self.namespace
 
     @visit.d(node.Module)
     def _(self, n):
-        self.namespace = self.namespace.child()
+        self.namespace = self.namespace.child(n.unique_name)
         n['namespace'] = self.namespace
 
     @visit.d(node.Val)

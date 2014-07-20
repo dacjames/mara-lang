@@ -1,6 +1,7 @@
 from abc import ABCMeta
 
 from util.reflection import deriving
+from util.functions import unique_id
 import special
 import attributes
 
@@ -13,6 +14,13 @@ class Node(deriving('eq', 'show')):
 
     def __init__(self):
         self._attrs = attributes.Attributes()
+        self._unique_name = None
+
+    @property
+    def unique_name(self):
+        if self._unique_name is None:
+            self._unique_name = unique_id(self.__class__.__name__)
+        return self._unique_name
 
     def walk(self, visitor):
         visitor.visit(self)

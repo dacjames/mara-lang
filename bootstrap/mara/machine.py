@@ -208,10 +208,20 @@ class Machine(object):
         Push a value onto the stack.
         '''
         self._stack_ptr += 1
-        if self._stack_ptr == len(self._stack_buffer):
+        if self._stack_ptr == -1 or self._stack_ptr == len(self._stack_buffer):
             self._stack_buffer.append(arg)
         else:
             self._stack_buffer[self._stack_ptr] = arg
+
+    def _reserve(self, count):
+        stack_size = len(self._stack_buffer)
+        self._stack_ptr += count
+
+        if self._stack_ptr >= stack_size:
+            # + 1 because the sp refers to the top value on the stack,
+            # not the next free space.
+            growth = self._stack_ptr - stack_size + 1
+            self._stack_buffer += [None] * growth
 
     def _pop(self):
         '''
@@ -531,6 +541,12 @@ class Machine(object):
         '''
         self._set(dst, self._stack_buffer[self._stack_ptr - offset])
 
+    def reserve(self, count):
+        '''
+        Reserves space for storing count number of variables.
+        '''
+        self._reserve(count)
+
     ##########################################################################
     # Allocation
     ##########################################################################
@@ -605,6 +621,14 @@ class Machine(object):
         address = self._get(ptr) + offset
         value = self._heaplet[address]
         self._set(dst, value)
+
+    def store_p(self, src, index):
+        '''
+        Store the value in reg src at the parameter index.
+        '''
+        offset = index + 1
+
+        self._stack_buffer[self._frame_ptr + offset] = self._get(src)
 
     def store_d(self, src, ptr):
         '''

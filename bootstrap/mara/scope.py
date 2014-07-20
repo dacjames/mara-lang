@@ -10,35 +10,12 @@ import special
 import node
 
 
-# class ScopeBox(deriving('eq', 'show')):
-#     def __init__(self, value):
-#         self.value = value
-
-#     def unbox(self):
-#         return self.value
-
-
-# # class ValBox(ScopeBox):
-# #     pass
-
-
-# # class VarBox(ScopeBox):
-# #     pass
-
-
-# # class DefBox(ScopeBox):
-# #     pass
-
-
-# # class ParamBox(ScopeBox):
-# #     pass
-
-
 class _Scope(deriving('members_dict')):
     _store = method_store()
 
-    def __init__(self):
+    def __init__(self, context):
         self.members = {}
+        self.context = context
 
     def __getitem__(self, key):
         return self.members.__getitem__(key)
@@ -91,8 +68,8 @@ class _Scope(deriving('members_dict')):
 
     ##########################################################################
 
-    def child(self):
-        return Scope(parent=self)
+    def child(self, context):
+        return Scope(parent=self, context=context)
 
     def merge(self, other):
         self.members = dict(self.members.items() + other.members.items())
@@ -113,6 +90,16 @@ class _Scope(deriving('members_dict')):
             return self._assign(old_value)(new_value)
         else:
             self.declare(ident, new_value)
+
+    def qualify(self, ident):
+
+        # pylint: disable=W0104
+        # lookup the value to trigger a KeyError if missing.
+        self[ident]
+
+        qualified = '{context}.{ident}'.format(context=self.context, ident=ident)
+
+        return qualified
 
     @multimethod(_store)
     def _assign(self, old_value):
@@ -138,12 +125,12 @@ class _Scope(deriving('members_dict')):
 
 class Root(_Scope):
     def __init__(self):
-        _Scope.__init__(self)
+        _Scope.__init__(self, 'Root')
 
 
 class Scope(_Scope):
-    def __init__(self, parent):
-        _Scope.__init__(self)
+    def __init__(self, parent, context):
+        _Scope.__init__(self, context)
 
         assert parent is not None, 'Scopes parent cannot be None.'
         self.parent = parent

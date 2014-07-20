@@ -88,9 +88,13 @@ def test_if_else(interpreter):
 
 def test_variable_resolution_with_constants(interpreter):
     given = maramodule('test', '''
-        val x = (5 + 5)
-        var y = 2
-        x * y
+        def foo(l) {
+            val x = (5 + 5)
+            var y = 2
+            x * y
+        }
+
+        foo(1)
     ''')
 
     result = interpreter.evaluate(given)
@@ -109,10 +113,15 @@ def test_define_and_call(interpreter):
             x + y
         }
 
-        val a = add(1, 2)
-        val b = add(3, 4)
+        def foo(x) {
+            val a = add(1, 2)
+            val b = add(3, 4)
 
-        a + b
+            a + b
+        }
+
+        foo(1)
+
     ''')
 
     result = interpreter.evaluate(given)
@@ -139,3 +148,18 @@ def test_nested_if_inside_function(interpreter):
     result = interpreter.evaluate(given)
 
     assert result == 20
+
+
+def test_variable_assignment(interpreter):
+    given = maramodule('test', '''
+        def foo(x) {
+            var z = 4
+            z = 3
+        }
+
+        foo(1)
+    ''')
+
+    result = interpreter.evaluate(given)
+
+    assert result == 3

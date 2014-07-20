@@ -28,6 +28,7 @@ class Interpreter(object):
 
         ast.walk(passes.JoinElse())
         ast.walk(passes.CollectNames())
+        ast.walk(passes.CollectLocals())
 
         pool = constant.ConstantPool()
         ast.walk(pool)

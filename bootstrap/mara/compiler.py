@@ -127,6 +127,12 @@ class Compiler(object):
     @visit.d(node.Val)
     def _(self, n):
         result = self.visit(n.value)
+        index = n['index']
+
+        self.block += [
+            ('store_p', result, index),
+        ]
+
         n['result'] = result
 
         return result
@@ -134,27 +140,60 @@ class Compiler(object):
     @visit.d(node.Var)
     def _(self, n):
         result = self.visit(n.value)
+
+        index = n['index']
+
+        self.block += [
+            ('store_p', result, index)
+        ]
+
         n['result'] = result
 
         return result
 
     @visit.d(node.ValueId)
     def _(self, n):
+        r = self.registry.frame()
+
         identifier = n.value
 
         declaration = n['namespace'][identifier]
 
-        source = declaration['result']
+        index = declaration['index']
 
-        return source
+        self.block += [
+            ('load_p', r(0), index)
+        ]
+
+        # source = declaration['result']
+
+        return self.result(r(0))
+
+    @visit.d(node.Assign)
+    def _(self, n):
+        identifier = n.name.value
+
+        declaration = n['namespace'][identifier]
+
+        index = declaration['index']
+
+        result = self.visit(n.value)
+
+        declaration._attrs.set_hard('result', result)
+
+        self.block += [
+            ('store_p', result, index)
+        ]
+
+        return self.result(result)
 
     @visit.d(node.Param)
     def _(self, n):
         r = self.registry.frame()
-        offset = n.index
+        index = n['index']
 
         self.block += [
-            ('load_p', r(0), offset),
+            ('load_p', r(0), index),
         ]
 
         n['result'] = r(0)
@@ -164,6 +203,8 @@ class Compiler(object):
     @visit.d(node.Def)
     def _(self, n):
         r = self.registry.frame()
+
+        local_variables = n['locals']
 
         #  +1 for address load, +1 for hole
         address = len(self.block) + 2
@@ -178,6 +219,11 @@ class Compiler(object):
         # set attributes
         n['address'] = address
         n['result'] = r(0)
+
+        # reserve space for local variables
+        self.block += [
+            ('reserve', len(local_variables)),
+        ]
 
         # generate loads for all the function params
         for param in n.param.values:
@@ -297,6 +343,14 @@ class Compiler(object):
     @visit.d(node.Module)
     def _(self, n):
         exprs = n.exprs
+
+        local_variables = n['locals']
+
+        print 'locals', local_variables
+
+        self.block += [
+            ('reserve', len(local_variables))
+        ]
 
         for expr in exprs:
             self.visit(expr)
