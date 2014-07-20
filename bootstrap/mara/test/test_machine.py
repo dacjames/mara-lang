@@ -216,16 +216,16 @@ def test_function_calls(machine):
         ['print_reg', r(1)],
         ['halt'],
         # g(x, y) { x + y }
-        ['load_p', r(1), 0],        # r1 = load x
-        ['load_p', r(2), 1],        # r2 = load y
-        ['add_rr', r(0), r(1), r(2)],   # r0 = x + y
+        ['load_p', r(11), 0],               # r11 = load x
+        ['load_p', r(12), 1],               # r12 = load y
+        ['add_rr', r(0), r(11), r(12)],     # r0 = x + y
         ['ret'],
         # f(x) { a = g(x, 10); g(a, a) }
-        ['load_p', r(1), 0],        # r1 = load x
-        ['load_v', r(2), 10],       # r2 = load 10
-        ['call', 6, r(1), r(2)],        # r0 = g(r1, r2)
-        ['add_rc', r(1), r(0), 0],      # r1 = r0 + 0
-        ['call', 6, r(1), r(1)],        # r0 = call(r1, r1)
+        ['load_p', r(21), 0],               # r1 = load x
+        ['load_v', r(22), 10],              # r2 = load 10
+        ['call', 6, r(21), r(22)],          # r0 = g(r21, r22)
+        ['copy', r(21), r(0)],              # r1 = r0
+        ['call', 6, r(21), r(21)],          # r0 = g(r21, r21)
         ['ret'],
     ])
 

@@ -12,7 +12,7 @@ class Machine(object):
     '''
     def __init__(self, buffered=False, traced=False):
         self._code = []
-        self._regs_buffer = defaultdict(lambda: [None] * 4)
+        self._regs_buffer = [None] * 4
         self._pc = 0
 
         self._stack_buffer = []
@@ -54,15 +54,9 @@ class Machine(object):
     @property
     def _regs(self):
         '''
-        A dictionary copy of the registers for the frame.
+        A dictionary copy of the registers.
         '''
-        fp = self._frame_ptr
-        frame = self._regs_buffer[fp]
-
-        if self._frame_ptr != 0:
-            frame[0] = self._regs_buffer[0][0]
-
-        return {i: r for i, r in enumerate(frame) if r is not None}
+        return {i: r for i, r in enumerate(self._regs_buffer) if r is not None}
 
     ##########################################################################
     # Internal Functions
@@ -132,31 +126,19 @@ class Machine(object):
 
     def _set(self, reg, value):
         '''
-        Set the value in a register for the current frame.
+        Set the value in a register.
         '''
-        # r0 is sharded by all frames
-        if reg == 0:
-            fp = 0
-        else:
-            fp = self._frame_ptr
-
         # the closest you can get to realloc in python
-        if reg >= len(self._regs_buffer[fp]):
-            self._regs_buffer[fp] += [None] * max(len(self._regs_buffer), reg)
+        if reg >= len(self._regs_buffer):
+            self._regs_buffer += [None] * max(len(self._regs_buffer), reg)
 
-        self._regs_buffer[fp][reg] = value
+        self._regs_buffer[reg] = value
 
     def _get(self, reg):
         '''
-        Get the value in a regester for the current frame.
+        Get the value in a register.
         '''
-        # r0 is sharded by all frames
-        if reg == 0:
-            fp = 0
-        else:
-            fp = self._frame_ptr
-
-        return self._regs_buffer[fp][reg]
+        return self._regs_buffer[reg]
 
     def _allocate(self, size):
         '''
@@ -483,16 +465,12 @@ class Machine(object):
         # save the frame pointer
         self._push(self._frame_ptr)
 
-        # remember new frame_ptr, but don't set it yet to ensure
-        # that params are loaded from the correct register frame.
-        new_frame_ptr = self._stack_ptr
+        # set the new frame pointer
+        self._frame_ptr = self._stack_ptr
 
         # push the arguments
         for param in params:
             self._push(self._get(param))
-
-        # set the new frame pointer
-        self._frame_ptr = new_frame_ptr
 
         # jump to the function
         self._pc = func
