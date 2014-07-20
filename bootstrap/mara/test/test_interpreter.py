@@ -177,7 +177,7 @@ def test_fib(interpreter):
     assert result == 5
 
 
-@pytest.mark.xfail
+@pytest.mark.skipif(True, reason='slowness')
 def test_benchmark(interpreter):
     given = maramodule('test', '''
         def slow_double (x, y) {

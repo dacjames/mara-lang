@@ -114,12 +114,8 @@ class Compiler(object):
     def _(self, n):
         r = self.registry.frame()
 
-        # self.block += [
-        #     ('load_c', r(0), n['constant']),
-        # ]
-
         self.block += [
-            ('load_v', r(0), int(n.value)),
+            ('load_c', r(0), n['constant']),
         ]
 
         return r(0)

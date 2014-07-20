@@ -4,9 +4,9 @@ Mara Dynamic Interpreter
 
 # pylint: disable=W0212
 
-import special
-import passes
-import constant
+import mara.special as special
+import mara.passes as passes
+import mara.constant as constant
 
 from machine import Machine
 from compiler import Compiler
@@ -26,6 +26,8 @@ class Interpreter(object):
     def evaluate(self, module):
         ast = self.parser.parse(module)
 
+        print ast
+
         ast.walk(passes.JoinElse())
         ast.walk_subtree(passes.ModuleFunction())
         ast.walk(passes.CollectNames())
@@ -36,9 +38,6 @@ class Interpreter(object):
 
         bytecode = self.compiler.compile(ast, pool)
         result = self.compiler.result()
-
-        for code in bytecode:
-            print code
 
         self.machine._load(bytecode, pool)
         self.machine._loop()

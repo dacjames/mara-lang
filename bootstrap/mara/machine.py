@@ -47,8 +47,6 @@ class Machine(object):
         self._free_ptr = 0
         self._end_ptr = 7
 
-        self._phi_trace_stack = [set()]
-
         self._pool = None  # Constant Pool
 
         self._print_buffer = []
@@ -158,7 +156,6 @@ class Machine(object):
         if reg >= len(self._regs_buffer):
             self._regs_buffer += [None] * max(len(self._regs_buffer), reg)
 
-        self._phi_trace(reg)
         self._regs_buffer[reg] = value
 
     def _get(self, reg):
@@ -175,28 +172,6 @@ class Machine(object):
             return self._regs_buffer[reg]
         else:
             return None
-
-    def _phi_start(self):
-        self._phi_trace_stack.append(set())
-
-    def _phi_end(self):
-        self._phi_trace_stack.pop()
-
-    def _phi_trace(self, reg):
-        seen = self._phi_trace_stack[-1]
-        seen.add(reg)
-
-    def _phi_get(self, left, right):
-        seen = self._phi_trace_stack[-1]
-
-        if left in seen and right not in seen:
-            return self._get(left)
-
-        if right in seen and left not in seen:
-            return self._get(right)
-
-        else:
-            raise TypeError(left, right)
 
     def _allocate(self, size):
         '''
@@ -285,7 +260,15 @@ class Machine(object):
         '''
         Return the value set by the path taken through the code.
         '''
-        self._set(result, self._phi_get(left, right))
+        lhs = self._get_nullable(left)
+        rhs = self._get_nullable(right)
+
+        if lhs is not None and rhs is None:
+            return self._set(result, lhs)
+        elif lhs is None and rhs is not None:
+            return self._set(result, rhs)
+        else:
+            raise TypeError(left, right)
 
     ##########################################################################
     # Printing
@@ -503,9 +486,6 @@ class Machine(object):
         # jump to the function
         self._pc = func
 
-        # start phi trace
-        self._phi_start()
-
         # cancel out loop increment
         self._pc -= 1
 
@@ -527,9 +507,6 @@ class Machine(object):
 
         # jump to the return address
         self._pc = ret_addr
-
-        # end the phi trace
-        self._phi_end()
 
     ##########################################################################
     # Stack Manipulation
@@ -565,6 +542,8 @@ class Machine(object):
         '''
         for reg in reversed(regs):
             self._push(self._get_nullable(reg))
+        # values = [self._get_nullable(r) for r in regs]
+        # self._push(values)
 
     def restore(self, *regs):
         '''
@@ -572,6 +551,9 @@ class Machine(object):
         '''
         for reg in regs:
             self._set(reg, self._pop())
+        # values = self._pop()
+        # for i, reg in enumerate(regs):
+        #     self._set(reg, values[i])
 
     ##########################################################################
     # Allocation
