@@ -14,6 +14,14 @@ class ModuleFunction(object):
         self.module = None
 
     @multimethod(_store)
+    def recurse_on(self, n):
+        False
+
+    @recurse_on.d(node.Module)
+    def recurse_on(self, n):
+        True
+
+    @multimethod(_store)
     def visit(self, n):
         pass
 

@@ -27,7 +27,7 @@ class Interpreter(object):
         ast = self.parser.parse(module)
 
         ast.walk(passes.JoinElse())
-        ast.walk(passes.ModuleFunction())
+        ast.walk_subtree(passes.ModuleFunction())
         ast.walk(passes.CollectNames())
         ast.walk(passes.CollectLocals())
 

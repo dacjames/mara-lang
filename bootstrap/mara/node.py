@@ -26,6 +26,11 @@ class Node(deriving('eq', 'show')):
         visitor.visit(self)
         self.recurse(visitor)
 
+    def walk_subtree(self, visitor):
+        visitor.visit(self)
+        if visitor.recurse_on(self):
+            self.recurse(visitor)
+
     def recurse(self, visitor):
         pass
 
