@@ -67,6 +67,7 @@ tokens = (
     'VID', 'TID', 'SID',
 
     'INTD', 'INTX', 'INTP', 'REAL', 'SCI',
+    'TRUE', 'FALSE',
 ) + tuple(KEYWORDS)
 
 states = (
@@ -252,8 +253,14 @@ def t_code_INTD(tok):
 def t_code_VID(tok):
     r'(_+[0-9]|_*[a-z])[A-Za-z_0-9]*'
 
-    if tok.value.upper() in KEYWORDS:
+    name = tok.value.upper()
+
+    if name in KEYWORDS:
         tok.type = tok.value.upper()
+    elif name == 'TRUE':
+        tok.type = 'TRUE'
+    elif name == 'FALSE':
+        tok.type = 'FALSE'
 
     return tok
 

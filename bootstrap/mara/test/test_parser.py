@@ -176,6 +176,25 @@ def test_exprs_parse_assignment(parser):
     assert expected == result
 
 
+def test_parse_booleans(parser):
+    given = maramodule('test', '''
+        true
+        false
+    ''')
+
+    expected = n.Module(
+        name='test',
+        exprs=[
+            n.Bool('1'),
+            n.Bool('0'),
+        ]
+    )
+
+    result = parser.parse(given)
+
+    assert expected == result
+
+
 def test_parse_unwrapped_if(parser):
     given = 'module simple; x * 2.0 if x > 0 end'
     expected = n.Module(

@@ -114,17 +114,25 @@ def p_literal(p):
                | INTP
                | REAL
                | SCI
+               | TRUE
+               | FALSE
     '''
     tok = p.slice[1]
 
     if tok.type in ('INTD', 'INTX', 'INTP'):
         p[0] = node.Int(tok.value)
 
-    if tok.type == 'REAL':
+    elif tok.type == 'REAL':
         p[0] = node.Real(tok.value)
 
-    if tok.type == 'SCI':
+    elif tok.type == 'SCI':
         p[0] = node.Sci(tok.value)
+
+    elif tok.type == 'TRUE':
+        p[0] = node.Bool('1')
+
+    elif tok.type == 'FALSE':
+        p[0] = node.Bool('0')
 
     return p[0]
 

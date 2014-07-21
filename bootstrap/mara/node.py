@@ -107,6 +107,12 @@ class Sci(_Value):
     pass
 
 
+class Bool(_Value):
+    def __init__(self, value):
+        assert value in ('0', '1')
+        _Value.__init__(self, value)
+
+
 class ValueId(_Value):
     pass
 
