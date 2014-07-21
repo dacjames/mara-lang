@@ -190,12 +190,11 @@ class Else(Node):
 
 class Assign(Node):
 
-    def __init__(self, name, value, type_=None):
+    def __init__(self, name, value):
         Node.__init__(self)
 
         self.name = name
         self.value = value
-        self.type_ = type_
 
     def recurse(self, visitor, walk):
         walk(self.value, visitor)

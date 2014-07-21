@@ -337,7 +337,7 @@ p_expr_list_comma = _seperated_expr_list('expr_list_comma', 'COMMA')
 def p_assign(p):
     '''assign : vid assign_rhs
     '''
-    p[0] = node.Assign(name=p[1], value=p[2].value, type_=None)
+    p[0] = node.Assign(name=p[1], value=p[2].value)
 
     return p[0]
 
@@ -365,7 +365,7 @@ def _untyped_declaration(cls, p):
     else:
         value = node.Unit()
 
-    return cls(name=p[2], value=value, type_=None)
+    return cls(name=p[2], value=value)
 
 
 def _typed_declaration(cls, p):

@@ -160,7 +160,7 @@ def test_exprs_parse_assignment(parser):
     ''')
 
     expected = n.Module('assignment', [
-        n.Assign(name=n.ValueId('a'), value=n.Int('10'), type_=None)
+        n.Assign(name=n.ValueId('a'), value=n.Int('10'))
     ])
 
     result = parser.parse(given)
@@ -400,16 +400,16 @@ def test_exprs_and_blocks(parser):
                 name=n.ValueId('block'),
                 value=n.Block(
                     exprs=[
-                        n.Assign(name=n.ValueId('x'), value=n.Int('10'), type_=None),
-                        n.Assign(name=n.ValueId('y'), value=n.ValueId('x'), type_=None),
-                        n.Assign(name=n.ValueId('z'), value=n.Int('5'), type_=None),
-                        n.Assign(name=n.ValueId('t'), type_=None,
+                        n.Assign(name=n.ValueId('x'), value=n.Int('10')),
+                        n.Assign(name=n.ValueId('y'), value=n.ValueId('x')),
+                        n.Assign(name=n.ValueId('z'), value=n.Int('5')),
+                        n.Assign(name=n.ValueId('t'),
                             value=n.BinOp(
                                 func=n.SymbolId('+'),
                                 args=[n.Int('10'), n.Int('5')]
                             )
                         ),
-                        n.Assign(name=n.ValueId('t'), type_=None,
+                        n.Assign(name=n.ValueId('t'),
                             value=n.BinOp(
                                 func=n.SymbolId('+'),
                                 args=[n.Int('10'), n.Int('5')]
