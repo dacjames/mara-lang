@@ -39,6 +39,12 @@ class Node(deriving('eq', 'show')):
     def recurse(self, visitor, walk):
         pass
 
+    def set_soft(self, key, value):
+        self._attrs.set_soft(key, value)
+
+    def set_hard(self, key, value):
+        self._attrs.set_hard(key, value)
+
     def __contains__(self, key):
         return self._attrs.__contains__(key)
 

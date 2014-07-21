@@ -86,12 +86,12 @@ def test_node_attributes():
     assert given['qua/bar'] == 0
     assert given['qua']['bar'] == 0
 
-    given._attrs.set_soft('foo', 0)
+    given.set_soft('foo', 0)
 
     with pytest.raises(KeyError):
-        given._attrs.set_soft('foo', 1)
+        given.set_soft('foo', 1)
 
-    given._attrs.set_hard('foo', 1)
+    given.set_hard('foo', 1)
 
     assert given._attrs['foo'] == 1
 
