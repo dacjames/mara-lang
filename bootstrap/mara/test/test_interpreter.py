@@ -98,6 +98,45 @@ def test_variable_resolution_with_constants(interpreter):
     assert result == 20
 
 
+def test_simple_type_checking(interpreter):
+    given = maramodule('test', '''
+        def foo () Int {
+            var x = 10
+            x
+        }
+        foo()
+
+        if true {
+            val z = 5
+        } else {
+            10
+        }
+    ''')
+
+    result = interpreter.evaluate(given, type_check=True)
+
+    assert result == 5
+
+
+def test_cannot_declare_unit(interpreter):
+    given = maramodule('test', '''
+        var x = if true { 5 }
+    ''')
+
+    with pytest.raises(TypeError):
+        interpreter.evaluate(given, type_check=True)
+
+
+def test_cannot_assign_unit(interpreter):
+    given = maramodule('test', '''
+        val y
+        y = if true { false }
+    ''')
+
+    with pytest.raises(TypeError):
+        interpreter.evaluate(given, type_check=True)
+
+
 def test_define_and_call(interpreter):
     given = maramodule('test', '''
         def add(x, y) {
