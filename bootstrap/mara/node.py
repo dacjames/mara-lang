@@ -223,7 +223,11 @@ class _Declaration(Node):
         Node.__init__(self)
         self.name = name
         self.value = value
-        self.type_ = type_
+
+        if type_ is None:
+            self.type_ = InferType()
+        else:
+            self.type_ = type_
 
     def recurse(self, visitor, walk):
         walk(self.value, visitor)

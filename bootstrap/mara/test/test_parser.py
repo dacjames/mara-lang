@@ -429,8 +429,8 @@ def test_declarations(parser):
     expected = n.Module(
         name='declarations',
         exprs=[
-            n.Var(name=n.ValueId('x'), value=n.Int('10'), type_=None),
-            n.Val(name=n.ValueId('y'), value=n.Int('20'), type_=None),
+            n.Var(name=n.ValueId('x'), value=n.Int('10'), type_=n.InferType()),
+            n.Val(name=n.ValueId('y'), value=n.Int('20'), type_=n.InferType()),
         ],
     )
 
