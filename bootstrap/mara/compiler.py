@@ -120,6 +120,16 @@ class Compiler(object):
 
         return r(0)
 
+    @visit.d(node.Bool)
+    def _(self, n):
+        r = self.registry.frame()
+
+        self.block += [
+            ('load_c', r(0), n['constant'])
+        ]
+
+        return r(0)
+
     @visit.d(node.Real)
     def _(self, n):
         r = self.registry.frame()
