@@ -40,6 +40,9 @@ class Interpreter(object):
         bytecode = self.compiler.compile(ast, pool)
         result = self.compiler.result()
 
+        for code in bytecode:
+            print code
+
         self.machine._load(bytecode, pool)
         self.machine._loop()
 

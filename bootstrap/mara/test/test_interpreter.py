@@ -216,6 +216,34 @@ def test_fib(interpreter):
     assert result == 5
 
 
+def test_loop(interpreter):
+    given = maramodule('test', '''
+        def bool(x) {
+            if x == 0 { false }
+            else { true }
+        }
+
+        var x = 10
+        while x > 0 {
+            x = x - 1
+        }
+
+        if (bool(x)) {
+            42
+        } else {
+            var z = (10 * -1)
+            while z < 0 {
+                z = z + 1
+            }
+        }
+
+    ''')
+
+    result = interpreter.evaluate(given)
+
+    assert result == 0
+
+
 @pytest.mark.skipif(True, reason='slowness')
 def test_benchmark(interpreter):
     given = maramodule('test', '''
@@ -233,3 +261,4 @@ def test_benchmark(interpreter):
     result = interpreter.evaluate(given)
 
     assert result == 200
+

@@ -260,6 +260,42 @@ class Compiler(object):
 
         return self.result(r(0))
 
+    @visit.d(node.While)
+    def _(self, n):
+        r = self.registry.frame()
+
+        # capture the "top" of the loop
+        begin_label = len(self.block)
+
+        # compute the predicate
+        pred_result = self.visit(n.pred)
+
+        # generate the skip
+        self.block += [
+            None  # patch with skip
+        ]
+        skip_label = len(self.block) - 1
+
+        # generate the body
+        body_label = len(self.block)
+        loop_result = self.visit(n.body)
+
+        jump_label = len(self.block)
+
+        loop_offset = jump_label - begin_label
+
+        # +2 to account for the jump and skip
+        skip_offest = jump_label - body_label + 2
+
+        # loop
+        self.block += [
+            ('jump_r', -loop_offset),
+        ]
+
+        self.block[skip_label] = ('branch_zero', pred_result, skip_offest)
+
+        return self.result(loop_result)
+
     @visit.d(node.Call)
     def _(self, n):
         r = self.registry.frame()
