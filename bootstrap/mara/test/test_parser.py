@@ -347,35 +347,72 @@ def test_parse_else(parser):
 
 def test_parse_postfix_while(parser):
     given = maramodule('test', '''
-        while (x > 0) {x * 2}
+        (x + 2) while (x < 0)
+        (x + 2) if (x < 0)
+        (x + 2) else (x < 0)
+
     ''')
     expected = n.Module(
         name='test',
         exprs=[
             n.While(
                 pred=n.BinOp(
-                    func=n.SymbolId('>'),
+                    func=n.SymbolId('<'),
                     args=[
                         n.ValueId('x'),
                         n.Int(value='0'),
                     ]
                 ),
-                body=n.Block(
-                    exprs=[
-                        n.BinOp(
-                            func=n.SymbolId('*'),
-                            args=[
-                                n.ValueId('x'),
-                                n.Int(value='2')
-                            ]
-                        ),
+                body=n.BinOp(
+                    func=n.SymbolId('+'),
+                    args=[
+                        n.ValueId('x'),
+                        n.Int(value='2')
                     ]
                 ),
-            )
+            ),
+            n.If(
+                pred=n.BinOp(
+                    func=n.SymbolId('<'),
+                    args=[
+                        n.ValueId('x'),
+                        n.Int(value='0'),
+                    ]
+                ),
+                if_body=n.BinOp(
+                    func=n.SymbolId('+'),
+                    args=[
+                        n.ValueId('x'),
+                        n.Int(value='2')
+                    ]
+                ),
+            ),
+            n.Else(
+                expr=n.BinOp(
+                    func=n.SymbolId('+'),
+                    args=[
+                        n.ValueId('x'),
+                        n.Int(value='2'),
+                    ]
+                ),
+                body=n.BinOp(
+                    func=n.SymbolId('<'),
+                    args=[
+                        n.ValueId('x'),
+                        n.Int(value='0'),
+                    ]
+                ),
+            ),
         ]
     )
 
     result = parser.parse(given)
+    print expected.exprs[2]
+    print result.exprs[2]
+
+    assert expected.exprs[0] == result.exprs[0]
+    assert expected.exprs[1] == result.exprs[1]
+    assert expected.exprs[2] == result.exprs[2]
     assert expected == result
 
 

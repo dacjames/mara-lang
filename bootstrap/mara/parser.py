@@ -222,6 +222,7 @@ def p_prefix_if(p):
 
 def p_postfix_if(p):
     '''postfix_if : expr IF expr
+                  | wrapped IF expr
     '''
     p[0] = node.If(pred=p[3], if_body=p[1])
 
@@ -245,6 +246,7 @@ def p_prefix_else(p):
 
 def p_postfix_else(p):
     '''postfix_else : expr ELSE expr
+                    | wrapped ELSE expr
     '''
     p[0] = node.Else(body=p[3], expr=p[1])
     return p[0]
@@ -259,15 +261,23 @@ def p_ifelse(p):
 
 
 def p_while(p):
-    '''while : WHILE expr block
-             | expr WHILE expr'''
+    '''while : prefix_while
+             | postfix_while
+    '''
+    p[0] = p[1]
 
-    if p[1] == 'while':
-        p[0] = node.While(pred=p[2], body=p[3])
-    else:
-        p[0] = node.While(pred=p[3], body=p[1])
 
-    return p[0]
+def p_prefix_while(p):
+    '''prefix_while : WHILE expr block
+    '''
+    p[0] = node.While(pred=p[2], body=p[3])
+
+
+def p_postfix_while(p):
+    '''postfix_while : expr WHILE expr
+                     | wrapped WHILE expr
+    '''
+    p[0] = node.While(pred=p[3], body=p[1])
 
 
 def p_binop(p):

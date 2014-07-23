@@ -44,9 +44,9 @@ class Balancer(object):
 
 KEYWORDS = set(k.upper() for k in [
     'match', 'as',
+    'while',
     'if', 'else',
     'for', 'in',
-    'while',
     'def', 'val', 'var', 'ref', 'mut',
     'datum', 'trait', 'type',
 ])
