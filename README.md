@@ -4,14 +4,14 @@ Mara is a new programming language designed to be fast, fun, and functional. The
 
 ## Features
 
-    - Multiple Dispatch
-    - Pattern Matching
-    - Objects (but no Classes)
+    - Multiple dispatch
+    - Pattern matching
+    - Objects (but no classes)
     - Traits & Protocols
-    - Type Inference
-    - For Expressions
-    - Hybrid Memory Management
-    - Dependency Injection
+    - "Raw" native types
+    - Hybrid memory management
+    - Type inference
+    - Dependency injection
 
 Okay, it doesn't offer all of those features today, but it will as development progressses.  Some of the driving principles behind Mara are:
 
