@@ -6,19 +6,14 @@ provide users = Service('/user/:id', User)
 end example
 
 
-module example-b
+module example_b
 depend users
 
 def main {
-    dac = users[196]
-    jess = users[1]
+    tom = users[137]
+    mary = users[19]
 
-    jess.tag (
-        tag     = 'boyfriend',
-        user    = dac,
-        tagback = 'girlfriend',
-    ).save
-
+    tom.relate['knows'].to(mary)
 }
 
-module example-b
+module example_b

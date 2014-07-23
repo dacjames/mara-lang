@@ -3,8 +3,8 @@ module arch64
 require 'os/*'
 
 provide 'os/arch' {
-    match context['os/group']
-    as _ == 'windows' .and context['os/version'] > '6.0' { 'WOW64' }
+    match os_group = context['os/group']
+    as os_group == 'windows' and context['os/version'] > '6.0' { 'WOW64' }
     else { 'amd64' }
 }
 

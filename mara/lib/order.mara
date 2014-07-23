@@ -1,8 +1,6 @@
 module order
 
-# datum NGram2(T) = (a T, b T)
-
-trait NGram2(T)::Comparable {
+trait BiGram::Comparable {
 
   def compare -> Int
 
@@ -31,16 +29,14 @@ trait NGram2(T)::Comparable {
 
 trait Comparable.Collection::Sort {
 
-    def quicksort -> This
+    def quicksort This
     def quicksort {
         smaller, larger, equal = this.partition compare
         smaller.self ++ equal ++ larger.self
     }
 
-    def mergesort -> This
+    def mergesort This
     def mergesort { ... }
-
-
 }
 
 

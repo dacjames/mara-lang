@@ -1,37 +1,27 @@
-end string
-
 ###
 # strings module
 
 The strings module provides several objects for working with characters and strings.
 
 - String
-  implimented for three datums:
-    - Symbol (interned, immutable array of bytes)
-    - Text (immutable tree of utf-8 code points)
-    - Char.Array
+  implimented for three objects:
+    - Symbol (interned, immutable array of Latin1 chars)
+    - Text (immutable, using a flexible tree based internal structure)
+    - Byte.Array
 
 - Char
-  implimented for two datums:
-    - Rune utf-code point, TODO: rune encoding
-    - Byte type of UInt8, unknown encoding
+  implimented for tree objects:
+    - Rune: Unicode code point
+    - Byte: alias of UInt8, unknown encoding
+    - Latin: single byte character
 
 
 ###
 
 module strings
 
-import strings_impl/(Text, Symbol, Char.Array)
-import chars_impl/(Rune, Byte)
-
-export {
-    String
-    Text
-    Symbol
-    Char.Array
-    Rune
-    Byte
-}
+import 'strings_impl.(Text, Symbol, Char.Array)'
+import 'chars_impl.(Rune, Byte)'
 
 
 trait String =
@@ -70,9 +60,7 @@ trait StringLiteral::StringShortcuts {
 }
 
 
-
-
-def Symbol::to Text = this.c.decode 'utf8'
+def Symbol::to Text = this.c.decode 'latin1'
 def Symbol::to Char.Array = this.elements
 
 

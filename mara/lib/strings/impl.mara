@@ -3,7 +3,7 @@
 module chars_impl
 import encodings
 
-datum Rune { codepoint UInt32 }
+datum Rune { codepoint Int32 }
 Rune = ...
 
 datum Char = UInt8

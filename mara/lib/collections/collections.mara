@@ -1,11 +1,11 @@
 module impl
 using Collection
 
-datum(T) LinkedList =
+object(T) LinkedList =
     | ListNode(T)
     | Nil
 
-datum(T) ListNode {
+object(T) ListNode {
     head T
     tail This
 }
@@ -25,7 +25,7 @@ end impl
 
 module example
 
-depend random/seed
+depend 'random.seed'
 
 a = random.matrix
 
@@ -51,8 +51,8 @@ trait Collection(Index, Elem) {
     def add (Elem) -> This | (Elem, This)
     def pull (Elem) -> This | (Elem, This)
 
-    def peak (Elem) -> Elem?
-    def look (Elem) -> Elem?
+    def peak (Elem) -> Elem.Maybe
+    def look (Elem) -> Elem.Maybe
 }
 
 end
@@ -73,3 +73,4 @@ list.first << list.tail === list.body >> list.last
 [1, 2] << 0 === 0 << [1, 2] === [0, 1, 2]
 [1, 2] >> 3 === 3 << [1, 2] === [1, 2, 3]
 
+end

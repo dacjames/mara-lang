@@ -11,9 +11,9 @@ Mara defines the following symbols.  Notice that all but a few symbols are mappe
 | `/`   | `divide`  | Division            |
 | `^`   | `power`   | Power               |
 *-------*-----------*---------------------*
-| `::`  | `bind`    | Bind                |
-| `|`   | `variant` | Variant Type        |
-| `&`   | `compose` | Type Composition    |
+| `::`  | `Bind`    | Bind                |
+| `|`   | `Variant` | Variant Type        |
+| `&`   | `Compose` | Type Composition    |
 *-------*-----------*---------------------*
 | `.`   | `call`    | Funcion Application |
 *-------*-----------*---------------------*
@@ -24,12 +24,13 @@ Mara defines the following symbols.  Notice that all but a few symbols are mappe
 ## Declarations
 *---------*-------------*
 | `def`   | Function    |
-| ``val`   | Value       |
+| `val`   | Value       |
 | `var`   | Variable    |
-| `ref`   | Reference   |
+| `let`   | Alias       |
 *---------*-------------*
 | `trait` | Trait       |
-| `datum` | Datum       |
+| `object` | Object     |
+| `proto` | Protocol    |
 *---------*-------------*
 
 ## Expression Keywords
@@ -47,18 +48,13 @@ Mara defines the following symbols.  Notice that all but a few symbols are mappe
 | `&&`  |  boolean and  |
 | `^^`  |  boolean xor  |
 | `!`   |  boolean not  |
-| `?`   |  truthy       |
 *-------*---------------*
-
-
-
-~   binary
-~!  binary not
-~|  binary or
-~&  binary and
-~>> shift right
-~<< shift left
-
+| `~|`  | binary or     |
+| `~!`  | binary not    |
+| `~&`  | binary and    |
+| `~>>` | shift right   |
+| `~<<` | shift left    |
+*-------*---------------*
 
 
 

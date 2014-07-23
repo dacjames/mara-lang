@@ -1,0 +1,10 @@
+val outer
+
+match test
+as x { etc }                    # identity
+as 0 { etc }                    # literal
+as [a, b] { etc }               # table (scalar)
+as [x: a, y: b] { etc }         # table (keyvalue)
+as .odd( etc )                  # function (-> Bool)
+as List(head: 10, tail: rest)   # objects
+

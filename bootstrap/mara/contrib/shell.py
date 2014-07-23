@@ -1,7 +1,7 @@
 USAGE = '''
 Usage:
     mara
-    mara <file>                         [options]
+    mara <code-file>                    [options]
     mara status                         [options]
     mara compile <code-file>            [options]
     mara eval <code-block>              [options]
@@ -18,7 +18,7 @@ Options:
     -p, --pretty                    Pretty print any output
 
     -f, --file      [<file>]        Write/Load file
-    -s, --string    [<string>]      Write/Read utf8 encoded string
+    -s, --string    [<string>]      Write/Read string
     -j, --json      [<object>]      Write/Read utf8 encoded json
     -b, --bytecode  [<msgpack>]     Write/Read binary msgpack
 '''
@@ -65,48 +65,8 @@ EXAMPLE = '''
 
 from docopt import docopt
 
-def main_eval(args, options):
-    print args, options
-
 if __name__ == '__main__':
-
-    def extract(main_func_name):
-        return '_'.join(name.split('_')[1:])
-
-    main_funcs = [
-        (extract(name), func)
-        for name, func in globals().items()
-        if callable(func) and name.lower().startswith('main')
-    ]
-
-    raw_args = docopt(USAGE)
-    print raw_args
-
-    args = {}
-    options = {}
-    commands = {}
-
-    for key, value in raw_args.items():
-        if key.startswith('--'):
-            options[key] = value
-
-        elif (key.startswith('<') and key.endswith('>')) or (key.upper() == key):
-            args[key] = value
-
-        else:
-            commands[key] = value
-
-    default_arg = args['<file>']
-    if default_arg in commands:
-        args['<file>'] = None
-        commands[default_arg] = True
-
-    for name, func in main_funcs:
-        if commands.get(name):
-            func(args, options)
-
     args = docopt(USAGE)
-
 
 
 

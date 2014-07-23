@@ -1,8 +1,8 @@
-`module
-import typeutil
+module
+import meta
 
-depend SEP = 'fs/path/SEP'
-depend OS = 'os/TMP_DIR'
+SEP = depend 'fs/path/SEP'
+OS = depend 'os/TMP_DIR'
 
 trait Path {
     def value -> Text
@@ -11,9 +11,9 @@ trait Path {
     def istmp -> Bool
 }
 
-def Text::isabs = this[0] == SEP
-def Text::isrel = this[0] != SEP
-def Text::istmp = this.contains TMP_DIR
+def Text::isabs { this[0] == SEP }
+def Text::isrel { this[0] != SEP }
+def Text::istmp { this.contains TMP_DIR }
 
 @meta.proxy
 datum RelPath { value Text; path_offsets Int64.Array }
@@ -26,10 +26,10 @@ datum TmpPath { value Text; rel_offset Int8 }
 
 
 def Path(value String) {
-    match value .= text
-    as value.isrel RelPath(value, value.findall '/'
-    as value.isabs AbsPath(value, value.findall '/')
-    as value.istmp TmpPath(value, value.lastindexof OS/TMP_DIR)
+    match value = value.text
+    as .isrel { RelPath(value, value.findall '/' }
+    as .isabs { AbsPath(value, value.findall '/') }
+    as .istmp { TmpPath(value, value.lastindexof OS/TMP_DIR) }
 }
 
 
