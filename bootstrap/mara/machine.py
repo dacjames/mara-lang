@@ -6,7 +6,7 @@ import functools
 
 from collections import defaultdict
 import special
-
+from assembler import Assembler
 
 def builtin_comparison(pred):
 
@@ -35,6 +35,8 @@ class Machine(object):
     A simple, register-based virtual machine.
     '''
     def __init__(self, buffered=False, traced=False):
+        self._assembler = Assembler()
+
         self._code = []
         self._regs_buffer = [None] * 4
         self._pc = 0
@@ -87,7 +89,7 @@ class Machine(object):
     ##########################################################################
 
     def _load(self, code, constant_pool=None):
-        self._code = code
+        self._code = self._assembler.assemble(code)
         self._pool = constant_pool
 
     def _describe(self):
@@ -126,7 +128,7 @@ class Machine(object):
         # iterations = 0
 
         while self._pc < end:
-            # if iterations > 1000:
+            # if iterations > 100:
             #     print('max iterations')
             #     break
 
@@ -270,6 +272,18 @@ class Machine(object):
         else:
             raise TypeError(left, right)
 
+    def noop(self):
+        '''
+        Do nothing.
+        '''
+        pass
+
+    def label(self, name):
+        '''
+        Skip labels.
+        '''
+        pass
+
     ##########################################################################
     # Printing
     ##########################################################################
@@ -365,21 +379,14 @@ class Machine(object):
     # Jumping
     ##########################################################################
 
-    def jump_r(self, offset):
-        '''
-        Relative jump a constant offset from the current pc.
-        '''
-        # -1 to cancel out loop iteration
-        self._pc += (offset - 1)
-
-    def jump_a(self, address):
+    def jump(self, address):
         '''
         Absolute jump to a constant address.
         '''
         # -1 to cancel out loop iteration
         self._pc = (address - 1)
 
-    def jump_rr(self, offset):
+    def jump_ir(self, offset):
         '''
         Jump relatively through a reg offset.
         '''
@@ -388,7 +395,7 @@ class Machine(object):
         # -1 to cancel out loop iteration
         self._pc += (offset - 1)
 
-    def jump_ra(self, address):
+    def jump_ia(self, address):
         '''
         Jump absolutely to an address store in reg address.
         '''
@@ -401,56 +408,26 @@ class Machine(object):
     # Branching
     ##########################################################################
 
-    def branch_zero(self, pred, jmp_offset):
+    def branch_zero(self, pred, address):
         '''
-        Branch relative if the value in reg pred is zero.
+        Branch to address if the value in reg pred is zero.
         '''
         if self._get(pred) == 0:
-            self._pc += (jmp_offset - 1)  # -1 to cancel loop iteration
+            self._pc = (address - 1)  # -1 to cancel loop iteration
 
-    def branch_one(self, pred, jmp_offset):
+    def branch_one(self, pred, address):
         '''
-        Branch relative if the value in reg pred is not zero.
+        Branch to address if the value in reg pred is not zero.
         '''
         if self._get(pred) == 1:
-            self._pc += (jmp_offset - 1)  # -1 to cancel loop iteration
+            self._pc = (address - 1)  # -1 to cancel loop iteration
 
-    def branch_eq(self, left, right, jmp_offset):
+    def branch_eq(self, left, right, address):
         '''
-        Branch relative if the value in reft left is equal to the value in reg ri ght.
+        Branch to address if the value in reft left is equal to the value in reg ri ght.
         '''
         if self._get(left) == self._get(right):
-            self._pc += (jmp_offset - 1)  # -1 to cancel loop iteration
-
-    def branch_gt(self, left, right, jmp_offset):
-        '''
-        Branch relative if the value in reg left is greater than the value in reg right.
-        '''
-        if self._get(left) > self._get(right):
-            self._pc += (jmp_offset - 1)  # -1 to cancel loop iteration
-
-    def branch_lt(self, left, right, jmp_offset):
-        '''
-        Branch relative if the value in reg pred is less than the value in reg right.
-        '''
-        if self._get(left) < self._get(right):
-            self._pc += (jmp_offset - 1)  # -1 to cancel loop iteration
-
-    def branch_gte(self, left, right, jmp_offset):
-        '''
-        Branch relative if the value in reg pred is
-        greater than or equal to the value in reg right.
-        '''
-        if self._get(left) >= self._get(right):
-            self._pc += (jmp_offset - 1)  # -1 to cancel loop iteration
-
-    def branch_lte(self, left, right, jmp_offset):
-        '''
-        Branch relative if the value in reg pred is
-        less than or equal to the value in reg right.
-        '''
-        if self._get(left) <= self._get(right):
-            self._pc += (jmp_offset - 1)  # -1 to cancel loop iteration
+            self._pc = (address - 1)  # -1 to cancel loop iteration
 
     ##########################################################################
     # Register Manipulation

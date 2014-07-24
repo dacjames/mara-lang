@@ -9,6 +9,7 @@ import scope
 import special
 import constant
 from util.dispatch import method_store, multimethod
+from util.functions import unique_id
 from util.reflection import deriving
 
 
@@ -45,6 +46,8 @@ class RegistryFrame(deriving('show', 'eq')):
         self.regs = {}
         self.parent = parent
 
+        self._unique_name = None
+
     def __call__(self, i):
         try:
             reg = self.regs[i]
@@ -53,6 +56,15 @@ class RegistryFrame(deriving('show', 'eq')):
 
         return reg
 
+    @property
+    def unique_name(self):
+        if self._unique_name is None:
+            self._unique_name = unique_id('f')
+
+        return self._unique_name
+
+    def label(self, name):
+        return '{f}_{n}'.format(f=self.unique_name, n=name)
 
 class Compiler(object):
     '''
@@ -102,6 +114,20 @@ class Compiler(object):
         bytecodes.append(('halt',))
         return bytecodes
 
+
+    def emit(self, *instructions):
+        self.block += instructions
+
+    def hole(self):
+        index = len(self.block)
+        self.block.append(None)
+        return index
+
+    def patch(self, index, instruction):
+        if self.block[index] != None:
+            raise ValueError('Must patch a hole, not ' + str(self.block[index]))
+        self.block[index] = instruction
+
     @multimethod(_store)
     def visit(self, n):
         raise TypeError('Node type {n} not yet supported for compilation'.format(n=n.__class__))
@@ -114,9 +140,9 @@ class Compiler(object):
     def _(self, n):
         r = self.registry.frame()
 
-        self.block += [
+        self.emit(
             ('load_c', r(0), n['constant']),
-        ]
+        )
 
         return r(0)
 
@@ -124,9 +150,9 @@ class Compiler(object):
     def _(self, n):
         r = self.registry.frame()
 
-        self.block += [
+        self.emit(
             ('load_c', r(0), n['constant'])
-        ]
+        )
 
         return r(0)
 
@@ -134,9 +160,9 @@ class Compiler(object):
     def _(self, n):
         r = self.registry.frame()
 
-        self.block += [
+        self.emit(
             ('load_c', r(0), n['constant']),
-        ]
+        )
 
         return r(0)
 
@@ -145,9 +171,9 @@ class Compiler(object):
         result = self.visit(n.value)
         index = n['index']
 
-        self.block += [
+        self.emit(
             ('store_p', result, index),
-        ]
+        )
 
         return result
 
@@ -157,9 +183,9 @@ class Compiler(object):
 
         index = n['index']
 
-        self.block += [
+        self.emit(
             ('store_p', result, index)
-        ]
+        )
 
         return result
 
@@ -173,9 +199,9 @@ class Compiler(object):
 
         index = declaration['index']
 
-        self.block += [
+        self.emit(
             ('load_p', r(0), index)
-        ]
+        )
 
         return self.result(r(0))
 
@@ -189,9 +215,9 @@ class Compiler(object):
 
         result = self.visit(n.value)
 
-        self.block += [
+        self.emit(
             ('store_p', result, index)
-        ]
+        )
 
         return self.result(result)
 
@@ -200,38 +226,38 @@ class Compiler(object):
         r = self.registry.frame()
         index = n['index']
 
-        self.block += [
+        self.emit(
             ('load_p', r(0), index),
-        ]
+        )
 
         return self.result(r(0))
 
     @visit.d(node.Def)
     def _(self, n):
         r = self.registry.frame()
+        l = r.label
 
         local_variables = n['locals']
 
-        #  +1 for address load, +1 for hole
-        address = len(self.block) + 2
+        #  +1 for address load, +1 for hole, +1 for label
+        address = len(self.block) + 3
 
         # store the address of the function as the result.
-        self.block += [
+        self.emit(
             ('load_v', r(0), address),
-            None,  # patch with skip
-        ]
-        skip_label = len(self.block) - 1
+            ('label', l('skip_label')),
+            ('jump', l('end')),
+        )
 
         # set attributes
         n['address'] = address
         n['result'] = r(0)
 
         # reserve space for local variables
-        self.block += [
+        self.emit(
             ('reserve', len(local_variables)),
-            None,   # patch with save
-        ]
-        save_label = len(self.block) - 1
+        )
+        save = self.hole()
 
         # track what registers we use in the function,
         # +1 because register numbers start at 1 (0 is special)
@@ -245,54 +271,40 @@ class Compiler(object):
         local_registers = range(reg_begin_index, reg_end_index)
 
         # generate the return of the result
-        self.block += [
+        self.emit(
             ('copy', 0, ret),
             tuple(['restore'] + local_registers),
             ('ret',),
-        ]
-        end_label = len(self.block)
+            ('label', l('end')),
+        )
 
         # patch in the save
-        self.block[save_label] = tuple(['save'] + local_registers)
-
-        # skip past the declaration
-        self.block[skip_label] = ('jump_a', end_label)
+        self.patch(save, tuple(['save'] + local_registers))
 
         return self.result(r(0))
 
     @visit.d(node.While)
     def _(self, n):
         r = self.registry.frame()
+        l = r.label
 
         # capture the "top" of the loop
-        begin_label = len(self.block)
+        self.emit(('label', l('begin')))
 
         # compute the predicate
         pred_result = self.visit(n.pred)
 
         # generate the skip
-        self.block += [
-            None  # patch with skip
-        ]
-        skip_label = len(self.block) - 1
+        self.emit(('branch_zero', pred_result, l('end')))
 
         # generate the body
-        body_label = len(self.block)
         loop_result = self.visit(n.body)
 
-        jump_label = len(self.block)
-
-        loop_offset = jump_label - begin_label
-
-        # +2 to account for the jump and skip
-        skip_offest = jump_label - body_label + 2
-
         # loop
-        self.block += [
-            ('jump_r', -loop_offset),
-        ]
+        self.emit(('jump', l('begin')))
 
-        self.block[skip_label] = ('branch_zero', pred_result, skip_offest)
+        # end of loop
+        self.emit(('label', l('end')))
 
         return self.result(loop_result)
 
@@ -315,10 +327,10 @@ class Compiler(object):
         ]
 
         # generate the call
-        self.block += [
+        self.emit(
             tuple(['call', address] + arg_registers),
             ('copy', r(0), 0),
-        ]
+        )
 
         return self.result(r(0))
 
@@ -331,8 +343,6 @@ class Compiler(object):
         left_expr = n.args[0]
         right_expr = n.args[1]
 
-        print 'binop', n
-
         op = self._builtins.get(func, None)
 
         if op is None:
@@ -342,45 +352,39 @@ class Compiler(object):
 
         right = self.visit(right_expr)
 
-        self.block += [
+        self.emit(
             (op, r(0), left, right),
-        ]
+        )
 
         return self.result(r(0))
 
     @visit.d(node.If)
     def _(self, n):
         r = self.registry.frame()
+        l = r.label
 
         pred_expr = n.pred
         if_body_expr = n.if_body
         else_body_expr = n.else_body
 
         pred = self.visit(pred_expr)
-        branch_label = len(self.block)
-        self.block += [
-            None,  # patch with branch
-        ]
+
+        self.emit(('branch_zero', pred, l('else_body')))
 
         body_result = self.visit(if_body_expr)
 
-        skip_label = len(self.block)
-        self.block += [
-            None,  # patch with skip
-        ]
+        self.emit(
+            ('jump', l('if_end')),
+            ('label', l('else_body')),
+        )
 
-        else_label = len(self.block)
         else_result = self.visit(else_body_expr)
 
-        end_label = len(self.block)
+        self.emit(('label', l('if_end')))
 
-        else_offset = else_label - branch_label
-        self.block[branch_label] = ('branch_zero', pred, else_offset)
-        self.block[skip_label] = ('jump_a', end_label)
-
-        self.block += [
+        self.emit(
             ('phi', r(0), body_result, else_result)
-        ]
+        )
 
         return self.result(r(0))
 
@@ -388,9 +392,9 @@ class Compiler(object):
     def _(self, n):
         r = self.registry.frame()
 
-        self.block += [
+        self.emit(
             ('load_v', r(0), special.NULL)
-        ]
+        )
 
         return self.result(r(0))
 

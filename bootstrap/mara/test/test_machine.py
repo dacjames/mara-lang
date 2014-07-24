@@ -33,11 +33,13 @@ def test_simple_machine(machine):
         ['print_sym', r(2)],
         ['load_v', r(42), 10],
         ['add', r(1), r(1), r(42)],
+        ['label', 'loop'],
         ['load_v', r(42), -10],
         ['add', r(1), r(1), r(42)],
         ['print_reg', r(1)],
         ['load_v', r(3), 0],
-        ['branch_gte', r(1), r(3), -3],
+        ['gte', r(4), r(1), r(4)],
+        ['branch_one', r(4), 'loop'],
         ['halt'],
     ])
 
@@ -55,34 +57,32 @@ def test_simple_machine(machine):
     ]
 
 
-def test_jumps(machine):
-    machine._load([
-        ['jump_r', 8],          # jump to a
-        ['load_v', r(0), 0],    # label x
-        ['jump_r', 7],          # jump to b
-        ['load_v', r(1), 1],    # label y
-        ['jump_r', 7],          # jump to c
-        ['load_v', r(2), 2],    # label z
-        ['jump_r', 7],          # jump to end
-        ['jump_r', 0],          # better never get here!
-        ['jump_a', 1],          # label a, jump to x
-        ['load_v', r(3), 3],    # label b
-        ['jump_ra', r(3)],      # jump to y
-        ['load_v', r(4), -7],   # label c
-        ['jump_rr', r(4)],      # jump to z
-        ['print_reg', r(0)],    # label end
-        ['print_reg', r(1)],
-        ['print_reg', r(2)],
-        ['halt'],
-    ])
+# def test_jumps(machine):
+#     machine._load([
+#         ['load_v', r(0), 0],    # label x
+#         ['jump_r', 7],          # jump to b
+#         ['load_v', r(1), 1],    # label y
+#         ['jump_r', 7],          # jump to c
+#         ['load_v', r(2), 2],    # label z
+#         ['jump_r', 7],          # jump to end
+#         ['jump_r', 0],          # better never get here!
+#         ['load_v', r(3), 3],    # label b
+#         ['jump_ra', r(3)],      # jump to y
+#         ['load_v', r(4), -7],   # label c
+#         ['jump_ir', r(4)],      # jump to z
+#         ['print_reg', r(0)],    # label end
+#         ['print_reg', r(1)],
+#         ['print_reg', r(2)],
+#         ['halt'],
+#     ])
 
-    machine._loop()
+#     machine._loop()
 
-    assert machine._print_buffer == [
-        'r0:0',
-        'r1:1',
-        'r2:2',
-    ]
+#     assert machine._print_buffer == [
+#         'r0:0',
+#         'r1:1',
+#         'r2:2',
+#     ]
 
 
 def test_branches(machine):
@@ -90,31 +90,24 @@ def test_branches(machine):
         ['load_v', r(0), 0],
         ['load_v', r(1), 1],
         ['load_v', r(2), 0],
-        ['branch_lt', r(1), r(0), 22],    # branch to error
-        ['branch_lt', r(2), r(0), 21],    # branch to error
-        ['branch_lt', r(0), r(1), 22],    # branch to good
-        ['branch_lte', r(1), r(0), 19],   # branch to error
-        ['branch_lte', r(0), r(2), 1],
-        ['branch_lte', r(0), r(1), 19],   # branch to good
-        ['branch_gt', r(0), r(1), 16],    # branch to error
-        ['branch_gt', r(0), r(2), 15],    # branch to error
-        ['branch_gt', r(1), r(0), 16],    # branch to good
-        ['branch_gte', r(0), r(1), 13],   # branch to error
-        ['branch_gte', r(0), r(2), 1],
-        ['branch_gte', r(1), r(0), 13],   # branch to good
-        ['branch_zero', r(1), 10],
-        ['branch_zero', r(0), 11],
-        ['branch_one', r(0), 8],
-        ['branch_one', r(1), 9],
-        ['jump_r', 6],                    # jump to success
-        ['jump_a', 6],                    # jump to lte test
-        ['jump_a', 9],                    # jump to gt test
-        ['jump_a', 12],                   # jump to gte test
-        ['jump_a', 15],                   # jump to zero test
-        ['jump_a', 17],                   # jump to one test
+        ['branch_zero', r(1), 'failure'],
+        ['branch_zero', r(0), 'zero_success'],
+        ['label', 'test_one'],
+        ['branch_one', r(0), 'failure'],
+        ['branch_one', r(1), 'one_success'],
+        ['label', 'test_eq'],
+        ['branch_eq', r(0), r(1), 'failure'],
+        ['branch_eq', r(1), r(1), 'success'],
+        ['label', 'zero_success'],
+        ['jump', 'test_one'],
+        ['label', 'one_success'],
+        ['jump', 'test_eq'],
+        ['label', 'failure'],
         ['load_v', r(99), 0],             # failure
-        ['jump_r', 2],
+        ['jump', 'end'],
+        ['label', 'success'],
         ['load_v', r(99), 1],             # success
+        ['label', 'end'],
         ['print_reg', r(99)],
     ])
 
