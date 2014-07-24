@@ -71,7 +71,7 @@ def p_expr(p):
             | declaration
             | call
             | definition
-            | proto
+            | specification
     '''
 
     p[0] = p[1]
@@ -611,23 +611,62 @@ def p_block_call(p):
 
     return p[0]
 
-def p_proto(p):
-    '''proto : default_proto
-             | generic_proto
+def p_specification(p):
+    '''specification : proto
+                     | trait
+                     | object
     '''
     p[0] = p[1]
 
 
-def p_default_proto(p):
-    '''default_proto : PROTO tid block
-    '''
-    p[0] = node.Proto(name=p[2], body=p[3])
+def _spec(kind):
+    def _p_spec(p):
+        p[0] = p[1]
+
+    _p_spec.__doc__ = '''
+        {kind} : default_{kind}
+               | generic_{kind}
+    '''.format(kind=kind)
+
+    _p_spec.__name__ = 'p_{kind}'.format(kind=kind)
+
+    return _p_spec
 
 
-def p_generic_proto(p):
-    '''generic_proto : PROTO tid def_param block
-    '''
-    p[0] = node.Proto(name=p[2], body=p[4], param=p[3])
+def _default_spec(rule, terminal, cls):
+    def _p_default_spec(p):
+        p[0] = cls(name=p[2], body=p[3])
+
+    _p_default_spec.__doc__ = '''{rule} : {terminal} tid block
+    '''.format(rule=rule, terminal=terminal)
+
+    _p_default_spec.__name__ = 'p_{rule}'.format(rule=rule)
+
+    return _p_default_spec
+
+
+def _generic_spec(rule, terminal, cls):
+    def _p_generic_spec(p):
+        p[0] = cls(name=p[2], body=p[4], param=p[3])
+
+    _p_generic_spec.__doc__ = '''{rule} : {terminal} tid def_param block
+    '''.format(rule=rule, terminal=terminal)
+
+    _p_generic_spec.__name__ = 'p_{rule}'.format(rule=rule)
+
+    return _p_generic_spec
+
+p_proto         = _spec('proto')
+p_default_proto = _default_spec('default_proto', 'PROTO', node.Proto)
+p_generic_proto = _generic_spec('generic_proto', 'PROTO', node.Proto)
+
+p_object            =_spec('object')
+p_default_object    = _default_spec('default_object', 'OBJECT', node.Object)
+p_generic_object    = _generic_spec('generic_object', 'OBJECT', node.Object)
+
+p_trait         = _spec('trait')
+p_default_trait = _default_spec('default_trait', 'TRAIT', node.Trait)
+p_generic_trait = _generic_spec('generic_trait', 'TRAIT', node.Trait)
 
 
 def p_error(tok):

@@ -716,7 +716,7 @@ def test_parse_comments(parser):
     assert expected == result
 
 
-def test_parse_protocols(parser):
+def test_parse_specifications(parser):
     given = maramodule('test', '''
         proto Compare {
             def foo () {}
@@ -726,6 +726,26 @@ def test_parse_protocols(parser):
         proto Compare (T Any) {
             def foo () T {}
             def bar (t T) {}
+        }
+
+        trait Qua {
+            def foo () {}
+            def bar () {}
+        }
+
+        trait Qua (T Any) {
+            def foo () T {}
+            def bar (t T) {}
+        }
+
+        object Qua {
+            val x Int
+            val y Int
+        }
+
+        object Qua (T Num) {
+            val x T
+            val y T
         }
     ''')
 
@@ -773,6 +793,88 @@ def test_parse_protocols(parser):
                     n.Param(
                         name=n.TypeId(value='T'),
                         type_=n.TypeId(value='Any')
+                    ),
+                ]),
+            ),
+            n.Trait(
+                name=n.TypeId(value='Qua'),
+                body=n.Block(exprs=[
+                    n.Def(
+                        name=n.ValueId(value='foo'),
+                        param=n.Tuple(values=[]),
+                        body=n.Block(exprs=[]),
+                        return_type=n.InferType()
+                    ),
+                    n.Def(
+                        name=n.ValueId(value='bar'),
+                        param=n.Tuple(values=[]),
+                        body=n.Block(exprs=[]),
+                        return_type=n.InferType()
+                    ),
+                ]),
+                param=n.Tuple(values=[])
+            ),
+            n.Trait(
+                name=n.TypeId(value='Qua'),
+                body=n.Block(exprs=[
+                    n.Def(
+                        body=n.Block(exprs=[]),
+                        name=n.ValueId(value='foo'),
+                        param=n.Tuple(values=[]),
+                        return_type=n.TypeId(value='T')
+                    ),
+                    n.Def(
+                        name=n.ValueId(value='bar'),
+                        body=n.Block(exprs=[]),
+                        param=n.Tuple(values=[
+                            n.Param(
+                                name=n.ValueId(value='t'),
+                                type_=n.TypeId(value='T')
+                            ),
+                        ]),
+                        return_type=n.InferType())
+                ]),
+                param=n.Tuple(values=[
+                    n.Param(
+                        name=n.TypeId(value='T'),
+                        type_=n.TypeId(value='Any')
+                    ),
+                ]),
+            ),
+            n.Object(
+                name=n.TypeId(value='Qua'),
+                body=n.Block(exprs=[
+                    n.Val(
+                        name=n.ValueId(value='x'),
+                        value=n.Unit(),
+                        type_=n.TypeId('Int'),
+                    ),
+                    n.Val(
+                        name=n.ValueId(value='y'),
+                        value=n.Unit(),
+                        type_=n.TypeId('Int'),
+                    ),
+                ]),
+                param=n.Tuple(values=[])
+            ),
+            n.Object(
+                name=n.TypeId(value='Qua'),
+                body=n.Block(exprs=[
+                    n.Val(
+                        name=n.ValueId(value='x'),
+                        value=n.Unit(),
+                        type_=n.TypeId('T'),
+                    ),
+                    n.Val(
+                        name=n.ValueId(value='y'),
+                        value=n.Unit(),
+                        type_=n.TypeId('T'),
+                    ),
+                ]),
+                param=n.Tuple(values=[
+                    n.Param(
+                        name=n.TypeId(value='T'),
+                        type_=n.TypeId(value='Num')
                     ),
                 ]),
             )

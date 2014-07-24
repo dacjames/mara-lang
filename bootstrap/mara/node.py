@@ -361,8 +361,7 @@ class Def(Node):
         walk(self.body, visitor)
 
 
-class Proto(Node):
-
+class _Specification(Node):
     def __init__(self, name, body, param=None):
         Node.__init__(self)
 
@@ -373,6 +372,19 @@ class Proto(Node):
             self.param = param
         else:
             self.param = Tuple([])
+
+
+class Proto(_Specification):
+    pass
+
+
+class Object(_Specification):
+    pass
+
+
+class Trait(_Specification):
+    pass
+
 
 ##############################################################################
 # Types
