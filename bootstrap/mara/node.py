@@ -361,6 +361,19 @@ class Def(Node):
         walk(self.body, visitor)
 
 
+class Proto(Node):
+
+    def __init__(self, name, body, param=None):
+        Node.__init__(self)
+
+        self.name = name
+        self.body = body
+
+        if param is not None:
+            self.param = param
+        else:
+            self.param = Tuple([])
+
 ##############################################################################
 # Types
 ##############################################################################
@@ -398,3 +411,5 @@ class FunctionType(Node):
     def recurse(self, visitor, walk):
         walk(self.param_type, visitor)
         walk(self.return_type, visitor)
+
+

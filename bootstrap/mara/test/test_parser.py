@@ -716,6 +716,75 @@ def test_parse_comments(parser):
     assert expected == result
 
 
+def test_parse_protocols(parser):
+    given = maramodule('test', '''
+        proto Compare {
+            def foo () {}
+            def bar () {}
+        }
+
+        proto Compare (T Any) {
+            def foo () T {}
+            def bar (t T) {}
+        }
+    ''')
+
+    expected = n.Module(name='test',
+        exprs=[
+            n.Proto(
+                name=n.TypeId(value='Compare'),
+                body=n.Block(exprs=[
+                    n.Def(
+                        name=n.ValueId(value='foo'),
+                        param=n.Tuple(values=[]),
+                        body=n.Block(exprs=[]),
+                        return_type=n.InferType()
+                    ),
+                    n.Def(
+                        name=n.ValueId(value='bar'),
+                        param=n.Tuple(values=[]),
+                        body=n.Block(exprs=[]),
+                        return_type=n.InferType()
+                    ),
+                ]),
+                param=n.Tuple(values=[])
+            ),
+            n.Proto(
+                name=n.TypeId(value='Compare'),
+                body=n.Block(exprs=[
+                    n.Def(
+                        body=n.Block(exprs=[]),
+                        name=n.ValueId(value='foo'),
+                        param=n.Tuple(values=[]),
+                        return_type=n.TypeId(value='T')
+                    ),
+                    n.Def(
+                        name=n.ValueId(value='bar'),
+                        body=n.Block(exprs=[]),
+                        param=n.Tuple(values=[
+                            n.Param(
+                                name=n.ValueId(value='t'),
+                                type_=n.TypeId(value='T')
+                            ),
+                        ]),
+                        return_type=n.InferType())
+                ]),
+                param=n.Tuple(values=[
+                    n.Param(
+                        name=n.TypeId(value='T'),
+                        type_=n.TypeId(value='Any')
+                    ),
+                ]),
+            )
+        ],
+    )
+
+    result = parser.parse(given)
+
+    assert expected == result
+
+
+
 @pytest.mark.xfail
 def test_always_fail():
     raise Exception

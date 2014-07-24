@@ -71,6 +71,7 @@ def p_expr(p):
             | declaration
             | call
             | definition
+            | proto
     '''
 
     p[0] = p[1]
@@ -516,6 +517,7 @@ def p_def_return(p):
 def p_param(p):
     '''param : untyped_param
              | typed_param
+             | bounded_param
     '''
     p[0] = p[1]
 
@@ -530,6 +532,11 @@ def p_untyped_param(p):
     '''untyped_param : vid
     '''
     p[0] = node.Param(name=p[1])
+
+def p_bounded_param(p):
+    '''bounded_param : tid tid
+    '''
+    p[0] = node.Param(name=p[1], type_=p[2])
 
 
 def p_call(p):
@@ -603,6 +610,24 @@ def p_block_call(p):
     p[0] = call
 
     return p[0]
+
+def p_proto(p):
+    '''proto : default_proto
+             | generic_proto
+    '''
+    p[0] = p[1]
+
+
+def p_default_proto(p):
+    '''default_proto : PROTO tid block
+    '''
+    p[0] = node.Proto(name=p[2], body=p[3])
+
+
+def p_generic_proto(p):
+    '''generic_proto : PROTO tid def_param block
+    '''
+    p[0] = node.Proto(name=p[2], body=p[4], param=p[3])
 
 
 def p_error(tok):
