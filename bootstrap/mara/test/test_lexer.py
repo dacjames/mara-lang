@@ -62,8 +62,8 @@ def test_lex_keywords(lex_simple):
         if else
         for in
         while
-        def val var ref mut
-        datum trait type
+        def val var let
+        object trait proto
     end'''
 
     output = list(lex_simple(given))
@@ -84,12 +84,11 @@ def test_lex_keywords(lex_simple):
         ('DEF', 'def'),
         ('VAL', 'val'),
         ('VAR', 'var'),
-        ('REF', 'ref'),
-        ('MUT', 'mut'),
+        ('LET', 'let'),
         ('TERM', '\n'),
-        ('DATUM', 'datum'),
+        ('OBJECT', 'object'),
         ('TRAIT', 'trait'),
-        ('TYPE', 'type'),
+        ('PROTO', 'proto'),
         ('TERM', '\n'),
         ('END', 'end'),
     ]

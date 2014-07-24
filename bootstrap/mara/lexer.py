@@ -47,8 +47,8 @@ KEYWORDS = set(k.upper() for k in [
     'while',
     'if', 'else',
     'for', 'in',
-    'def', 'val', 'var', 'ref', 'mut',
-    'datum', 'trait', 'type',
+    'def', 'val', 'var', 'let',
+    'object', 'trait', 'proto',
 ])
 
 tokens = (
