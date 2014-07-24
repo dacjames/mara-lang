@@ -20,7 +20,7 @@ class CollectNames(object):
 
     @visit.d(node.Block)
     def _(self, n):
-        if 'def_context' not in n:
+        if 'def_context' not in n and 'spec_context' not in n:
             self.namespace = self.namespace.child(n.unique_name)
 
         n['namespace'] = self.namespace
@@ -61,3 +61,25 @@ class CollectNames(object):
 
         self.namespace.declare(ident, n)
         n['namespace'] = self.namespace
+
+    @visit.d(node.Object)
+    def _(self, n):
+        self._visit_spec(n)
+
+    @visit.d(node.Trait)
+    def _(self, n):
+        self._visit_spec(n)
+
+    @visit.d(node.Proto)
+    def _(self, n):
+        self._visit_spec(n)
+
+    def _visit_spec(self, n):
+        ident = n.name.value
+
+        self.namespace.declare(ident, n)
+
+        n.body['spec_context'] = n
+
+        n['namespace'] = self.namespace
+        self.namespace = self.namespace.child(ident)

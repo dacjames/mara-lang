@@ -120,6 +120,19 @@ def test_collect_names(parser, collect_names):
 
         z = 30
         def foo (x) {}
+
+        proto QuaP {
+            def foo (x) {}
+        }
+
+        trait QuaT {
+            def foo (x) {}
+        }
+
+        object QuaO {
+            val x = 10
+        }
+
     ''')
 
     expected = {
@@ -135,6 +148,20 @@ def test_collect_names(parser, collect_names):
             name=node.ValueId('foo'),
             param=node.Tuple([node.Param(node.ValueId('x'))]),
             body=node.Block([]),
+        ),
+        'QuaP.foo': node.Def(
+            name=node.ValueId('foo'),
+            param=node.Tuple([node.Param(node.ValueId('x'))]),
+            body=node.Block([]),
+        ),
+        'QuaT.foo': node.Def(
+            name=node.ValueId('foo'),
+            param=node.Tuple([node.Param(node.ValueId('x'))]),
+            body=node.Block([]),
+        ),
+        'QuaO.x': node.Val(
+            name=node.ValueId('x'),
+            value=node.Int('10'),
         ),
     }
 
