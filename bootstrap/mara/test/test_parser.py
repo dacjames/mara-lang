@@ -154,6 +154,52 @@ def test_parse_function_call(parser):
     assert expected == result
 
 
+def test_function_call_if_regression(parser):
+    given = maramodule('test', '''
+        def bool (x) {
+            if x == 0 { true }
+            else { false }
+        }
+
+        if bool(1) {
+            42
+        } else {
+            99
+        }
+    ''')
+
+    expected = n.Module(name='test', exprs=[
+        n.Def(
+            name=n.ValueId(value='bool'),
+            param=n.Tuple(values=[n.Param(name=n.ValueId(value='x'), type_=n.InferType())]),
+            body=n.Block(exprs=[
+                n.If(
+                    pred=n.BinOp(args=[n.ValueId(value='x'), n.Int(value='0')], func=n.SymbolId(value='==')),
+                    if_body=n.Block(exprs=[n.Bool(value='1')]),
+                    else_body=n.Unit(),
+                ),
+                n.Else(
+                    body=n.Block(exprs=[n.Bool(value='0')]),
+                    expr=None,
+                )
+            ]),
+            return_type=n.InferType()
+        ),
+        n.If(
+            pred=n.Call(
+                arg=n.Tuple(values=[n.Int(value='1')]),
+                func=n.ValueId(value='bool'),
+            ),
+            if_body=n.Block(exprs=[n.Int(value='42')]),
+            else_body=n.Block(exprs=[n.Int(value='99')]),
+        ),
+    ])
+
+    result = parser.parse(given)
+
+    assert expected == result
+
+
 def test_exprs_parse_assignment(parser):
     given = maramodule('assignment', '''
         a = 10

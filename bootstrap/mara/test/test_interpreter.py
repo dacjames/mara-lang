@@ -223,14 +223,18 @@ def test_loop(interpreter):
             else { true }
         }
 
+        def lt(a, b) {
+            a < b
+        }
+
         var x = 10
         (x = x - 1) while x > 0
 
-        if (bool(x)) {
+        if bool(x) {
             42
         } else {
             var z = (10 * -1)
-            while z < 0 {
+            while lt(z, 0) {
                 z = z + 1
             }
         }

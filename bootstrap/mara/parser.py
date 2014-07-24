@@ -212,11 +212,24 @@ def p_if(p):
 
     return p[0]
 
-
 def p_prefix_if(p):
     '''prefix_if : IF expr block
+                 | IF block_call
     '''
-    p[0] = node.If(pred=p[2], if_body=p[3])
+    # The second rule manually resolves a conflict between if and block calls.
+    # expressions like:
+    #    if foo(x) { etc }
+    # will parse as
+    #    if (foo(x) { etc })
+    # when we actually want them to parse as
+    #    if (foo(x)) { etc }
+
+    if len(p) == 3:
+        call = p[2]
+        newcall = node.Call(arg=call.arg, func=call.func)
+        p[0] = node.If(pred=newcall, if_body=call.block)
+    else:
+        p[0] = node.If(pred=p[2], if_body=p[3])
 
     return p[0]
 
@@ -270,8 +283,22 @@ def p_while(p):
 
 def p_prefix_while(p):
     '''prefix_while : WHILE expr block
+                    | WHILE block_call
     '''
-    p[0] = node.While(pred=p[2], body=p[3])
+    # The second rule manually resolves a conflict between while and block calls.
+    # expressions like:
+    #    while foo(x) { etc }
+    # will parse as
+    #    while (foo(x) { etc })
+    # when we actually want them to parse as
+    #    while (foo(x)) { etc }
+
+    if len(p) == 3:
+        call = p[2]
+        newcall = node.Call(arg=call.arg, func=call.func)
+        p[0] = node.While(pred=newcall, body=call.block)
+    else:
+        p[0] = node.While(pred=p[2], body=p[3])
 
 
 def p_postfix_while(p):
