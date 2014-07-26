@@ -1,7 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 '''
-Scope Objects
+Scope Objects.
+
+Handles name resolution according to the following rules.
+
+Method resolution:
+    - Local Functions
+    - Bound Functions
+    - Adopted from Traits
+    - Adopted from Protocols
+    - Global Functions
+
 '''
 
 from util.dispatch import method_store, multimethod
