@@ -1,5 +1,8 @@
 from .. import parser as parser_module
 from .. import node as n
+
+from programs import program_name_resolution
+
 import pytest
 
 # pylint: disable=W0621
@@ -980,7 +983,13 @@ def test_parse_specifications(parser):
 
     assert expected == result
 
+@pytest.mark.xfail
+def test_name_resolution_program(parser, program_name_resolution):
+    ast = parser.parse(program_name_resolution)
 
+    print ast
+
+    assert False
 
 @pytest.mark.xfail
 def test_always_fail():

@@ -1,0 +1,75 @@
+module test
+
+object Point {
+    val x Int
+    val y Int
+}
+
+proto PlusTwo {
+    def plus (a Point, b Point) {
+        etc
+    }
+
+    def minus (a Point, b Point) {
+        etc
+    }
+
+    def times(a Point, b Point) {
+        Point.new(x: a.x * b.x, y: a.x * b.x)
+    }
+
+    def divide(a Point, b Point) {
+        etc
+    }
+}
+
+trait Pointy {
+    def x () Int
+    def y () Int
+
+    def plus (that This) {
+        Point.new (
+            x: (this.x + that.x),
+            y: (this.y + that.y),
+        )
+    }
+
+    def minus (that This) {
+        etc
+    }
+
+    def times (that This) {
+        etc
+    }
+
+    def divide (that This) {
+        etc
+    }
+
+}
+
+def Point::minus (that Point) {
+    etc
+}
+
+def Point::divide (that Point) {
+    Point.new (x: this.x + that.x, y: this.x + that.x)
+}
+
+def test () {
+
+    a = Point(Int).new (0, 0)
+    b = Point(Int).new (1, 1)
+
+    def minus(a Point, b Point) {
+        Point.new (x: a.x - b.x, y: a.x - b.y)
+    }
+
+    a + b   # Pointy.plus(a, b)
+    a - b   # minus(a, b)
+    a * b   # PlusTwo.divide(a, b)
+    a / b   # Point::divide(a, b)
+}
+
+end
+

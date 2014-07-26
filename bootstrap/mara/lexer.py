@@ -88,6 +88,13 @@ def t_MODULE(tok):
     tok.lexer.marabalancer = Balancer()
     return tok
 
+def t_OUTER(tok):
+    r'((?!module).)+'
+    pass
+
+def t_NL(tok):
+    r'\n|\r|\r\n'
+    pass
 
 # Block Comment
 def t_code_BCOMMENT(tok):
@@ -158,7 +165,6 @@ def t_code_END(tok):
     return tok
 
 t_code_ignore = ' \t'
-
 
 def t_error(tok):
     return tok
