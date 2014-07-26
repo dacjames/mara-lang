@@ -466,21 +466,38 @@ def p_var_typed(p):
 
 
 def p_definition(p):
-    '''definition : def_typed
-                  | def_untyped
+    '''definition : def_abstract
+                  | def_concrete
     '''
     p[0] = p[1]
 
     return p[0]
 
 
+def p_def_abstract(p):
+    '''def_abstract : def_typed
+                    | def_untyped
+    '''
+    definition = p[1]
+    definition.body = node.Unit()
+
+    p[0] = definition
+
+def p_def_concrete(p):
+    '''def_concrete : def_abstract block
+    '''
+    definition = p[1]
+    definition.body = p[2]
+
+    p[0] = definition
+
 def p_def_typed(p):
-    '''def_typed : DEF def_name def_param def_return block
+    '''def_typed : DEF def_name def_param def_return
     '''
     p[0] = node.Def(
         name=p[2],
         param=p[3],
-        body=p[5],
+        body=None,
         return_type=p[4],
     )
 
@@ -488,12 +505,12 @@ def p_def_typed(p):
 
 
 def p_def_untyped(p):
-    '''def_untyped : DEF def_name def_param block
+    '''def_untyped : DEF def_name def_param
     '''
     p[0] = node.Def(
         name=p[2],
         param=p[3],
-        body=p[4],
+        body=None,
     )
 
 
