@@ -72,6 +72,7 @@ def p_expr(p):
             | call
             | definition
             | specification
+            | binding
     '''
 
     p[0] = p[1]
@@ -517,6 +518,7 @@ def p_def_untyped(p):
 def p_def_name(p):
     '''def_name : tid
                 | vid
+                | binding
     '''
     p[0] = p[1]
 
@@ -654,6 +656,14 @@ def p_block_call(p):
     p[0] = call
 
     return p[0]
+
+def p_binding(p):
+    '''binding : name BIND name
+    '''
+    # According to mara semantics, can only bind to a type
+    # but we parse bindings to values to aid in error reporting.
+
+    p[0] = node.Binding(left=p[1], right=p[3])
 
 def p_specification(p):
     '''specification : proto

@@ -313,6 +313,15 @@ class BlockComment(_Comment):
     pass
 
 
+class Binding(Node):
+
+    def __init__(self, left, right):
+        Node.__init__(self)
+
+        self.left = left
+        self.right = right
+
+
 class Call(Node):
 
     def __init__(self, func, arg, block=None):

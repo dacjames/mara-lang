@@ -59,6 +59,30 @@ def test_parse_simple_expr(parser):
     assert expected == result
 
 
+def test_parse_binding(parser):
+    given = maramodule('test', '''
+        x::y
+        X::y
+        x::Y
+        X::Y
+    ''')
+
+    expected = n.Module(name='test', exprs=[
+        n.Binding(left=n.ValueId('x'), right=n.ValueId('y')),
+        n.Binding(left=n.TypeId('X'), right=n.ValueId('y')),
+        n.Binding(left=n.ValueId('x'), right=n.TypeId('Y')),
+        n.Binding(left=n.TypeId('X'), right=n.TypeId('Y')),
+    ])
+
+    result = parser.parse(given)
+
+    assert expected.exprs[0] == result.exprs[0]
+    assert expected.exprs[1] == result.exprs[1]
+    assert expected.exprs[2] == result.exprs[2]
+    assert expected.exprs[3] == result.exprs[3]
+    assert expected == result
+
+
 def test_parse_function_call(parser):
     given = maramodule('test', '''
         foo(10)
@@ -71,7 +95,6 @@ def test_parse_function_call(parser):
         x.foo {2 + 4 }
         x.foo 10 { 2 + 4 }
         x.foo(3, 5){2 + 4}
-
     ''')
 
     block = n.Block(
@@ -557,6 +580,9 @@ def test_definitions(parser):
             5
         }
         def bar(x, y Real) Float { 1000 * 0.9 }
+
+        def Int::foo ()
+        def Int::foo () {}
     ''')
 
     expected = n.Module(
@@ -616,7 +642,17 @@ def test_definitions(parser):
                         n.Real('0.9'),
                     ]),
                 ])
-            )
+            ),
+            n.Def(
+                name=n.Binding(left=n.TypeId('Int'), right=n.ValueId('foo')),
+                param=n.Tuple([]),
+                body=n.Unit(),
+            ),
+            n.Def(
+                name=n.Binding(left=n.TypeId('Int'), right=n.ValueId('foo')),
+                param=n.Tuple([]),
+                body=n.Block([]),
+            ),
         ],
     )
 
