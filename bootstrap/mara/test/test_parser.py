@@ -983,14 +983,8 @@ def test_parse_specifications(parser):
 
     assert expected == result
 
-@pytest.mark.xfail
+
 def test_name_resolution_program(parser, program_name_resolution):
     ast = parser.parse(program_name_resolution)
 
-    print ast
-
-    assert False
-
-@pytest.mark.xfail
-def test_always_fail():
-    raise Exception
+    assert ast is not None

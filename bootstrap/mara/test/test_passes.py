@@ -10,6 +10,8 @@ from .. import special
 from .. import passes
 from .. import scope
 
+from programs import program_name_resolution
+
 from test_lexer import lex_simple
 from test_parser import parser, maramodule
 
@@ -234,6 +236,15 @@ def test_type_check_infer(type_check):
         param_type=node.Tuple([node.AnyType()]),
         return_type=node.IntType(),
     )
+
+
+@pytest.skip
+def test_name_resolution_program(parser, collect_names, program_name_resolution):
+    ast = parser.parse(program_name_resolution)
+
+    ast.walk_down(collect_names)
+
+    assert False
 
 
 def test_type_check_return_fail(type_check):

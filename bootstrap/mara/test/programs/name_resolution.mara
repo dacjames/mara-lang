@@ -1,16 +1,22 @@
 module test
 
 object Point {
+    use Property
+
     val x Int
     val y Int
 }
 
+def Point::plus (that Point) {
+    etc
+}
+
 proto PlusTwo {
-    def plus (a Point, b Point) {
+    def minus (a Point, b Point) {
         etc
     }
 
-    def minus (a Point, b Point) {
+    def plus (a Point, b Point) {
         etc
     }
 
@@ -27,14 +33,14 @@ trait Pointy {
     def x () Int
     def y () Int
 
-    def plus (that This) {
+    def minus (that This) {
         Point.new (
             x: (this.x + that.x),
             y: (this.y + that.y),
         )
     }
 
-    def minus (that This) {
+    def plus (that This) {
         etc
     }
 
@@ -48,9 +54,7 @@ trait Pointy {
 
 }
 
-def Point::minus (that Point) {
-    etc
-}
+
 
 def Point::divide (that Point) {
     Point.new (x: this.x + that.x, y: this.x + that.x)
@@ -59,15 +63,27 @@ def Point::divide (that Point) {
 def test () {
 
     a = Point(Int).new (0, 0)
+    ###
+    Interface {
+        def test.Property.x(this Int)
+        def test.Property.y(this Int)
+
+        def test.Pointy.minus(a Int, Int)
+        def test.test.plus(a Int, b Int)
+        def test.PlusTwo.times(a Int, b Int)
+        def test.Point.div(this Int, that Point)
+    }
+    ###
+
     b = Point(Int).new (1, 1)
 
-    def minus(a Point, b Point) {
+    def plus(a Point, b Point) {
         Point.new (x: a.x - b.x, y: a.x - b.y)
     }
 
-    a + b   # Pointy.plus(a, b)
-    a - b   # minus(a, b)
-    a * b   # PlusTwo.divide(a, b)
+    a - b   # plus(a, b)
+    a + b   # Pointy.minus(a, b)
+    a * b   # PlusTwo.times(a, b)
     a / b   # Point::divide(a, b)
 }
 
