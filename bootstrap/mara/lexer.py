@@ -51,6 +51,10 @@ KEYWORDS = set(k.upper() for k in [
     'object', 'trait', 'proto',
 ])
 
+KEYSYMS = {
+    '::': 'BIND',
+}
+
 tokens = (
     'MODULE', 'END',
     'TERM',
@@ -68,7 +72,7 @@ tokens = (
 
     'INTD', 'INTX', 'INTP', 'REAL', 'SCI',
     'TRUE', 'FALSE',
-) + tuple(KEYWORDS)
+) + tuple(KEYWORDS) + tuple(KEYSYMS.values())
 
 states = (
     ('code', 'exclusive'),
@@ -278,6 +282,10 @@ WHITESPACE = re.compile(r'[ \t\r\n]')
 
 @TOKEN(r'{A}+|{B}({A}|{B})+'.format(A=SYMA, B=SYMB))
 def t_code_SID(tok):
+    value = tok.value
+    if value in KEYSYMS:
+        tok.type = KEYSYMS[value]
+
     return tok
 
 

@@ -34,7 +34,7 @@ def test_lex_wrappers(lex_simple):
 
 
 def test_lex_distinct_symbols(lex_simple):
-    given = r'module @ | & $ \ , . = + - ^ / * : end'
+    given = r'module @ | & $ \ , . = + - ^ / * : :: end'
     output = list(lex_simple(given))
     assert output == [
         ('MODULE', 'module'),
@@ -52,6 +52,7 @@ def test_lex_distinct_symbols(lex_simple):
         ('DIVIDE', '/'),
         ('TIMES', '*'),
         ('COLON', ':'),
+        ('BIND', '::'),
         ('END', 'end'),
     ]
 
