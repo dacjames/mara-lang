@@ -6,8 +6,7 @@ Mara is a new programming language designed to be fast, fun, and functional. The
 
     - Multiple dispatch
     - Pattern matching
-    - Objects (but no classes)
-    - Traits & Protocols
+    - Flexible, classless object system.
     - "Raw" native types
     - Hybrid memory management
     - Type inference
@@ -27,8 +26,8 @@ Below is a simple implimentation of a program like the unix `tree` utility.
     module main
     using 'core'
 
-    argv = depend 'sys.argv'
-    max_depth = depend 'tree.max_depth' { 20 }
+    argv = inject 'sys.argv'
+    max_depth = inject 'tree.max_depth' { 20 }
 
     path_arg = argv[0] else raise "I need a file!"
     path = path_arg.Path else raise
