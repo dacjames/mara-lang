@@ -10,7 +10,7 @@ Native types are anything that Mara can translate directly to LLVM bytecode type
 - `Uint(n)` unsigned, fixed width integers.  Supports any `n` accepted by LLVM.
 - `Float(n)` IEEE floating point numbers.  Support `n in [32, 64, 128]`.
 - `Chunk(n, T)` fixed size region of memory, mapped directly to a LLVM array.
-- `Struct(List((Symbol, Type)))`  contiguous group of fields, mapped directly to a LLVM struct.
+- `Struct((Symbol, Type)...)`  contiguous group of fields, mapped directly to a LLVM struct.
 - `Ptr(T)` pointer to a memory location.
 
 Because they are *untagged*, native types cannot be used for dynamic dispatch.
