@@ -10,8 +10,8 @@ Native types are anything that Mara can translate directly to LLVM bytecode type
 - `Uint(n)` unsigned, fixed width integers.  Supports any `n` accepted by LLVM.
 - `Float(n)` IEEE floating point numbers.  Support `n in [32, 64, 128]`.
 - `Chunk(n, T)` fixed size region of memory, mapped directly to a LLVM array.
-- `Struct`  contiguous group of fields, mapped directly to a LLVM struct.
-- `Ptr` pointer to a memory location.
+- `Struct(Type.List)`  contiguous group of fields, mapped directly to a LLVM struct.
+- `Ptr(T)` pointer to a memory location.
 
 Because they are *untagged*, native types cannot be used for dynamic dispatch.
 
@@ -26,7 +26,7 @@ Object types are the most commonly used types in mara programs.  `Array`, `File`
 
 ## Interface
 
-Interface types are the unit of abstraction in Mara and behave similar to interfaces in languages like Java or C++.  They allow objects to be referenced through an opaque reference which hides the underlying implementation.  For example, the `List` interface is implemented for `LinkedList`, `Array`, and `Deque` objects so functions defined for `List` can operate on all three objects using the same code.
+Interface types are the unit of abstraction in Mara and behave similar to interfaces in languages like Java or C++.  They allow objects to be manipulated through an opaque reference which hides the underlying implementation.  For example, the `List` interface is implemented for `LinkedList`, `Array`, and `Deque` objects so functions defined for `List` can operate on all three objects using the same code.
 
 Unlike traditional OO languages, Interfaces in Mara are not defined directly using an interface syntax.  Instead, interfaces are created in two ways: 1) traits define a unique interface and 2) the interface of an object is inferred by the set of functions defined for it when it is instantiated.
 
