@@ -1,8 +1,23 @@
 module order
 
-trait BiGram::Comparable {
+trait Comparable {
 
   def compare -> Int
+
+  def eq  { this.compare == 0 }
+  def neq { this.compare != 0 }
+  def gt  { this.compare >  0 }
+  def lt  { this.compare <  0 }
+  def lteq{ this.compare <= 0 }
+  def gteq{ this.compare >= 0 }
+}
+
+trait ComparePair(T, U) {
+  def _0 -> T
+  def _1 -> U
+
+  let a = ._0
+  let b = ._1
 
   compare = match
     as a < b then -1
@@ -18,30 +33,6 @@ trait BiGram::Comparable {
     as a > b then 1
     as a < b then -1
     else 0
-
-  def eq  { this.compare == 0 }
-  def neq { this.compare != 0 }
-  def gt  { this.compare >  0 }
-  def lt  { this.compare <  0 }
-  def lteq{ this.compare <= 0 }
-  def gteq{ this.compare >= 0 }
 }
-
-trait Comparable.Collection::Sort {
-
-    def quicksort This
-    def quicksort {
-        smaller, larger, equal = this.partition compare
-        smaller.self ++ equal ++ larger.self
-    }
-
-    def mergesort This
-    def mergesort { ... }
-}
-
-
-
-
-
 
 end

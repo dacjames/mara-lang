@@ -4,6 +4,7 @@ Symbols
 
 Mara defines the following symbols.  Notice that all but a few symbols are mapped to only one meaning regardless of context.
 
+```
 *-------*-----------*---------------------*
 | `+`   | `plus`    | Addition            |
 | `-`   | `minus`   | Subtraction         |
@@ -20,8 +21,11 @@ Mara defines the following symbols.  Notice that all but a few symbols are mappe
 | `++`  | `concat`  | Concatenate/Append  |
 | `--`  | `remove`  | Remove/Diference    |
 *-------*-----------*---------------------*
+```
 
 ## Declarations
+
+```
 *---------*-------------*
 | `def`   | Function    |
 | `val`   | Value       |
@@ -32,8 +36,11 @@ Mara defines the following symbols.  Notice that all but a few symbols are mappe
 | `object` | Object     |
 | `proto` | Protocol    |
 *---------*-------------*
+```
 
 ## Expression Keywords
+
+```
 *---------------*-----------------------*
 | `for` `in`          | Loop Exprs      |
 | `match` `as`        | Match Exprs     |
@@ -41,8 +48,11 @@ Mara defines the following symbols.  Notice that all but a few symbols are mappe
 | `if` `elif` `else`  | Conditionals    |
 | `do`                | Eval Exprs      |
 *---------------------*-----------------*
+```
 
 ## Operators
+
+```
 *-------*---------------*
 | `||`  |  boolean or   |
 | `&&`  |  boolean and  |
@@ -55,7 +65,7 @@ Mara defines the following symbols.  Notice that all but a few symbols are mappe
 | `~>>` | shift right   |
 | `~<<` | shift left    |
 *-------*---------------*
-
+```
 
 
 

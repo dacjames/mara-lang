@@ -37,7 +37,7 @@ Conceptually, a bound function is a function that is "attached" to an object.  T
     namespace Int.Instance {
         This = Int
         def plus (this This, other Int) Int {
-            using Int.Type
+            using Int
             etc
         }
     }
