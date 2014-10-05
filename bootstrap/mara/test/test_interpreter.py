@@ -227,15 +227,18 @@ def test_loop(interpreter):
             a < b
         }
 
+        def add (a, b) { a + b }
+
         var x = 10
         (x = x - 1) while x > 0
 
         if bool(x) {
             42
         } else {
-            var z = (10 * -1)
+            var z = (100 * -1)
+            var l = 1
             while lt(z, 0) {
-                z = z + 1
+                z = add(z, l)
             }
         }
 
