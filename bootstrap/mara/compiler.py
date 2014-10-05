@@ -114,7 +114,6 @@ class Compiler(object):
         bytecodes.append(('halt',))
         return bytecodes
 
-
     def emit(self, *instructions):
         self.block += instructions
 

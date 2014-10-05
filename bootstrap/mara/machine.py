@@ -105,11 +105,28 @@ class Machine(object):
         '''
         State of the machine after executing an instruction.
         '''
-        stack_view = []
+        base_stack = []
+        stack_fill = None
+
         for i, elem in enumerate(self._stack):
+            if elem is None:
+                if stack_fill is None:
+                    stack_fill = [i, i]
+                else:
+                    stack_fill[1] = i
+            else:
+                if stack_fill is not None:
+                    base_stack.append((None, stack_fill))
+                    stack_fill = None
+
+                base_stack.append((i, elem))
+
+        stack_view = []
+        for i, elem in base_stack:
             fp = 'fp:' if i == self._frame_ptr else ''
             sp = 'sp:' if i == self._stack_ptr else ''
-            stack_view.append(fp + sp + str(elem))
+            elem_str = 'NULL[' + '..'.join(str(e) for e in elem) + ']' if i is None else str(elem)
+            stack_view.append(fp + sp + elem_str)
 
         return '{pc}= {{{regs}}} [{stack}]'.format(
             pc=self._pc,
