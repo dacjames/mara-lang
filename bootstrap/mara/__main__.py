@@ -63,6 +63,8 @@ class MaraShell(object):
 
         self._interpreter = interpreter.Interpreter()
 
+        self._position = 0
+
     def _shell_out(self, cmd):
         output = subprocess.check_output(cmd)
         return output
@@ -80,7 +82,7 @@ class MaraShell(object):
             return self._shell_out(cmd)
 
 
-        module = 'module main\n{0}\nend'.format(src)
+        module = 'module main_{0}\n{1}\nend'.format(self._position, src)
         try:
             data = self._interpreter.evaluate(module)
         except:
@@ -98,14 +100,19 @@ class MaraShell(object):
         line = ''
 
         while True:
-            line = raw_input('~=> ')
-            
-            src = self.read(line)
-            data = self.eval(src)
+            try:
+                line = raw_input('~=> ')
+                src = self.read(line)
+                data = self.eval(src)
+                
+            except EOFError:
+                data = special.HALT
+
             result = self.print_(data)
-            
             if result is special.HALT:
                 break
+
+            self._position += 1
 
 
 if __name__ == '__main__':

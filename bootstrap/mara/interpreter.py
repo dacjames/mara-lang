@@ -40,10 +40,10 @@ class Interpreter(object):
         bytecode = self.compiler.compile(ast, pool)
         result = self.compiler.result()
 
-        for code in bytecode:
-            print code
+        for i, code in enumerate(bytecode):
+            print '{0}:\t{1}'.format(i, code)
 
-        self.machine._load(bytecode, pool)
-        self.machine._loop()
+        start = self.machine._load(bytecode, pool)
+        self.machine._loop(start)
 
         return self.machine._regs[result]
