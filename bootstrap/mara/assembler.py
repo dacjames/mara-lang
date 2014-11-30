@@ -29,7 +29,6 @@ class Assembler(object):
 
             newcode.append(result)
 
-        print newcode
         return newcode
 
     def jump(self, op, label):
