@@ -61,15 +61,16 @@ class MaraCompleter(object):
 
 class Interpreter(object):
 
-    def __init__(self, buffered=False, traced=False, history=True):
+    def __init__(self, buffered=False, traced=False, shell=False, history=True):
         self.compiler = Compiler()
         self.parser = Parser()
         self.machine = Machine(buffered=buffered, traced=traced)
         self.completer = MaraCompleter()
 
-        self.mara_dir = os.path.join(os.path.expanduser("~"), '.mara')
-        if not os.path.exists(self.mara_dir):
-            os.mkdir(self.mara_dir)
+        if shell:
+            self.mara_dir = os.path.join(os.path.expanduser("~"), '.mara')
+            if not os.path.exists(self.mara_dir):
+                os.mkdir(self.mara_dir)
 
         if history:
             self.history_filename = os.path.join(self.mara_dir, "history.txt")
@@ -92,10 +93,6 @@ class Interpreter(object):
 
     def on_exit(self):
         readline.write_history_file(self.history_filename)
-
-    def eval_shell(self, cmd):
-        output = subprocess.check_output(cmd)
-        return output
 
     def eval_mara(self, line, type_check=False):
         module = 'module main_{0}\n{1}\nend'.format(self.position, line)

@@ -1,5 +1,5 @@
 import interpreter
 
 
-shell = interpreter.Interpreter()
+shell = interpreter.Interpreter(shell=True)
 shell.loop()
