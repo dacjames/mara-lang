@@ -108,8 +108,8 @@ class Compiler(object):
         try:
             bytecodes = self.visit(ast)
         except CompileError:
-            for code in self.block:
-                print code
+            for i, code in enumerate(self.block):
+                print i, ':', code
             raise
         bytecodes.append(('halt',))
         return bytecodes

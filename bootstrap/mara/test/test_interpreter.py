@@ -248,6 +248,18 @@ def test_loop(interpreter):
 
     assert result == 0
 
+def test_evaluate_twice(interpreter):
+    given = maramodule('test', '''
+        val x = 10
+        x * 2
+    ''')
+
+    result_0 = interpreter.evaluate(given)
+    result_1 = interpreter.evaluate(given)
+
+    assert result_0 == result_1
+    assert result_0 == 20
+
 
 @pytest.mark.skipif(True, reason='slowness')
 def test_benchmark(interpreter):

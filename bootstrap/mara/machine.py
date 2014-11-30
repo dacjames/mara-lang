@@ -89,8 +89,11 @@ class Machine(object):
     ##########################################################################
 
     def _load(self, code, constant_pool=None):
+        start = len(self._code)
         self._code = self._assembler.assemble(code)
         self._pool = constant_pool
+
+        return start
 
     def _describe(self):
         '''
@@ -134,7 +137,7 @@ class Machine(object):
             stack=', '.join(stack_view),
         )
 
-    def _loop(self):
+    def _loop(self, start):
         '''
         Main Interpretor Loop.
         '''
@@ -142,6 +145,7 @@ class Machine(object):
             return
 
         end = len(self._code)
+        self._pc = start
         # iterations = 0
 
         while self._pc < end:
