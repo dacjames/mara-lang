@@ -6,6 +6,7 @@ Mara Dynamic Interpreter
 import readline
 import subprocess
 import traceback
+import os
 
 import mara.special as special
 import mara.passes as passes
@@ -60,18 +61,37 @@ class MaraCompleter(object):
 
 class Interpreter(object):
 
-    def __init__(self, buffered=False, traced=False):
+    def __init__(self, buffered=False, traced=False, history=True):
         self.compiler = Compiler()
         self.parser = Parser()
         self.machine = Machine(buffered=buffered, traced=traced)
-
         self.completer = MaraCompleter()
-        readline.set_completer(self.completer)
-        readline.parse_and_bind('tab: complete')
+
+        self.mara_dir = os.path.join(os.path.expanduser("~"), '.mara')
+        if not os.path.exists(self.mara_dir):
+            os.mkdir(self.mara_dir)
+
+        if history:
+            self.history_filename = os.path.join(self.mara_dir, "history.txt")
 
         self.isbuffered = buffered
         self.istraced = traced
         self.position = 0
+
+        self.init_readline()
+
+    def init_readline(self):
+        readline.set_completer(self.completer)
+        readline.parse_and_bind('tab: complete')
+
+        if getattr(self, 'history_filename', None):
+            try:
+                readline.read_history_file(self.history_filename)
+            except IOError:
+                pass
+
+    def on_exit(self):
+        readline.write_history_file(self.history_filename)
 
     def eval_shell(self, cmd):
         output = subprocess.check_output(cmd)
@@ -150,6 +170,7 @@ class Interpreter(object):
             result = self.print_(data)
 
             if result is special.HALT:
+                self.on_exit()
                 break
 
             self.position += 1
